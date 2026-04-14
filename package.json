@@ -10,7 +10,9 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "deploy": "npx expo export -p web && wrangler deploy",
+    "preview": "npx expo export -p web && wrangler dev"
   },
   "jest": {
     "preset": "jest-expo"
@@ -88,7 +90,8 @@
     "patch-package": "^8.0.1",
     "react-test-renderer": "18.3.1",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "wrangler": "^4.82.2"
   },
   "private": true,
   "overrides": {
