@@ -61,9 +61,14 @@ async function fetchPlayableUri(text: string, langcode: string, meta?: TtsMeta):
     // because the browser can't send custom headers so ngrok serves its HTML
     // interstitial instead of the MP3. Fetch the binary ourselves and return
     // a same-origin blob URL instead.
-    const audioRes = await fetch(audioUrl, {
+    const proxiedUrl = (() => {
+      try { return new URL(audioUrl).pathname; } catch { return audioUrl; }
+    })();
+
+    const audioRes = await fetch(proxiedUrl, {
       headers: { 'ngrok-skip-browser-warning': '1' },
     });
+
     if (!audioRes.ok) throw new Error(`Audio fetch ${audioRes.status}`);
     const audioBuf = await audioRes.arrayBuffer();
     return URL.createObjectURL(new Blob([audioBuf], { type: 'audio/mpeg' }));
