@@ -10,11 +10,6 @@ import { Navbar } from '../../components/layout/Navbar';
 import ContactModal from '../../components/layout/ContactModal';
 import CookieBanner from '../../components/layout/CookieBanner';
 
-// Module-level: survives component remounts when the user changes langcode.
-// Tracks for which user.id we already applied the preferred-language redirect,
-// so we never redirect again after the user manually switches language.
-let preferredLangAppliedForUserId: string | null = null;
-
 export default function LangcodeLayout() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const languages = useLanguageStore((s) => s.languages);
@@ -35,6 +30,8 @@ export default function LangcodeLayout() {
   // Auth state for logout redirect
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
+  const isNewLogin = useAuthStore((s) => s.isNewLogin);
+  const clearNewLogin = useAuthStore((s) => s.clearNewLogin);
 
   // ── Guard: no navegar hasta que el Root Layout esté montado ──────────────
   // router.replace() llamado en el primer render (o síncrono con él) lanza
@@ -73,14 +70,13 @@ export default function LangcodeLayout() {
     }
   }, [ready, user, isAuthLoading, langcode, segments]);
 
-  // Redirect to the user's preferred language on login / session restore.
-  // The module-level variable (not a useRef) ensures the check survives remounts
-  // when the user manually changes langcode — so we never override a manual choice.
+  // Redirect to the user's preferred language only on a fresh login.
+  // isNewLogin is true after signIn/signUp/signInWithGoogle and false after restore(),
+  // so page reloads with an existing session never trigger this redirect.
   useEffect(() => {
     if (!ready || !user || languages.length === 0) return;
-    if (preferredLangAppliedForUserId === user.id) return; // Already applied for this user
-
-    preferredLangAppliedForUserId = user.id;
+    if (!isNewLogin) return;
+    clearNewLogin();
 
     const preferredLang = user.preferredLanguage;
     if (!preferredLang || preferredLang === langcode) return;
@@ -91,12 +87,8 @@ export default function LangcodeLayout() {
     setLanguageByCode(preferredLang);
     const restPath = segments.slice(1).join('/');
     router.replace(`/${preferredLang}/${restPath}` as any);
+  // isNewLogin intentionally omitted from deps — read as current value when user/languages change
   }, [ready, user?.id, languages]);
-
-  // Reset on logout so the redirect applies again on next login.
-  useEffect(() => {
-    if (!user) preferredLangAppliedForUserId = null;
-  }, [user?.id]);
 
   return (
     <View style={{ flex: 1 }}>

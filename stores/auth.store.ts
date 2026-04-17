@@ -10,6 +10,7 @@ interface AuthState {
   session: AuthSession | null;
   user: User | null;
   isLoading: boolean;
+  isNewLogin: boolean;
   error: string | null;
   pendingAuthModal: 'login' | 'register' | null;
   contactModalOpen: boolean;
@@ -21,6 +22,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   restore: () => Promise<void>;
   clearError: () => void;
+  clearNewLogin: () => void;
   openAuthModal: (mode: 'login' | 'register') => void;
   closeAuthModal: () => void;
   openContactModal: () => void;
@@ -32,6 +34,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   user: null,
   isLoading: false,
+  isNewLogin: false,
   error: null,
   pendingAuthModal: null,
   contactModalOpen: false,
@@ -40,7 +43,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await login(credentials);
-      set({ session, user: session.user, isLoading: false });
+      set({ session, user: session.user, isLoading: false, isNewLogin: true });
       inactivityTracker.start(() => {
         get().signOut();
       });
@@ -53,7 +56,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await register(data);
-      set({ session, user: session.user, isLoading: false });
+      set({ session, user: session.user, isLoading: false, isNewLogin: true });
       inactivityTracker.start(() => {
         get().signOut();
       });
@@ -67,7 +70,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { loginWithGoogle } = await import('../services/auth.service');
       const session = await loginWithGoogle(googleAccessToken, role);
-      set({ session, user: session.user, isLoading: false });
+      set({ session, user: session.user, isLoading: false, isNewLogin: true });
       inactivityTracker.start(() => { get().signOut(); });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Google sign-in failed' });
@@ -85,7 +88,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const session = await restoreSession();
       if (session) {
-        set({ session, user: session.user });
+        set({ session, user: session.user, isNewLogin: false });
         inactivityTracker.start(() => {
           get().signOut();
         });
@@ -98,6 +101,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+  clearNewLogin: () => set({ isNewLogin: false }),
   openAuthModal: (mode) => set({ pendingAuthModal: mode }),
   closeAuthModal: () => set({ pendingAuthModal: null }),
   openContactModal: () => set({ contactModalOpen: true }),
