@@ -5,8 +5,9 @@ import { forwardRef } from 'react';
 import { ScrollView, ScrollViewProps } from 'react-native';
 
 export const PageScrollView = forwardRef<ScrollView, ScrollViewProps>(
-  (props, ref) => (
+    ({ style, ...props }, ref) => (
     <ScrollView
+      style={[{ flex: 1, minHeight: 0 }, style]}
       ref={ref}
       {...props}
       bounces={false}

@@ -11,6 +11,6 @@
 import { Platform } from 'react-native';
 
 export const webFullHeight =
-  Platform.OS === 'web'
-    ? ({ height: '100dvh' as any, overflow: 'hidden' as any })
-    : {};
+    Platform.OS === 'web'
+        ? ({ overflow: 'hidden' as any, minHeight: 0 as any })
+        : {};

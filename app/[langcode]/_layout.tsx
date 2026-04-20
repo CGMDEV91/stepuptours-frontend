@@ -91,9 +91,9 @@ export default function LangcodeLayout() {
   }, [ready, user?.id, languages]);
 
   return (
-    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, minHeight: 0 }}>
       <Navbar onOpenAuth={(mode) => openAuthModal(mode)} />
-      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, minHeight: 0 }}>
         <Slot />
       </View>
       <AuthModals

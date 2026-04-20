@@ -7,10 +7,11 @@ import { FlatList, FlatListProps } from 'react-native';
 type Props<T> = FlatListProps<T> & { innerRef?: React.Ref<FlatList<T>> };
 
 export function PageFlatList<T>(props: Props<T>) {
-  const { innerRef, ...rest } = props;
+  const { innerRef, style, ...rest } = props;
   return (
     <FlatList
       ref={innerRef}
+      style={[{ flex: 1, minHeight: 0 }, style]}
       {...rest}
       bounces={false}
       alwaysBounceVertical={false}
