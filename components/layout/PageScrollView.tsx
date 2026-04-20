@@ -1,22 +1,25 @@
 // components/layout/PageScrollView.tsx
-// Page-level ScrollView wrapper that locks bounce/overscroll/inset behaviour
-// so pages hosting the Footer never allow scrolling past the last element.
 import { forwardRef } from 'react';
-import { ScrollView, ScrollViewProps } from 'react-native';
+import { ScrollView, ScrollViewProps, Platform } from 'react-native';
 
 export const PageScrollView = forwardRef<ScrollView, ScrollViewProps>(
-    ({ style, ...props }, ref) => (
-    <ScrollView
-      style={[{ flex: 1, minHeight: 0 }, style]}
-      ref={ref}
-      {...props}
-      bounces={false}
-      alwaysBounceVertical={false}
-      overScrollMode="never"
-      automaticallyAdjustContentInsets={false}
-      contentInsetAdjustmentBehavior="never"
-    />
-  )
+    ({ style, contentContainerStyle, ...props }, ref) => (
+        <ScrollView
+            style={[{ flex: 1, minHeight: 0 }, style]}
+            contentContainerStyle={[{ flexGrow: 1 }, contentContainerStyle]}
+            ref={ref}
+            {...props}
+            bounces={false}
+            alwaysBounceVertical={false}
+            overScrollMode="never"
+            automaticallyAdjustContentInsets={false}
+            contentInsetAdjustmentBehavior="never"
+            scrollIndicatorInsets={{ right: 1 }}
+            {...(Platform.OS === 'web' && {
+                // @ts-ignore
+                style: [{ flex: 1, minHeight: 0, WebkitOverflowScrolling: 'auto' }, style],
+            })}
+        />
+    )
 );
-
 PageScrollView.displayName = 'PageScrollView';

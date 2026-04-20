@@ -29,23 +29,6 @@ body {
   overscroll-behavior: none;
 }
 
-/* Defensive: ensure no nested scroll container leaks elastic overscroll up
-   to its parent (iOS Safari rubber-band, Android 12+ stretch). */
-* {
-  overscroll-behavior: contain;
-}
-
-/* ── Scroll over interactive elements ───────────────────────────────────────
-   React Native Web sets touch-action: none on all Touchable components
-   (TouchableOpacity, Pressable → role="button"). This blocks trackpad/
-   precision-touchpad vertical scroll when the pointer is over a button.
-   Restoring pan-y allows scroll while keeping tap/click working normally.
-   The !important on the role selector is required to beat RN Web's inline
-   style specificity (1000). Scoped to role="button"/"link" to avoid
-   breaking horizontal scroll containers (FlatList etc.) which lack that role. */
-* {
-  touch-action: pan-y;
-}
 [role="button"],
 [role="link"] {
   touch-action: pan-y !important;
