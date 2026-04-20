@@ -7,6 +7,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { useLanguageStore } from "../stores/language.store";
 import { useFonts } from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
+import { View, Platform } from 'react-native';
 
 // ── Scroll overlay (solo web) ─────────────────────────────────────────────
 function setupScrollBehavior() {
@@ -109,9 +110,11 @@ export default function RootLayout() {
 
 
   return (
-    <>
-      <Stack screenOptions={{ headerShown: false }} />
-      <PortalHost />
-    </>
+      <>
+        <View style={Platform.OS === 'web' ? { flex: 1, height: '100%' } : { flex: 1 }}>
+          <Stack screenOptions={{ headerShown: false }} />
+        </View>
+        <PortalHost />
+      </>
   );
 }
