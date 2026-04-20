@@ -5,6 +5,17 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 
 ---
 
+## BUG-003 — All pages allow scroll past Footer into empty white space on iOS Safari and Chrome Android
+
+**Status:** Fixed
+**Date:** 2026-04-20
+**Symptom:** On any page of the app (mobile web, `stepuptours.pages.dev`), scrolling to the bottom revealed the Footer correctly but allowed the user to keep scrolling into blank white space below it. Reproduced on real iOS Safari and Chrome Android; not reproducible in desktop DevTools mobile simulation.
+**Root cause:** Two compounding causes: (1) `#root { position: fixed }` in `global.css` removed `#root` from the document flow, leaving `body` technically empty — iOS Safari then ignored `overflow: hidden` on `body` and allowed elastic document-level scroll regardless of inner `overflow: hidden` containers. (2) `setupScrollBehavior` in `app/_layout.tsx` appended `position: absolute` thumb divs as children of every scroll container; WebKit incorrectly includes absolutely-positioned children in `scrollHeight` calculations, extending the scrollable area beyond the Footer.
+**Fix:** Removed `position: fixed` (and `top/left/width`) from `#root` in `global.css` so it participates in normal document flow. Removed `setupScrollBehavior` entirely from `app/_layout.tsx` — the decorative custom scrollbar was the direct cause of the inflated `scrollHeight` on Safari.
+**Files:** `global.css`, `app/_layout.tsx`
+
+---
+
 ## BUG-001 — preferredLanguage redirect fires on every page reload
 
 **Status:** Fixed

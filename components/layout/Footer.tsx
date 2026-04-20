@@ -27,6 +27,7 @@ export default function Footer() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { width } = useWindowDimensions();
   const openContactModal = useAuthStore((s) => s.openContactModal);
+  const user = useAuthStore((s) => s.user);
   const isDesktop = width >= 768;
 
   const lang = langcode ?? 'en';
@@ -97,8 +98,12 @@ export default function Footer() {
           </View>
           <FooterLink label={t('footer.home')}             onPress={() => navigate(`/${lang}`)} />
           <FooterLink label={t('nav.ranking')}             onPress={() => navigate(`/${lang}/ranking`)} />
-          <FooterLink label={t('nav.favourites')}          onPress={() => navigate(`/${lang}/favourites`)} />
-          <FooterLink label={t('nav.completed')}           onPress={() => navigate(`/${lang}/completed`)} />
+          {user && (
+            <>
+              <FooterLink label={t('nav.favourites')}      onPress={() => navigate(`/${lang}/favourites`)} />
+              <FooterLink label={t('nav.completed')}       onPress={() => navigate(`/${lang}/completed`)} />
+            </>
+          )}
         </View>
 
         {/* Col 3 — Legal */}

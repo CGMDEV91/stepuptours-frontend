@@ -620,7 +620,8 @@ export default function HomePage() {
                 alignSelf: 'center',
                 width: '100%',
                 paddingHorizontal: PADDING,
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
+                gap: GAP,
                 paddingBottom: 10,
               }
             : undefined
