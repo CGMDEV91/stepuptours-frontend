@@ -4,7 +4,6 @@ import { useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
-  FlatList,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
@@ -26,6 +25,7 @@ import { TourCard } from '../../../components/tour/TourCard';
 import { Ionicons } from '@expo/vector-icons';
 import type { TourFilters } from '../../../types';
 import Footer from '../../../components/layout/Footer';
+import { PageFlatList } from '../../../components/layout/PageFlatList';
 const AMBER = '#F59E0B';
 
 const HERO_IMAGE =
@@ -607,13 +607,11 @@ export default function HomePage() {
 
   return (
     <View style={styles.root}>
-      <FlatList
+      <PageFlatList
         data={tours}
         keyExtractor={(item) => item.id}
         numColumns={cols}
         key={`grid-${cols}`}
-        bounces={false}
-        overScrollMode="never"
         columnWrapperStyle={
           cols > 1
             ? {
@@ -626,7 +624,10 @@ export default function HomePage() {
               }
             : undefined
         }
-        contentContainerStyle={{ flexGrow: 1, paddingTop: 0, paddingBottom: 0 }}
+        contentContainerStyle={[
+          { paddingTop: 0, paddingBottom: 0 },
+          tours.length === 0 && { flexGrow: 1 },
+        ]}
         onEndReached={loadMore}
         onEndReachedThreshold={0.3}
         refreshControl={

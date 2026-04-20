@@ -6,7 +6,6 @@ import {
   View,
   Text,
   TextInput,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
@@ -27,6 +26,7 @@ import { getUserTourActivities } from '../../services/tours.service';
 import { updatePassword } from '../../services/user.service';
 import BackButton from '../../components/layout/BackButton';
 import Footer from '../../components/layout/Footer';
+import { PageScrollView } from '../../components/layout/PageScrollView';
 import type { TourActivity } from '../../types';
 
 const AMBER = '#F59E0B';
@@ -360,11 +360,9 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.root}>
-      <ScrollView
+      <PageScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
-        bounces={false}
-        overScrollMode="never"
       >
         {/* ── Dark navy profile banner ── */}
         <View style={styles.profileBanner}>
@@ -504,7 +502,7 @@ export default function ProfileScreen() {
           </View>
         </View>
         <Footer />
-      </ScrollView>
+      </PageScrollView>
 
       <Picker
         visible={langPickerVisible}

@@ -24,6 +24,7 @@ import { PaymentDataTab } from '../../components/dashboard/PaymentDataTab';
 import { DonationsTab } from '../../components/dashboard/DonationsTab';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
+import { PageScrollView } from '../../components/layout/PageScrollView';
 
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
@@ -202,7 +203,7 @@ export default function DashboardScreen() {
     <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}) }}>
       {isMobile ? (
         // ── Mobile: banner + tabs + contenido en scroll único ────────────
-        <ScrollView
+        <PageScrollView
           ref={scrollRef}
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 0 }}
@@ -217,12 +218,12 @@ export default function DashboardScreen() {
             {activeTab === 'donations' && <DonationsTab userId={user.id} />}
           </View>
           <Footer />
-        </ScrollView>
+        </PageScrollView>
       ) : (
         // ── Desktop: pills sticky + contenido en scroll ───────────────────
         <>
           {desktopTabBar}
-          <ScrollView
+          <PageScrollView
             ref={scrollRef}
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingBottom: 0 }}
@@ -236,7 +237,7 @@ export default function DashboardScreen() {
               {activeTab === 'donations' && <DonationsTab userId={user.id} />}
             </View>
             <Footer />
-          </ScrollView>
+          </PageScrollView>
         </>
       )}
 

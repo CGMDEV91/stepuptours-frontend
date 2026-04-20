@@ -5,6 +5,7 @@ import {
   drupalGet,
   drupalGetRaw,
   drupalGetJsonApi,
+  drupalGetJsonApiBase,
   drupalPost,
   drupalPatch,
   buildFilters,
@@ -134,37 +135,31 @@ async function batchGetStepCounts(tourIds: string[]): Promise<Record<string, num
   const { cached, missing } = getCachedStepCounts(tourIds);
   if (missing.length === 0) return cached;
 
-  const filterParts = missing.map(
-    (id, i) =>
-      `filter[tid][condition][path]=field_tour.id` +
-      `&filter[tid][condition][operator]=IN` +
-      `&filter[tid][condition][value][${i}]=${id}`
+  // One parallel call per tour — identical filter to getTourById (proven to work).
+  // A single batch IN-filter was unreliable: Drupal JSON:API returned 0 for some
+  // tours even when steps existed, likely due to how the IN condition is parsed
+  // server-side. Parallel individual calls are guaranteed correct.
+  const results = await Promise.allSettled(
+    missing.map(async (id) => {
+      const steps = await drupalGetJsonApi(
+        '/node/tour_step',
+        `filter[field_tour.id]=${id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
+      );
+      return { id, count: Array.isArray(steps) ? steps.length : 0 };
+    })
   );
 
-  const params = [
-    filterParts.join('&'),
-    'filter[status]=1',
-    'fields[node--tour_step]=field_tour',
-    'page[limit]=500',
-  ].join('&');
-
-  try {
-    const { data } = await drupalGetRaw('/node/tour_step', params);
-    const steps = Array.isArray(data) ? data : data ? [data] : [];
-
-    const fetched: Record<string, number> = {};
-    // Initialise to 0 for every missing ID so tours with no steps are also cached
-    for (const id of missing) fetched[id] = 0;
-    for (const step of steps) {
-      const tourId = (step as any).field_tour?.id;
-      if (tourId) fetched[tourId] = (fetched[tourId] ?? 0) + 1;
+  const fetched: Record<string, number> = {};
+  for (const id of missing) fetched[id] = 0;
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      fetched[result.value.id] = result.value.count;
     }
-
-    setCachedStepCounts(fetched);
-    return { ...cached, ...fetched };
-  } catch {
-    return cached; // Return whatever we had cached on error
+    // 'rejected' leaves the tour at 0 — not cached, so it retries on next fetch
   }
+
+  setCachedStepCounts(fetched);
+  return { ...cached, ...fetched };
 }
 
 // ── Obtener listado de tours ───────────────────────────────────────────────────
@@ -220,11 +215,12 @@ export async function getTourById(id: string): Promise<Tour> {
   const tour = mapDrupalTour(raw);
 
   try {
-    const stepsRes = await drupalGetRaw(
+    // Use base URL (no language prefix) so the count includes all published steps
+    // regardless of whether they have a translation in the current language.
+    const steps = await drupalGetJsonApiBase(
       '/node/tour_step',
       `filter[field_tour.id]=${raw.id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
     );
-    const steps = Array.isArray(stepsRes.data) ? stepsRes.data : stepsRes.data ? [stepsRes.data] : [];
     tour.stopsCount = steps.length;
   } catch {
     tour.stopsCount = 0;

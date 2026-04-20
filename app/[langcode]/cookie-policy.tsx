@@ -5,20 +5,20 @@ import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
+import { PageScrollView } from '../../components/layout/PageScrollView';
 
 export default function CookiePolicyScreen() {
   const { t } = useTranslation();
 
   return (
     <View style={styles.root}>
-      <ScrollView
+      <PageScrollView
         contentContainerStyle={styles.scrollContent}
       >
         <PageBanner icon="document-text" iconBgColor="#6366F1" title={t('legal.cookiePolicy')} />
@@ -155,7 +155,7 @@ export default function CookiePolicyScreen() {
 
         </View>
         <Footer />
-      </ScrollView>
+      </PageScrollView>
     </View>
   );
 }

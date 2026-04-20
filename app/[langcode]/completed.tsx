@@ -5,7 +5,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
@@ -20,6 +19,7 @@ import type { ActivityWithTour } from '../../services/tours.service';
 import { TourCard } from '../../components/tour/TourCard';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
+import { PageFlatList } from '../../components/layout/PageFlatList';
 
 const AMBER = '#F59E0B';
 
@@ -117,13 +117,11 @@ export default function CompletedScreen() {
 
   // ── Main render ────────────────────────────────────────────────────────────
   return (
-    <FlatList
+    <PageFlatList
       data={items}
       keyExtractor={(item) => item.activity.tourId}
       numColumns={cols}
       key={`completed-grid-${cols}`}
-      bounces={false}
-      overScrollMode="never"
       ListHeaderComponent={
         <View>
           <PageBanner

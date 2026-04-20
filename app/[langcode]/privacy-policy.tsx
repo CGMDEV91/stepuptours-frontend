@@ -5,13 +5,13 @@ import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
+import { PageScrollView } from '../../components/layout/PageScrollView';
 
 const AMBER = '#F59E0B';
 
@@ -20,7 +20,7 @@ export default function PrivacyPolicyScreen() {
 
   return (
     <View style={styles.root}>
-      <ScrollView
+      <PageScrollView
         contentContainerStyle={styles.scrollContent}
       >
         <PageBanner icon="shield-checkmark" iconBgColor="#10B981" title={t('legal.privacyPolicy')} />
@@ -236,7 +236,7 @@ export default function PrivacyPolicyScreen() {
 
         </View>
         <Footer />
-      </ScrollView>
+      </PageScrollView>
     </View>
   );
 }

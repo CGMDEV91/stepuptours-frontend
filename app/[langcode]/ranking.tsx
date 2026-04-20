@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   ActivityIndicator,
   StyleSheet,
   useWindowDimensions,
@@ -18,6 +17,7 @@ import CountryFlag from 'react-native-country-flag';
 import { getRanking } from '../../services/ranking.service';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
+import { PageScrollView } from '../../components/layout/PageScrollView';
 import type { RankingEntry } from '../../types';
 
 const AMBER = '#F59E0B';
@@ -211,11 +211,9 @@ export default function RankingScreen() {
   };
 
   return (
-    <ScrollView
+    <PageScrollView
       style={styles.root}
       contentContainerStyle={styles.scrollContent}
-      bounces={false}
-      overScrollMode="never"
     >
       <PageBanner
         icon="trophy"
@@ -237,7 +235,7 @@ export default function RankingScreen() {
         {renderContent()}
       </View>
       <Footer />
-    </ScrollView>
+    </PageScrollView>
   );
 }
 

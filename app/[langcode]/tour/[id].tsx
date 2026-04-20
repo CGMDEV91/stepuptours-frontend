@@ -5,7 +5,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   Modal,
@@ -25,6 +24,7 @@ import { BusinessCard } from '../../../components/tour/BusinessCard';
 import { HtmlText } from '../../../components/ui/HtmlText';
 import BackButton from '../../../components/layout/BackButton';
 import Footer from '../../../components/layout/Footer';
+import { PageScrollView } from '../../../components/layout/PageScrollView';
 import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
 
@@ -188,11 +188,9 @@ export default function TourDetailScreen() {
 
   return (
     <View style={styles.screen}>
-      <ScrollView
+      <PageScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        bounces={false}
-        overScrollMode="never"
       >
         {/* Banner */}
         <View style={styles.bannerContainer}>
@@ -293,7 +291,7 @@ export default function TourDetailScreen() {
           </View>
         </View>
         <Footer />
-      </ScrollView>
+      </PageScrollView>
 
       {/* Rating modal */}
       <Modal

@@ -235,6 +235,20 @@ export async function drupalGetJsonApi(
   return response.data?.data ?? [];
 }
 
+/**
+ * Like drupalGetJsonApi but always uses the base (non-language-prefixed) URL.
+ * Use this for queries where content count/existence must not depend on whether
+ * a translation exists — e.g. counting tour steps.
+ */
+export async function drupalGetJsonApiBase(
+  endpoint: string,
+  params?: string,
+): Promise<any[]> {
+  const url = params ? `${endpoint}?${params}` : endpoint;
+  const response = await drupalClientBase.get(url);
+  return response.data?.data ?? [];
+}
+
 export async function drupalPost<T>(endpoint: string, body: object): Promise<T> {
   const response = await drupalClient.post(endpoint, body);
   return deserializer.deserialize(response.data) as T;
