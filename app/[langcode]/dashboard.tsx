@@ -200,7 +200,7 @@ export default function DashboardScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...webFullHeight }}>
+    <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
         // ── Mobile: banner + tabs + contenido en scroll único ────────────
         <PageScrollView

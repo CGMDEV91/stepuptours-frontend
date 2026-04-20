@@ -530,7 +530,7 @@ export default function CreateBusinessScreen() {
           animationType="slide"
           onRequestClose={() => setCategoryPickerVisible(false)}
         >
-          <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+          <View style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalHeaderTitle}>Category</Text>
               <TouchableOpacity
@@ -585,7 +585,7 @@ export default function CreateBusinessScreen() {
           animationType="slide"
           onRequestClose={() => setLangPickerVisible(false)}
         >
-          <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+          <View style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalHeaderTitle}>
                 {t('createBusiness.field.language', 'Language')}

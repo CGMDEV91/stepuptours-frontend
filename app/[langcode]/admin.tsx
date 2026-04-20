@@ -187,7 +187,7 @@ export default function AdminScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...webFullHeight }}>
+    <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
         <ScrollView
           ref={scrollRef}

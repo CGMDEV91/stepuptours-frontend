@@ -206,7 +206,7 @@ export function SubscriptionTab({ userId, onScrollTop }: SubscriptionTabProps) {
       </View>
 
       <View style={styles.renewalRow}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, minHeight: 0 }}>
           <Text style={styles.renewalLabel}>{t('dashboard.subscription.autoRenewal')}</Text>
           <Text style={styles.renewalSub}>
             {subscription.autoRenewal
@@ -334,7 +334,7 @@ function NoSubscriptionView({ onSubscribed, userId }: NoSubscriptionViewProps) {
                   activeOpacity={0.8}
                 >
                   <View style={styles.planPickerRow}>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, minHeight: 0 }}>
                       <Text style={styles.planPickerName}>{plan.title}</Text>
                       <Text style={styles.planPickerCycle}>{cycleLabel(plan.billingCycle, t)}</Text>
                     </View>
