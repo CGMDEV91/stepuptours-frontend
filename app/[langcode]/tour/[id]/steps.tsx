@@ -28,6 +28,7 @@ import { CompletionPopup } from '../../../../components/tour/CompletionPopup';
 import { TourOnboardingModal, ONBOARDING_STORAGE_KEY } from '../../../../components/tour/TourOnboardingModal';
 import BackButton from '../../../../components/layout/BackButton';
 import { CONTENT_MAX_WIDTH } from '../../../../styles/theme';
+import { webFullHeight } from '../../../../lib/web-styles';
 
 const AMBER = '#F59E0B';
 
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}),
+    ...webFullHeight,
   },
   loadingContainer: {
     flex: 1,

@@ -11,7 +11,6 @@ import {
   StyleSheet,
   useWindowDimensions,
   Animated,
-  Platform,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +21,7 @@ import { TranslationsTab } from '../../components/admin/TranslationsTab';
 import { DonationsView } from '../../components/shared/DonationsView';
 import { BusinessTab } from '../../components/dashboard/BusinessTab';
 import PageBanner from '../../components/layout/PageBanner';
+import { webFullHeight } from '../../lib/web-styles';
 
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
@@ -187,7 +187,7 @@ export default function AdminScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}) }}>
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
         <ScrollView
           ref={scrollRef}

@@ -26,6 +26,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { TourFilters } from '../../../types';
 import Footer from '../../../components/layout/Footer';
 import { PageFlatList } from '../../../components/layout/PageFlatList';
+import { webFullHeight } from '../../../lib/web-styles';
 const AMBER = '#F59E0B';
 
 const HERO_IMAGE =
@@ -769,7 +770,7 @@ export default function HomePage() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#FFFFFF', ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}) },
+  root: { flex: 1, backgroundColor: '#FFFFFF', ...webFullHeight },
 
   btnPrimary: { backgroundColor: AMBER, paddingHorizontal: 20, paddingVertical: 9, borderRadius: 20 },
   btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },

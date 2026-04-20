@@ -11,7 +11,6 @@ import {
   StyleSheet,
   useWindowDimensions,
   Animated,
-  Platform,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +24,7 @@ import { DonationsTab } from '../../components/dashboard/DonationsTab';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
+import { webFullHeight } from '../../lib/web-styles';
 
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
@@ -200,7 +200,7 @@ export default function DashboardScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}) }}>
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
         // ── Mobile: banner + tabs + contenido en scroll único ────────────
         <PageScrollView

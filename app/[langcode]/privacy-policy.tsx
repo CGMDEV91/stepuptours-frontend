@@ -6,12 +6,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
+import { webFullHeight } from '../../lib/web-styles';
 
 const AMBER = '#F59E0B';
 
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#F9FAFB',
-    ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}),
+    ...webFullHeight,
   },
 
   // Scroll content: centred on desktop

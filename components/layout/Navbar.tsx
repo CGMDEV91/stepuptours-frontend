@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 200,
     ...(Platform.OS === 'web'
-      ? { position: 'absolute' as any, height: '100vh' as any }
+      ? { position: 'absolute' as any, height: '100dvh' as any }
       : { height: 9999 }),
   },
   dropdownBackdrop: {

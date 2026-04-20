@@ -11,7 +11,6 @@ import {
   StyleSheet,
   Share,
   useWindowDimensions,
-  Platform,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +24,7 @@ import { HtmlText } from '../../../components/ui/HtmlText';
 import BackButton from '../../../components/layout/BackButton';
 import Footer from '../../../components/layout/Footer';
 import { PageScrollView } from '../../../components/layout/PageScrollView';
+import { webFullHeight } from '../../../lib/web-styles';
 import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
 
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}),
+    ...webFullHeight,
   },
   loadingContainer: {
     flex: 1,

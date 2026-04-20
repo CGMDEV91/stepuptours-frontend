@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../stores/auth.store';
 import { useLanguageStore } from '../../../stores/language.store';
+import { webFullHeight } from '../../../lib/web-styles';
 import {
   getBusinessById,
   getBusinessCategories,
@@ -711,7 +712,7 @@ export default function CreateBusinessScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F9FAFB', ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}) },
+  screen: { flex: 1, backgroundColor: '#F9FAFB', ...webFullHeight },
   centered: {
     flex: 1,
     alignItems: 'center',

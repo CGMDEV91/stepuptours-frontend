@@ -18,6 +18,7 @@ import { getRanking } from '../../services/ranking.service';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
+import { webFullHeight } from '../../lib/web-styles';
 import type { RankingEntry } from '../../types';
 
 const AMBER = '#F59E0B';
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#F9FAFB',
-    ...(Platform.OS === 'web' ? { height: '100vh' as any, overflow: 'hidden' as any } : {}),
+    ...webFullHeight,
   },
   scrollContent: {
     paddingBottom: 0,
