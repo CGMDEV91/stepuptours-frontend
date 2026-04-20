@@ -122,7 +122,7 @@ export default function Footer() {
           />
           <FooterLink
             label={t('footer.termsOfUse')}
-            onPress={() => navigate(`/${lang}/privacy-policy`)}
+            onPress={() => navigate(`/${lang}/terms-of-use`)}
           />
           <FooterLink label={t('footer.contact')} onPress={openContactModal} />
         </View>

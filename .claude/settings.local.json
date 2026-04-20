@@ -3,7 +3,9 @@
     "allow": [
       "Bash(powershell.exe -Command \"New-Item -ItemType Directory -Force -Path '\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\.claude\\\\\\\\skills\\\\\\\\log-bug'\")",
       "Bash(powershell.exe -Command \"Get-ChildItem -Recurse -Path '\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\.claude' | Select-Object FullName\")",
-      "Bash(powershell.exe -Command \"tree '\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\.claude'\")"
+      "Bash(powershell.exe -Command \"tree '\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\.claude'\")",
+      "Bash(test -f /home/carlos/devel/stepuptours/stepuptours-frontend/app/[langcode]/terms-of-use.tsx)",
+      "Read(///wsl.localhost/Ubuntu/home/carlos/devel/stepuptours/stepuptours-frontend/i18n/locales/**)"
     ]
   }
 }
