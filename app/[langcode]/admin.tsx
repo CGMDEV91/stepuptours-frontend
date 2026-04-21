@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
 import { SiteSettingsTab } from '../../components/admin/SiteSettingsTab';
 import { TranslationsTab } from '../../components/admin/TranslationsTab';
+import { LegalTab } from '../../components/admin/LegalTab';
 import { DonationsView } from '../../components/shared/DonationsView';
 import { BusinessTab } from '../../components/dashboard/BusinessTab';
 import PageBanner from '../../components/layout/PageBanner';
@@ -26,7 +27,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'users';
+type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'users' | 'legal';
 
 interface Tab {
   id: TabId;
@@ -35,14 +36,15 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { id: 'settings', labelKey: 'admin.tabs.settings', icon: 'settings-outline' },
+  { id: 'settings',     labelKey: 'admin.tabs.settings',     icon: 'settings-outline' },
   { id: 'translations', labelKey: 'admin.tabs.translations', icon: 'language-outline' },
-  { id: 'businesses', labelKey: 'admin.tabs.businesses', icon: 'business-outline' },
-  { id: 'donations', labelKey: 'admin.tabs.donations', icon: 'cash-outline' },
-  { id: 'users', labelKey: 'admin.tabs.users', icon: 'people-outline' },
+  { id: 'legal',        labelKey: 'admin.tabs.legal',        icon: 'document-text-outline' },
+  { id: 'businesses',   labelKey: 'admin.tabs.businesses',   icon: 'business-outline' },
+  { id: 'donations',    labelKey: 'admin.tabs.donations',    icon: 'cash-outline' },
+  { id: 'users',        labelKey: 'admin.tabs.users',        icon: 'people-outline' },
 ];
 
-const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'businesses', 'donations', 'users'];
+const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'users'];
 function isValidAdminTab(value: string): value is TabId {
   return VALID_ADMIN_TABS.includes(value as TabId);
 }
@@ -102,68 +104,68 @@ export default function AdminScreen() {
 
   if (isAuthLoading || !user || !isAdmin) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={AMBER} />
-      </View>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={AMBER} />
+        </View>
     );
   }
 
   // ── Tab bar mobile: columna vertical ─────────────────────────────────────
   const mobileTabBar = (
-    <View style={styles.mobileTabBar}>
-      {TABS.map((tab) => {
-        const isActive = tab.id === activeTab;
-        return (
-          <TouchableOpacity
-            key={tab.id}
-            style={[styles.mobileTabItem, isActive && styles.mobileTabItemActive]}
-            onPress={() => setActiveTab(tab.id)}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name={tab.icon as any}
-              size={18}
-              color={isActive ? '#FFFFFF' : '#6B7280'}
-            />
-            <Text style={[styles.mobileTabLabel, isActive && styles.mobileTabLabelActive]}>
-              {t(tab.labelKey)}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+      <View style={styles.mobileTabBar}>
+        {TABS.map((tab) => {
+          const isActive = tab.id === activeTab;
+          return (
+              <TouchableOpacity
+                  key={tab.id}
+                  style={[styles.mobileTabItem, isActive && styles.mobileTabItemActive]}
+                  onPress={() => setActiveTab(tab.id)}
+                  activeOpacity={0.8}
+              >
+                <Ionicons
+                    name={tab.icon as any}
+                    size={18}
+                    color={isActive ? '#FFFFFF' : '#6B7280'}
+                />
+                <Text style={[styles.mobileTabLabel, isActive && styles.mobileTabLabelActive]}>
+                  {t(tab.labelKey)}
+                </Text>
+              </TouchableOpacity>
+          );
+        })}
+      </View>
   );
 
   // ── Tab bar desktop: pills horizontales ───────────────────────────────────
   const desktopTabBar = (
-    <View style={styles.tabBarWrapper}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tabBar}
-      >
-        {TABS.map((tab) => {
-          const isActive = tab.id === activeTab;
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={[styles.tabPill, isActive && styles.tabPillActive]}
-              onPress={() => setActiveTab(tab.id)}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name={tab.icon as any}
-                size={16}
-                color={isActive ? '#FFFFFF' : '#6B7280'}
-              />
-              <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                {t(tab.labelKey)}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    </View>
+      <View style={styles.tabBarWrapper}>
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabBar}
+        >
+          {TABS.map((tab) => {
+            const isActive = tab.id === activeTab;
+            return (
+                <TouchableOpacity
+                    key={tab.id}
+                    style={[styles.tabPill, isActive && styles.tabPillActive]}
+                    onPress={() => setActiveTab(tab.id)}
+                    activeOpacity={0.8}
+                >
+                  <Ionicons
+                      name={tab.icon as any}
+                      size={16}
+                      color={isActive ? '#FFFFFF' : '#6B7280'}
+                  />
+                  <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+                    {t(tab.labelKey)}
+                  </Text>
+                </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
   );
 
   const renderContent = () => {
@@ -172,70 +174,72 @@ export default function AdminScreen() {
         return <SiteSettingsTab />;
       case 'translations':
         return <TranslationsTab />;
+      case 'legal':
+        return <LegalTab />;
       case 'businesses':
         return <BusinessTab />;
       case 'donations':
         return <DonationsView mode="admin" />;
       case 'users':
         return (
-          <View style={styles.placeholder}>
-            <Ionicons name="people-outline" size={48} color="#D1D5DB" />
-            <Text style={styles.placeholderText}>Coming soon</Text>
-          </View>
+            <View style={styles.placeholder}>
+              <Ionicons name="people-outline" size={48} color="#D1D5DB" />
+              <Text style={styles.placeholderText}>Coming soon</Text>
+            </View>
         );
     }
   };
 
   return (
-    <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
-      {isMobile ? (
-        <ScrollView
-          ref={scrollRef}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 48 }}
-        >
-          <PageBanner
-            icon="shield-checkmark-outline"
-            iconBgColor="#1E293B"
-            title={t('admin.title')}
-            subtitle="Manage site settings and content"
-            showBack={false}
-          />
-          {mobileTabBar}
-          <View style={{ paddingHorizontal: 16, paddingTop: 20 }}>
-            {renderContent()}
-          </View>
-        </ScrollView>
-      ) : (
-        <>
-          {desktopTabBar}
-          <ScrollView
-            ref={scrollRef}
-            style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 48 }}
-          >
-            <PageBanner
-              icon="shield-checkmark-outline"
-              iconBgColor="#1E293B"
-              title={t('admin.title')}
-              subtitle="Manage site settings and content"
-              showBack={false}
-            />
-            <View style={{ maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20 }}>
-              {renderContent()}
-            </View>
-          </ScrollView>
-        </>
-      )}
+      <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
+        {isMobile ? (
+            <ScrollView
+                ref={scrollRef}
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: 48 }}
+            >
+              <PageBanner
+                  icon="shield-checkmark-outline"
+                  iconBgColor="#1E293B"
+                  title={t('admin.title')}
+                  subtitle="Manage site settings and content"
+                  showBack={false}
+              />
+              {mobileTabBar}
+              <View style={{ paddingHorizontal: 16, paddingTop: 20 }}>
+                {renderContent()}
+              </View>
+            </ScrollView>
+        ) : (
+            <>
+              {desktopTabBar}
+              <ScrollView
+                  ref={scrollRef}
+                  style={{ flex: 1 }}
+                  contentContainerStyle={{ paddingBottom: 48 }}
+              >
+                <PageBanner
+                    icon="shield-checkmark-outline"
+                    iconBgColor="#1E293B"
+                    title={t('admin.title')}
+                    subtitle="Manage site settings and content"
+                    showBack={false}
+                />
+                <View style={{ maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20 }}>
+                  {renderContent()}
+                </View>
+              </ScrollView>
+            </>
+        )}
 
-      {/* Toast notification */}
-      {toastMessage ? (
-        <Animated.View style={[styles.toast, { opacity: toastOpacity }]} pointerEvents="none">
-          <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
-          <Text style={styles.toastText}>{toastMessage}</Text>
-        </Animated.View>
-      ) : null}
-    </View>
+        {/* Toast notification */}
+        {toastMessage ? (
+            <Animated.View style={[styles.toast, { opacity: toastOpacity }]} pointerEvents="none">
+              <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
+              <Text style={styles.toastText}>{toastMessage}</Text>
+            </Animated.View>
+        ) : null}
+      </View>
   );
 }
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.com';
 
 export interface Language {
   id: string; // 'es', 'en', 'fr'

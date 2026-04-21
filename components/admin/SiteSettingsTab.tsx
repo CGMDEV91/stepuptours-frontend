@@ -18,7 +18,9 @@ import {
   getSiteSettings,
   updateSiteSettings,
   updateStripeKeys,
-  type SocialLink,
+  getSocialLinks,
+  saveSocialLinks,
+  type SocialLinksConfig,
 } from '../../services/admin.service';
 import { resetStripePromise } from '../../lib/stripe';
 
@@ -43,12 +45,6 @@ const INNER_TABS: InnerTab[] = [
 
 // ── State interfaces ─────────────────────────────────────────────────────────
 
-interface SocialState {
-  facebook: SocialLink;
-  twitter: SocialLink;
-  instagram: SocialLink;
-}
-
 interface PaymentState {
   platformRevenuePercentage: number;
   stripeConfigured: boolean;
@@ -67,16 +63,10 @@ interface StripeFormState {
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const NETWORKS = [
-  { key: 'facebook' as const, icon: 'logo-facebook' as const, label: 'Facebook' },
-  { key: 'twitter'  as const, icon: 'logo-twitter'  as const, label: 'Twitter / X' },
+  { key: 'facebook'  as const, icon: 'logo-facebook'  as const, label: 'Facebook' },
+  { key: 'twitter'   as const, icon: 'logo-twitter'   as const, label: 'Twitter / X' },
   { key: 'instagram' as const, icon: 'logo-instagram' as const, label: 'Instagram' },
 ];
-
-const DEFAULT_SOCIAL: SocialState = {
-  facebook:  { url: '', visible: true },
-  twitter:   { url: '', visible: true },
-  instagram: { url: '', visible: true },
-};
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -84,7 +74,11 @@ export function SiteSettingsTab() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
 
-  const [social,  setSocial]  = useState<SocialState>(DEFAULT_SOCIAL);
+  const [social,  setSocial]  = useState<SocialLinksConfig>({
+    facebook:  { url: '', visible: false },
+    twitter:   { url: '', visible: false },
+    instagram: { url: '', visible: false },
+  });
   const [payment, setPayment] = useState<PaymentState>({ platformRevenuePercentage: 20, stripeConfigured: false });
   const [stripe,  setStripe]  = useState<StripeFormState>({
     publishableKey: '', secretKey: '', webhookSecret: '',
@@ -101,42 +95,36 @@ export function SiteSettingsTab() {
   // ── Load ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    getSiteSettings()
-      .then((data: any) => {
-        if (data.socialLinks) {
-          setSocial({
-            facebook:  data.socialLinks.facebook  ?? DEFAULT_SOCIAL.facebook,
-            twitter:   data.socialLinks.twitter   ?? DEFAULT_SOCIAL.twitter,
-            instagram: data.socialLinks.instagram ?? DEFAULT_SOCIAL.instagram,
-          });
-        }
-        if (data.paymentSettings) {
-          setPayment({
-            platformRevenuePercentage: data.paymentSettings.platformRevenuePercentage ?? 20,
-            stripeConfigured: data.paymentSettings.stripeConfigured ?? false,
-          });
-        }
-        if (data.stripeSettings) {
-          setStripe((prev) => ({
-            ...prev,
-            publishableKey:       data.stripeSettings.publishableKey ?? '',
-            secretKeyConfigured:  data.stripeSettings.secretKeyConfigured ?? false,
-            webhookConfigured:    data.stripeSettings.webhookConfigured ?? false,
-          }));
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      getSocialLinks(),
+      getSiteSettings().catch(() => null),
+    ]).then(([socialLinks, siteData]) => {
+      setSocial(socialLinks);
+      if (siteData?.paymentSettings) {
+        setPayment({
+          platformRevenuePercentage: siteData.paymentSettings.platformRevenuePercentage ?? 20,
+          stripeConfigured: siteData.paymentSettings.stripeConfigured ?? false,
+        });
+      }
+      if (siteData?.stripeSettings) {
+        setStripe((prev) => ({
+          ...prev,
+          publishableKey:      siteData.stripeSettings!.publishableKey ?? '',
+          secretKeyConfigured: siteData.stripeSettings!.secretKeyConfigured ?? false,
+          webhookConfigured:   siteData.stripeSettings!.webhookConfigured ?? false,
+        }));
+      }
+    }).finally(() => setLoading(false));
   }, []);
 
   // ── General handlers ──────────────────────────────────────────────────────
 
-  const handleUrlChange = (network: keyof SocialState, url: string) => {
+  const handleUrlChange = (network: keyof SocialLinksConfig, url: string) => {
     setSocial((prev) => ({ ...prev, [network]: { ...prev[network], url } }));
     setFeedback(null);
   };
 
-  const handleVisibleChange = (network: keyof SocialState, visible: boolean) => {
+  const handleVisibleChange = (network: keyof SocialLinksConfig, visible: boolean) => {
     setSocial((prev) => ({ ...prev, [network]: { ...prev[network], visible } }));
     setFeedback(null);
   };
@@ -154,10 +142,12 @@ export function SiteSettingsTab() {
     setSaving(true);
     setFeedback(null);
     try {
-      await updateSiteSettings({
-        socialLinks: social,
-        paymentSettings: { platformRevenuePercentage: payment.platformRevenuePercentage },
-      } as any);
+      await Promise.all([
+        saveSocialLinks(social),
+        updateSiteSettings({
+          paymentSettings: { platformRevenuePercentage: payment.platformRevenuePercentage },
+        } as any),
+      ]);
       setFeedback({ type: 'success', message: t('admin.settings.saved') });
     } catch {
       setFeedback({ type: 'error', message: t('admin.settings.error') });
@@ -205,203 +195,202 @@ export function SiteSettingsTab() {
 
   if (loading) {
     return (
-      <View style={styles.loadingWrap}>
-        <ActivityIndicator size="large" color={AMBER} />
-      </View>
+        <View style={styles.loadingWrap}>
+          <ActivityIndicator size="large" color={AMBER} />
+        </View>
     );
   }
 
   return (
-    <View>
-      {/* ── Inner tab bar ───────────────────────────────────────────────── */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.innerTabBar}
-        style={styles.innerTabBarScroll}
-      >
-        {INNER_TABS.map((tab) => {
-          const isActive = tab.id === activeTab;
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={[styles.innerTabPill, isActive && { backgroundColor: tab.color }]}
-              onPress={() => setActiveTab(tab.id)}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name={tab.icon}
-                size={15}
-                color={isActive ? '#FFFFFF' : '#6B7280'}
-              />
-              <Text style={[styles.innerTabLabel, isActive && styles.innerTabLabelActive]}>
-                {t(tab.labelKey)}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      <View>
+        {/* ── Inner tab bar ───────────────────────────────────────────────── */}
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.innerTabBar}
+            style={styles.innerTabBarScroll}
+        >
+          {INNER_TABS.map((tab) => {
+            const isActive = tab.id === activeTab;
+            return (
+                <TouchableOpacity
+                    key={tab.id}
+                    style={[styles.innerTabPill, isActive && { backgroundColor: tab.color }]}
+                    onPress={() => setActiveTab(tab.id)}
+                    activeOpacity={0.8}
+                >
+                  <Ionicons
+                      name={tab.icon}
+                      size={15}
+                      color={isActive ? '#FFFFFF' : '#6B7280'}
+                  />
+                  <Text style={[styles.innerTabLabel, isActive && styles.innerTabLabelActive]}>
+                    {t(tab.labelKey)}
+                  </Text>
+                </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
 
-      {/* ── Tab content ─────────────────────────────────────────────────── */}
-      {activeTab === 'general' && (
-        <View>
-          {/* Social Links */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="share-social-outline" size={20} color={AMBER} />
-              <Text style={styles.cardTitle}>{t('admin.settings.socialLinks')}</Text>
-            </View>
-            {NETWORKS.map((net, idx) => (
-              <View key={net.key}>
-                {idx > 0 && <View style={styles.divider} />}
+        {/* ── Tab content ─────────────────────────────────────────────────── */}
+        {activeTab === 'general' && (
+            <View>
+              {/* Social Links */}
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="share-social-outline" size={20} color={AMBER} />
+                  <Text style={styles.cardTitle}>{t('admin.settings.socialLinks')}</Text>
+                </View>
+                {NETWORKS.map((net, idx) => (
+                    <View key={net.key}>
+                      {idx > 0 && <View style={styles.divider} />}
+                      <View style={styles.row}>
+                        <View style={styles.iconCircle}>
+                          <Ionicons name={net.icon} size={18} color="#6B7280" />
+                        </View>
+                        <View style={styles.inputWrap}>
+                          <Text style={styles.inputLabel}>{net.label}</Text>
+                          <TextInput
+                              style={styles.input}
+                              value={social[net.key].url}
+                              onChangeText={(val) => handleUrlChange(net.key, val)}
+                              placeholder={`https://${net.key}.com/...`}
+                              placeholderTextColor="#D1D5DB"
+                              autoCapitalize="none"
+                              autoCorrect={false}
+                          />
+                        </View>
+                        <View style={styles.switchWrap}>
+                          <Text style={styles.switchLabel}>{t('admin.settings.socialVisible')}</Text>
+                          <Switch
+                              value={social[net.key].visible}
+                              onValueChange={(val) => handleVisibleChange(net.key, val)}
+                              trackColor={{ false: '#D1D5DB', true: AMBER + '80' }}
+                              thumbColor={social[net.key].visible ? AMBER : '#F3F4F6'}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                ))}
+              </View>
+
+              {/* Revenue Split */}
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="cash-outline" size={20} color={AMBER} />
+                  <Text style={styles.cardTitle}>{t('admin.settings.revenueSplit')}</Text>
+                </View>
                 <View style={styles.row}>
-                  <View style={styles.iconCircle}>
-                    <Ionicons name={net.icon} size={18} color="#6B7280" />
-                  </View>
                   <View style={styles.inputWrap}>
-                    <Text style={styles.inputLabel}>{net.label}</Text>
+                    <Text style={styles.inputLabel}>{t('admin.settings.platformPercentage')}</Text>
                     <TextInput
-                      style={styles.input}
-                      value={social[net.key].url}
-                      onChangeText={(val) => handleUrlChange(net.key, val)}
-                      placeholder={`https://${net.key}.com/...`}
-                      placeholderTextColor="#D1D5DB"
-                      autoCapitalize="none"
-                      autoCorrect={false}
+                        style={[styles.input, { width: 80, textAlign: 'center' }]}
+                        value={String(payment.platformRevenuePercentage)}
+                        onChangeText={handlePercentageChange}
+                        keyboardType="number-pad"
+                        maxLength={3}
                     />
                   </View>
-                  <View style={styles.switchWrap}>
-                    <Text style={styles.switchLabel}>{t('admin.settings.socialVisible')}</Text>
-                    <Switch
-                      value={social[net.key].visible}
-                      onValueChange={(val) => handleVisibleChange(net.key, val)}
-                      trackColor={{ false: '#D1D5DB', true: AMBER + '80' }}
-                      thumbColor={social[net.key].visible ? AMBER : '#F3F4F6'}
-                    />
+                  <View style={styles.splitPreview}>
+                    <View style={styles.splitRow}>
+                      <Ionicons name="business-outline" size={14} color="#059669" />
+                      <Text style={styles.splitText}>
+                        {t('donation.split.platform')}: {payment.platformRevenuePercentage}%
+                      </Text>
+                    </View>
+                    <View style={styles.splitRow}>
+                      <Ionicons name="person-outline" size={14} color="#2563EB" />
+                      <Text style={styles.splitText}>
+                        {t('donation.split.guide')}: {100 - payment.platformRevenuePercentage}%
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Revenue Split */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="cash-outline" size={20} color={AMBER} />
-              <Text style={styles.cardTitle}>{t('admin.settings.revenueSplit')}</Text>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.inputWrap}>
-                <Text style={styles.inputLabel}>{t('admin.settings.platformPercentage')}</Text>
-                <TextInput
-                  style={[styles.input, { width: 80, textAlign: 'center' }]}
-                  value={String(payment.platformRevenuePercentage)}
-                  onChangeText={handlePercentageChange}
-                  keyboardType="number-pad"
-                  maxLength={3}
-                />
-              </View>
-              <View style={styles.splitPreview}>
-                <View style={styles.splitRow}>
-                  <Ionicons name="business-outline" size={14} color="#059669" />
-                  <Text style={styles.splitText}>
-                    {t('donation.split.platform')}: {payment.platformRevenuePercentage}%
-                  </Text>
-                </View>
-                <View style={styles.splitRow}>
-                  <Ionicons name="person-outline" size={14} color="#2563EB" />
-                  <Text style={styles.splitText}>
-                    {t('donation.split.guide')}: {100 - payment.platformRevenuePercentage}%
-                  </Text>
+                <View style={styles.infoNote}>
+                  <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
+                  <Text style={styles.infoNoteText}>{t('admin.settings.adminOwnerNote')}</Text>
                 </View>
               </View>
-            </View>
-            <View style={styles.infoNote}>
-              <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
-              <Text style={styles.infoNoteText}>{t('admin.settings.adminOwnerNote')}</Text>
-            </View>
-          </View>
 
-          {feedback && <FeedbackBanner feedback={feedback} />}
-          <SaveButton onPress={handleSave} loading={saving} label={t('admin.settings.save')} />
-        </View>
-      )}
-
-      {activeTab === 'stripe' && (
-        <View>
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="card-outline" size={20} color={STRIPE_COLOR} />
-              <Text style={styles.cardTitle}>{t('admin.settings.stripeConfig')}</Text>
-              <StatusBadge
-                configured={payment.stripeConfigured}
-                labelYes={t('admin.settings.stripeConnected')}
-                labelNo={t('admin.settings.stripeNotConfigured')}
-              />
+              {feedback && <FeedbackBanner feedback={feedback} />}
+              <SaveButton onPress={handleSave} loading={saving} label={t('admin.settings.save')} />
             </View>
+        )}
 
-            <View style={styles.infoNote}>
-              <Ionicons name="shield-checkmark-outline" size={16} color="#6B7280" />
-              <Text style={styles.infoNoteText}>{t('admin.settings.stripeKeysNote')}</Text>
-            </View>
+        {activeTab === 'stripe' && (
+            <View>
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="card-outline" size={20} color={STRIPE_COLOR} />
+                  <Text style={styles.cardTitle}>{t('admin.settings.stripeConfig')}</Text>
+                  <StatusBadge
+                      configured={payment.stripeConfigured}
+                      labelYes={t('admin.settings.stripeConnected')}
+                      labelNo={t('admin.settings.stripeNotConfigured')}
+                  />
+                </View>
 
-            <View style={styles.stripeFieldsWrap}>
-              <View style={styles.stripeField}>
-                <Text style={styles.inputLabel}>{t('admin.settings.stripePublishableKey')}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={stripe.publishableKey}
-                  onChangeText={(v) => setStripe((prev) => ({ ...prev, publishableKey: v }))}
-                  placeholder="pk_test_..."
-                  placeholderTextColor="#D1D5DB"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
+                <View style={styles.infoNote}>
+                  <Ionicons name="shield-checkmark-outline" size={16} color="#6B7280" />
+                  <Text style={styles.infoNoteText}>{t('admin.settings.stripeKeysNote')}</Text>
+                </View>
+
+                <View style={styles.stripeFieldsWrap}>
+                  <View style={styles.stripeField}>
+                    <Text style={styles.inputLabel}>{t('admin.settings.stripePublishableKey')}</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={stripe.publishableKey}
+                        onChangeText={(v) => setStripe((prev) => ({ ...prev, publishableKey: v }))}
+                        placeholder="pk_test_..."
+                        placeholderTextColor="#D1D5DB"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                  </View>
+
+                  <SecretField
+                      label={
+                          t('admin.settings.stripeSecretKey') +
+                          (stripe.secretKeyConfigured ? `  \u2713 ${t('admin.settings.keySet')}` : '')
+                      }
+                      value={stripe.secretKey}
+                      onChangeText={(v) => setStripe((prev) => ({ ...prev, secretKey: v }))}
+                      placeholder={stripe.secretKeyConfigured ? '\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7' : 'sk_test_...'}
+                      show={stripe.showSecretKey}
+                      onToggleShow={() => setStripe((prev) => ({ ...prev, showSecretKey: !prev.showSecretKey }))}
+                  />
+
+                  <SecretField
+                      label={
+                          t('admin.settings.stripeWebhookSecret') +
+                          (stripe.webhookConfigured ? `  \u2713 ${t('admin.settings.keySet')}` : '')
+                      }
+                      value={stripe.webhookSecret}
+                      onChangeText={(v) => setStripe((prev) => ({ ...prev, webhookSecret: v }))}
+                      placeholder={stripe.webhookConfigured ? '\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7' : 'whsec_...'}
+                      show={stripe.showWebhookSecret}
+                      onToggleShow={() => setStripe((prev) => ({ ...prev, showWebhookSecret: !prev.showWebhookSecret }))}
+                  />
+                </View>
+
+                <View style={styles.hintRow}>
+                  <Ionicons name="open-outline" size={14} color="#6B7280" />
+                  <Text style={styles.hintText}>{t('admin.settings.stripeDashboardHint')}</Text>
+                </View>
               </View>
 
-              <SecretField
-                label={
-                  t('admin.settings.stripeSecretKey') +
-                  (stripe.secretKeyConfigured ? `  ✓ ${t('admin.settings.keySet')}` : '')
-                }
-                value={stripe.secretKey}
-                onChangeText={(v) => setStripe((prev) => ({ ...prev, secretKey: v }))}
-                placeholder={stripe.secretKeyConfigured ? '••••••••••••••••••••' : 'sk_test_...'}
-                show={stripe.showSecretKey}
-                onToggleShow={() => setStripe((prev) => ({ ...prev, showSecretKey: !prev.showSecretKey }))}
-              />
-
-              <SecretField
-                label={
-                  t('admin.settings.stripeWebhookSecret') +
-                  (stripe.webhookConfigured ? `  ✓ ${t('admin.settings.keySet')}` : '')
-                }
-                value={stripe.webhookSecret}
-                onChangeText={(v) => setStripe((prev) => ({ ...prev, webhookSecret: v }))}
-                placeholder={stripe.webhookConfigured ? '••••••••••••••••••••' : 'whsec_...'}
-                show={stripe.showWebhookSecret}
-                onToggleShow={() => setStripe((prev) => ({ ...prev, showWebhookSecret: !prev.showWebhookSecret }))}
+              {stripeFeedback && <FeedbackBanner feedback={stripeFeedback} />}
+              <SaveButton
+                  onPress={handleSaveStripe}
+                  loading={savingStripe}
+                  label={t('admin.settings.saveStripeKeys')}
+                  icon="card-outline"
+                  color={STRIPE_COLOR}
               />
             </View>
-
-            <View style={styles.hintRow}>
-              <Ionicons name="open-outline" size={14} color="#6B7280" />
-              <Text style={styles.hintText}>{t('admin.settings.stripeDashboardHint')}</Text>
-            </View>
-          </View>
-
-          {stripeFeedback && <FeedbackBanner feedback={stripeFeedback} />}
-          <SaveButton
-            onPress={handleSaveStripe}
-            loading={savingStripe}
-            label={t('admin.settings.saveStripeKeys')}
-            icon="card-outline"
-            color={STRIPE_COLOR}
-          />
-        </View>
-      )}
-
-    </View>
+        )}
+      </View>
   );
 }
 
@@ -411,46 +400,46 @@ type Feedback = { type: 'success' | 'error'; message: string };
 
 function FeedbackBanner({ feedback }: { feedback: Feedback }) {
   return (
-    <View style={[styles.feedbackBanner, feedback.type === 'success' ? styles.feedbackSuccess : styles.feedbackError]}>
-      <Ionicons
-        name={feedback.type === 'success' ? 'checkmark-circle' : 'alert-circle'}
-        size={18}
-        color={feedback.type === 'success' ? '#065F46' : '#991B1B'}
-      />
-      <Text style={[styles.feedbackText, feedback.type === 'success' ? styles.feedbackTextSuccess : styles.feedbackTextError]}>
-        {feedback.message}
-      </Text>
-    </View>
+      <View style={[styles.feedbackBanner, feedback.type === 'success' ? styles.feedbackSuccess : styles.feedbackError]}>
+        <Ionicons
+            name={feedback.type === 'success' ? 'checkmark-circle' : 'alert-circle'}
+            size={18}
+            color={feedback.type === 'success' ? '#065F46' : '#991B1B'}
+        />
+        <Text style={[styles.feedbackText, feedback.type === 'success' ? styles.feedbackTextSuccess : styles.feedbackTextError]}>
+          {feedback.message}
+        </Text>
+      </View>
   );
 }
 
 function StatusBadge({
-  configured,
-  labelYes,
-  labelNo,
-}: {
+                       configured,
+                       labelYes,
+                       labelNo,
+                     }: {
   configured: boolean;
   labelYes: string;
   labelNo: string;
 }) {
   return (
-    <View style={styles.statusBadge}>
-      <View style={[styles.statusDot, configured ? styles.statusDotGreen : styles.statusDotRed]} />
-      <Text style={[styles.statusText, { color: configured ? '#059669' : '#DC2626' }]}>
-        {configured ? labelYes : labelNo}
-      </Text>
-    </View>
+      <View style={styles.statusBadge}>
+        <View style={[styles.statusDot, configured ? styles.statusDotGreen : styles.statusDotRed]} />
+        <Text style={[styles.statusText, { color: configured ? '#059669' : '#DC2626' }]}>
+          {configured ? labelYes : labelNo}
+        </Text>
+      </View>
   );
 }
 
 function SecretField({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  show,
-  onToggleShow,
-}: {
+                       label,
+                       value,
+                       onChangeText,
+                       placeholder,
+                       show,
+                       onToggleShow,
+                     }: {
   label: string;
   value: string;
   onChangeText: (v: string) => void;
@@ -459,35 +448,35 @@ function SecretField({
   onToggleShow: () => void;
 }) {
   return (
-    <View style={styles.stripeField}>
-      <Text style={styles.inputLabel}>{label}</Text>
-      <View style={styles.inputRow}>
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor="#D1D5DB"
-          secureTextEntry={!show}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        <TouchableOpacity style={styles.eyeBtn} onPress={onToggleShow}>
-          <Ionicons name={show ? 'eye-off-outline' : 'eye-outline'} size={18} color="#9CA3AF" />
-        </TouchableOpacity>
+      <View style={styles.stripeField}>
+        <Text style={styles.inputLabel}>{label}</Text>
+        <View style={styles.inputRow}>
+          <TextInput
+              style={[styles.input, { flex: 1 }]}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder={placeholder}
+              placeholderTextColor="#D1D5DB"
+              secureTextEntry={!show}
+              autoCapitalize="none"
+              autoCorrect={false}
+          />
+          <TouchableOpacity style={styles.eyeBtn} onPress={onToggleShow}>
+            <Ionicons name={show ? 'eye-off-outline' : 'eye-outline'} size={18} color="#9CA3AF" />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
   );
 }
 
 function SaveButton({
-  onPress,
-  loading,
-  label,
-  icon,
-  color = AMBER,
-  disabled = false,
-}: {
+                      onPress,
+                      loading,
+                      label,
+                      icon,
+                      color = AMBER,
+                      disabled = false,
+                    }: {
   onPress: () => void;
   loading: boolean;
   label: string;
@@ -496,21 +485,21 @@ function SaveButton({
   disabled?: boolean;
 }) {
   return (
-    <TouchableOpacity
-      style={[styles.saveBtn, { backgroundColor: color }, (loading || disabled) && styles.saveBtnDisabled]}
-      onPress={onPress}
-      disabled={loading || disabled}
-      activeOpacity={0.8}
-    >
-      {loading ? (
-        <ActivityIndicator size="small" color="#FFFFFF" />
-      ) : (
-        <>
-          {icon && <Ionicons name={icon} size={16} color="#FFFFFF" />}
-          <Text style={styles.saveBtnText}>{label}</Text>
-        </>
-      )}
-    </TouchableOpacity>
+      <TouchableOpacity
+          style={[styles.saveBtn, { backgroundColor: color }, (loading || disabled) && styles.saveBtnDisabled]}
+          onPress={onPress}
+          disabled={loading || disabled}
+          activeOpacity={0.8}
+      >
+        {loading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+            <>
+              {icon && <Ionicons name={icon} size={16} color="#FFFFFF" />}
+              <Text style={styles.saveBtnText}>{label}</Text>
+            </>
+        )}
+      </TouchableOpacity>
   );
 }
 
@@ -522,7 +511,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Inner tab bar
   innerTabBarScroll: {
     marginBottom: 20,
   },
@@ -550,7 +538,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // Card
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
@@ -579,7 +566,6 @@ const styles = StyleSheet.create({
     marginVertical: 14,
   },
 
-  // Row layout
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -624,7 +610,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // Split preview
   splitPreview: {
     flex: 1,
     gap: 6,
@@ -641,7 +626,6 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
 
-  // Info note
   infoNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -658,7 +642,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  // Status badge
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -680,7 +663,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Stripe / secret fields
   stripeFieldsWrap: {
     gap: 14,
   },
@@ -700,7 +682,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
 
-  // Hint row
   hintRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -712,7 +693,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
 
-  // Feedback
   feedbackBanner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -727,7 +707,6 @@ const styles = StyleSheet.create({
   feedbackTextSuccess: { color: '#065F46' },
   feedbackTextError:   { color: '#991B1B' },
 
-  // Save button
   saveBtn: {
     borderRadius: 10,
     paddingVertical: 14,

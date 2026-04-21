@@ -95,10 +95,11 @@ export default function TourDetailScreen() {
   }, [user, id, openAuthModal, toggleFavorite]);
 
   const handleShare = async () => {
+    const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.com';
     try {
       await Share.share({
         message: `${tour?.title} - StepUp Tours`,
-        url: `https://stepuptours.ddev.site/${langcode}/tour/${id}`,
+        url: `${BASE_URL}/${langcode}/tour/${id}`,
       });
     } catch {}
   };
