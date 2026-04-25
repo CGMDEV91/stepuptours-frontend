@@ -61,7 +61,7 @@ interface ToursState {
 
 const DEFAULT_FILTERS: TourFilters = {
   page: 1,
-  limit: 20,
+  limit: 9,
 };
 
 export const useToursStore = create<ToursState>((set, get) => ({

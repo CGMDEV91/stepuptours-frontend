@@ -504,7 +504,7 @@ export default function HomePage() {
   //   for useEffect so it can react to tab-refocus without useFocusEffect deps.
   const isFocusedRef = useRef(false);
   const [focusGeneration, setFocusGeneration] = useState(0);
-  const loadingMoreRef = useRef(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Empty deps → callback never changes → useFocusEffect only fires on actual
   // focus/blur events, NEVER on language or state changes.
@@ -526,7 +526,6 @@ export default function HomePage() {
     if (!currentLanguageId || currentLanguageId !== langcode) return;
     clearFilters();
     setSearch('');
-    loadingMoreRef.current = false;
     fetchTours({});
     fetchCountries();
     fetchCities();
@@ -547,20 +546,18 @@ export default function HomePage() {
       : (gridWidth - PADDING * 2 - GAP * (cols - 1)) / cols;
 
   const loadMore = useCallback(() => {
-    if (!hasMore || isLoading || loadingMoreRef.current || tours.length === 0) return;
-    loadingMoreRef.current = true;
+    if (!hasMore || isLoading || isLoadingMore || tours.length === 0) return;
+    setIsLoadingMore(true);
     fetchTours({ page: (filters.page ?? 1) + 1 }, true).finally(() => {
-      loadingMoreRef.current = false;
+      setIsLoadingMore(false);
     });
-  }, [hasMore, isLoading, filters.page, tours.length]);
+  }, [hasMore, isLoading, isLoadingMore, filters.page, tours.length]);
 
   const onRefresh = useCallback(() => {
-    loadingMoreRef.current = false;
     return fetchTours({ page: 1 });
   }, []);
 
   const onSearch = () => {
-    loadingMoreRef.current = false;
     setFilters({ search });
     fetchTours({ search, page: 1 });
   };
@@ -569,27 +566,23 @@ export default function HomePage() {
     const next = country ? { country, city: undefined } : { country: undefined, city: undefined };
     setFilters(next);
     fetchCities(country ?? undefined);
-    loadingMoreRef.current = false;
     fetchTours({ ...filters, ...next, page: 1 });
   };
 
   const handleCitySelect = (city: string | null) => {
     const next = { city: city ?? undefined };
     setFilters(next);
-    loadingMoreRef.current = false;
     fetchTours({ ...filters, ...next, page: 1 });
   };
 
   const handleSortSelect = (sort: TourFilters['sort']) => {
     setFilters({ sort });
-    loadingMoreRef.current = false;
     fetchTours({ ...filters, sort, page: 1 });
   };
 
   const handleClear = () => {
     clearFilters();
     setSearch('');
-    loadingMoreRef.current = false;
     fetchTours({});
   };
 
@@ -602,7 +595,6 @@ export default function HomePage() {
     };
     setFilters(next);
     if (country) fetchCities(country);
-    loadingMoreRef.current = false;
     fetchTours({ ...filters, ...next });
   };
 
@@ -630,8 +622,6 @@ export default function HomePage() {
           { paddingTop: 0, paddingBottom: 0 },
           tours.length === 0 && { flexGrow: 1 },
         ]}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.3}
         refreshControl={
           <RefreshControl
             refreshing={isLoading && tours.length > 0}
@@ -672,7 +662,7 @@ export default function HomePage() {
                   />
                   {search.length > 0 && (
                     <TouchableOpacity
-                      onPress={() => { setSearch(''); clearFilters(); loadingMoreRef.current = false; fetchTours(); }}
+                      onPress={() => { setSearch(''); clearFilters(); fetchTours(); }}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
                       <Ionicons name="close-circle" size={18} color="#C4C9D4" />
@@ -744,7 +734,7 @@ export default function HomePage() {
             <View style={styles.emptyState}>
               <Ionicons name="map-outline" size={48} color="#D1D5DB" />
               <Text style={styles.emptyTitle}>{t('home.noTours')}</Text>
-              <TouchableOpacity style={styles.btnPrimary} onPress={() => { clearFilters(); loadingMoreRef.current = false; fetchTours(); }}>
+              <TouchableOpacity style={styles.btnPrimary} onPress={() => { clearFilters(); fetchTours(); }}>
                 <Text style={styles.btnPrimaryText}>{t('home.allCountries')}</Text>
               </TouchableOpacity>
             </View>
@@ -756,9 +746,20 @@ export default function HomePage() {
         }
         ListFooterComponent={
           <>
-            {hasMore && isLoading && (
-              <View style={{ paddingVertical: 20, alignItems: 'center' }}>
-                <ActivityIndicator size="small" color={AMBER} />
+            {hasMore && (
+              <View style={styles.loadMoreContainer}>
+                <TouchableOpacity
+                  style={styles.loadMoreBtn}
+                  onPress={loadMore}
+                  disabled={isLoadingMore}
+                  activeOpacity={0.8}
+                >
+                  {isLoadingMore ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.loadMoreText}>{t('home.loadMore')}</Text>
+                  )}
+                </TouchableOpacity>
               </View>
             )}
             <Footer />
@@ -1184,4 +1185,21 @@ const styles = StyleSheet.create({
   },
   emptyTitle: { fontSize: 16, color: '#6B7280', fontWeight: '500' },
   loadingState: { flex: 1, paddingVertical: 60, alignItems: 'center', justifyContent: 'center' },
+  loadMoreContainer: {
+    paddingBottom: 28,
+    alignItems: 'center',
+  },
+  loadMoreBtn: {
+    backgroundColor: AMBER,
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 24,
+    minWidth: 140,
+    alignItems: 'center',
+  },
+  loadMoreText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
 });
