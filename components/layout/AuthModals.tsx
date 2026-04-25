@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth.store';
 import { getGoogleAccessToken } from '../../services/googleAuth.service';
+import { getRegistrationSettings } from '../../services/admin.service';
 
 interface Props {
   visible: 'login' | 'register' | null;
@@ -142,7 +143,10 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
       await signInWithGoogle(token);
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
-      setGoogleError(e.message);
+      const type = e?.message ?? '';
+      if (!type.includes('popup_closed') && !type.includes('access_denied')) {
+        setGoogleError(type);
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -255,8 +259,15 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string; publicName?: string; email?: string; password?: string; confirm?: string;
   }>({});
+  const [allowProfessional, setAllowProfessional] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getRegistrationSettings().then((s) =>
+      setAllowProfessional(s.allowProfessionalRegistration)
+    );
+  }, []);
   const publicNameRef = useRef<RNTextInput>(null);
   const emailRef = useRef<RNTextInput>(null);
   const passwordRef = useRef<RNTextInput>(null);
@@ -299,7 +310,10 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
       await signInWithGoogle(token, role === 'professional' ? 'professional' : undefined);
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
-      setGoogleError(e.message);
+      const type = e?.message ?? '';
+      if (!type.includes('popup_closed') && !type.includes('access_denied')) {
+        setGoogleError(type);
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -326,42 +340,44 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
         </View>
       ) : null}
 
-      {/* Selector de rol */}
-      <View style={roleStyles.container}>
-        <Text style={roleStyles.label}>{t('auth.roleLabel')}</Text>
-        <View style={roleStyles.row}>
-          <TouchableOpacity
-            style={[roleStyles.card, role === 'traveller' && roleStyles.cardSelected]}
-            onPress={() => setRole('traveller')}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name="person-outline"
-              size={22}
-              color={role === 'traveller' ? '#F59E0B' : '#9CA3AF'}
-            />
-            <Text style={[roleStyles.cardTitle, role === 'traveller' && roleStyles.cardTitleSelected]}>
-              {t('auth.roleTraveller')}
-            </Text>
-            <Text style={roleStyles.cardHint}>{t('auth.roleTravellerHint')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[roleStyles.card, role === 'professional' && roleStyles.cardSelected]}
-            onPress={() => setRole('professional')}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name="briefcase-outline"
-              size={22}
-              color={role === 'professional' ? '#F59E0B' : '#9CA3AF'}
-            />
-            <Text style={[roleStyles.cardTitle, role === 'professional' && roleStyles.cardTitleSelected]}>
-              {t('auth.roleProfessional')}
-            </Text>
-            <Text style={roleStyles.cardHint}>{t('auth.roleProfessionalHint')}</Text>
-          </TouchableOpacity>
+      {/* Selector de rol — visible solo si allowProfessional está activo */}
+      {allowProfessional && (
+        <View style={roleStyles.container}>
+          <Text style={roleStyles.label}>{t('auth.roleLabel')}</Text>
+          <View style={roleStyles.row}>
+            <TouchableOpacity
+              style={[roleStyles.card, role === 'traveller' && roleStyles.cardSelected]}
+              onPress={() => setRole('traveller')}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name="person-outline"
+                size={22}
+                color={role === 'traveller' ? '#F59E0B' : '#9CA3AF'}
+              />
+              <Text style={[roleStyles.cardTitle, role === 'traveller' && roleStyles.cardTitleSelected]}>
+                {t('auth.roleTraveller')}
+              </Text>
+              <Text style={roleStyles.cardHint}>{t('auth.roleTravellerHint')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[roleStyles.card, role === 'professional' && roleStyles.cardSelected]}
+              onPress={() => setRole('professional')}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name="briefcase-outline"
+                size={22}
+                color={role === 'professional' ? '#F59E0B' : '#9CA3AF'}
+              />
+              <Text style={[roleStyles.cardTitle, role === 'professional' && roleStyles.cardTitleSelected]}>
+                {t('auth.roleProfessional')}
+              </Text>
+              <Text style={roleStyles.cardHint}>{t('auth.roleProfessionalHint')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
 
       {/* Botón Google */}
       <TouchableOpacity

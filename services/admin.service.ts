@@ -160,3 +160,23 @@ export async function getSocialLinks(): Promise<SocialLinksConfig> {
 export async function saveSocialLinks(links: SocialLinksConfig): Promise<void> {
   await AsyncStorage.setItem(SOCIAL_LINKS_KEY, JSON.stringify(links));
 }
+
+// ── Registration Settings (AsyncStorage) ──────────────────────────────────────
+
+const REGISTRATION_SETTINGS_KEY = 'admin:registrationSettings';
+
+export interface RegistrationSettings {
+  allowProfessionalRegistration: boolean;
+}
+
+export async function getRegistrationSettings(): Promise<RegistrationSettings> {
+  try {
+    const raw = await AsyncStorage.getItem(REGISTRATION_SETTINGS_KEY);
+    if (raw) return JSON.parse(raw) as RegistrationSettings;
+  } catch {}
+  return { allowProfessionalRegistration: false };
+}
+
+export async function saveRegistrationSettings(settings: RegistrationSettings): Promise<void> {
+  await AsyncStorage.setItem(REGISTRATION_SETTINGS_KEY, JSON.stringify(settings));
+}

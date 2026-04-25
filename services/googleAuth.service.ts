@@ -47,6 +47,10 @@ export async function getGoogleAccessToken(): Promise<string> {
           resolve(response.access_token as string);
         }
       },
+      // Fired when the user closes the account picker without selecting an account
+      error_callback: (err: any) => {
+        reject(new Error(err?.type ?? 'popup_closed'));
+      },
     });
     client.requestAccessToken({ prompt: '' });
   });

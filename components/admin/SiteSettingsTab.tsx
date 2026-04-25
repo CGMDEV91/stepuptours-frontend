@@ -20,7 +20,10 @@ import {
   updateStripeKeys,
   getSocialLinks,
   saveSocialLinks,
+  getRegistrationSettings,
+  saveRegistrationSettings,
   type SocialLinksConfig,
+  type RegistrationSettings,
 } from '../../services/admin.service';
 import { resetStripePromise } from '../../lib/stripe';
 
@@ -79,6 +82,9 @@ export function SiteSettingsTab() {
     twitter:   { url: '', visible: false },
     instagram: { url: '', visible: false },
   });
+  const [registration, setRegistration] = useState<RegistrationSettings>({
+    allowProfessionalRegistration: false,
+  });
   const [payment, setPayment] = useState<PaymentState>({ platformRevenuePercentage: 20, stripeConfigured: false });
   const [stripe,  setStripe]  = useState<StripeFormState>({
     publishableKey: '', secretKey: '', webhookSecret: '',
@@ -97,9 +103,11 @@ export function SiteSettingsTab() {
   useEffect(() => {
     Promise.all([
       getSocialLinks(),
+      getRegistrationSettings(),
       getSiteSettings().catch(() => null),
-    ]).then(([socialLinks, siteData]) => {
+    ]).then(([socialLinks, regSettings, siteData]) => {
       setSocial(socialLinks);
+      setRegistration(regSettings);
       if (siteData?.paymentSettings) {
         setPayment({
           platformRevenuePercentage: siteData.paymentSettings.platformRevenuePercentage ?? 20,
@@ -144,6 +152,7 @@ export function SiteSettingsTab() {
     try {
       await Promise.all([
         saveSocialLinks(social),
+        saveRegistrationSettings(registration),
         updateSiteSettings({
           paymentSettings: { platformRevenuePercentage: payment.platformRevenuePercentage },
         } as any),
@@ -309,6 +318,33 @@ export function SiteSettingsTab() {
                 <View style={styles.infoNote}>
                   <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
                   <Text style={styles.infoNoteText}>{t('admin.settings.adminOwnerNote')}</Text>
+                </View>
+              </View>
+
+              {/* Registration Settings */}
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="people-outline" size={20} color={AMBER} />
+                  <Text style={styles.cardTitle}>{t('admin.settings.registrationSection')}</Text>
+                </View>
+                <View style={styles.row}>
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>
+                      {t('admin.settings.allowProfessional')}
+                    </Text>
+                    <Text style={styles.infoNoteText}>
+                      {t('admin.settings.allowProfessionalHint')}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={registration.allowProfessionalRegistration}
+                    onValueChange={(v) => {
+                      setRegistration({ allowProfessionalRegistration: v });
+                      setFeedback(null);
+                    }}
+                    trackColor={{ false: '#D1D5DB', true: AMBER + '80' }}
+                    thumbColor={registration.allowProfessionalRegistration ? AMBER : '#F3F4F6'}
+                  />
                 </View>
               </View>
 

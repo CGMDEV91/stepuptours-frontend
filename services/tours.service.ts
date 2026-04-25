@@ -488,22 +488,40 @@ export async function getToursByIds(ids: string[]): Promise<Tour[]> {
 // ── Obtener países disponibles ─────────────────────────────────────────────────
 
 export async function getCountries(): Promise<{ id: string; name: string }[]> {
-  const params = 'sort=name&fields[taxonomy_term--countries]=name';
-  const raw = await drupalGet<any[]>('/taxonomy_term/countries', params);
-  const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
-  return list.map((item) => ({ id: item.id, name: item.name }));
+  const params = [
+    'filter[status]=1',
+    'page[limit]=500',
+    'fields[node--tour]=field_country',
+    'fields[taxonomy_term--countries]=name',
+    'include=field_country',
+  ].join('&');
+  const tours = await drupalGet<any[]>('/node/tour', params);
+  const seen = new Map<string, { id: string; name: string }>();
+  for (const tour of (Array.isArray(tours) ? tours : [])) {
+    const c = tour.field_country;
+    if (c?.id && c?.name) seen.set(c.id, { id: c.id, name: c.name });
+  }
+  return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // ── Obtener ciudades por país ─────────────────────────────────────────────────
 
 export async function getCitiesByCountry(countryName?: string): Promise<{ id: string; name: string }[]> {
-  const parts = ['sort=name', 'page[limit]=200', 'fields[taxonomy_term--cities]=name'];
+  const parts = [
+    'filter[status]=1',
+    'page[limit]=500',
+    'fields[node--tour]=field_city',
+    'fields[taxonomy_term--cities]=name',
+    'include=field_city',
+  ];
   if (countryName) {
     parts.push(`filter[field_country.name]=${encodeURIComponent(countryName)}`);
   }
-  const params = parts.join('&');
-  const items = await drupalGetJsonApi('/taxonomy_term/cities', params);
-  return items
-    .map((item: any) => ({ id: item.id, name: item.attributes?.name ?? '' }))
-    .filter((c: { id: string; name: string }) => c.name);
+  const tours = await drupalGet<any[]>('/node/tour', parts.join('&'));
+  const seen = new Map<string, { id: string; name: string }>();
+  for (const tour of (Array.isArray(tours) ? tours : [])) {
+    const c = tour.field_city;
+    if (c?.id && c?.name) seen.set(c.id, { id: c.id, name: c.name });
+  }
+  return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
