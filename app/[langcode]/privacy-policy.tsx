@@ -10,22 +10,31 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 
 function renderLegalBody(text: string): React.ReactElement[] {
-  return text.split(/\n{2,}/).map((seg, i) => {
+  const elements: React.ReactElement[] = [];
+  text.split(/\n{2,}/).forEach((seg, i) => {
     if (seg.startsWith('### ')) {
-      return <Text key={i} style={styles.subTitle}>{seg.slice(4)}</Text>;
+      const nl = seg.indexOf('\n');
+      if (nl !== -1) {
+        elements.push(<Text key={`${i}-h`} style={styles.subTitle}>{seg.slice(4, nl)}</Text>);
+        const rest = seg.slice(nl + 1).trim();
+        if (rest) elements.push(<Text key={`${i}-b`} style={styles.body}>{rest}</Text>);
+      } else {
+        elements.push(<Text key={i} style={styles.subTitle}>{seg.slice(4)}</Text>);
+      }
+      return;
     }
     const lines = seg.split('\n');
     if (lines.some(l => l.startsWith('2022 '))) {
-      return (
+      elements.push(
         <View key={i} style={styles.list}>
-          {lines.map((line, j) => (
-            <Text key={j} style={styles.listItem}>{line}</Text>
-          ))}
+          {lines.map((line, j) => <Text key={j} style={styles.listItem}>{line}</Text>)}
         </View>
       );
+    } else {
+      elements.push(<Text key={i} style={styles.body}>{seg}</Text>);
     }
-    return <Text key={i} style={styles.body}>{seg}</Text>;
   });
+  return elements;
 }
 
 const SECTIONS = [

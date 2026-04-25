@@ -280,6 +280,7 @@ function DonationCardForm({ tourId, amount, isDonationValid, paymentIntentId, on
   const elements = useElements ? useElements() : null;
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [elementReady, setElementReady] = useState(false);
 
   // Allow vertical scroll to pass through Stripe iframes on mobile web.
   // Stripe sets touch-action:none on its iframes which traps scroll events.
@@ -335,14 +336,15 @@ function DonationCardForm({ tourId, amount, isDonationValid, paymentIntentId, on
 
       {/* PaymentElement — includes Apple Pay, Google Pay, card, etc. */}
       <View style={donationStyles.cardWrap}>
-        <PaymentElement options={{ layout: 'tabs' }} />
+        {!elementReady && <ActivityIndicator color={AMBER} style={{ marginVertical: 8 }} />}
+        <PaymentElement options={{ layout: 'tabs' }} onReady={() => setElementReady(true)} />
       </View>
 
       <View style={donationStyles.payRow}>
         <TouchableOpacity
-          style={[donationStyles.payBtn, (!isDonationValid || processing) && donationStyles.payBtnDisabled]}
+          style={[donationStyles.payBtn, (!isDonationValid || processing || !elementReady) && donationStyles.payBtnDisabled]}
           onPress={handlePay}
-          disabled={!isDonationValid || processing}
+          disabled={!isDonationValid || processing || !elementReady}
           activeOpacity={0.85}
         >
           {processing ? (
