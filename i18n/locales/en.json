@@ -497,5 +497,58 @@
   "admin.legal.introPh": "Introduction paragraph shown as highlighted quote block...",
   "admin.legal.titlePh": "Section title...",
   "admin.legal.contentPh": "Section content...\n\nUse ### Sub-heading for sub-headings\nUse • for bullet items\nBlank line = new paragraph",
-  "admin.legal.formatHint": "### Sub-heading  •  • Bullet item  •  Blank line = paragraph break"
+  "admin.legal.formatHint": "### Sub-heading  •  • Bullet item  •  Blank line = paragraph break",
+
+  "footer.faq": "FAQ",
+  "legal.faq": "Frequently Asked Questions",
+
+  "faq.intro": "Find answers to the most common questions about StepUp Tours — self-guided city tours with audio narration, step-by-step navigation, and a gamified experience you can enjoy at your own pace.",
+
+  "faq.cat1": "Getting Started",
+  "faq.q1": "What is StepUp Tours?",
+  "faq.a1": "StepUp Tours is a self-guided city tour app that lets you explore cities at your own pace. Each tour is made up of a series of stops (steps) spread across the city. When you arrive at each stop you unlock a rich description read aloud by our AI audio guide, a Street View of the location, and nearby points of interest. Complete all mandatory stops to finish the tour and earn XP points.",
+  "faq.q2": "Do I need an account to use the app?",
+  "faq.a2": "No account is required to browse and view tours. However, you need a free account to complete steps, earn XP, save favourites, rate tours, and support guides with a donation. Sign up takes less than a minute.",
+  "faq.q3": "Which languages are supported?",
+  "faq.a3": "The app is available in English, Spanish, French, German, Italian, and Greek. Tour content and the audio guide are available in all supported languages — except Greek, where the audio guide is not yet available. You can switch language at any time from your profile.",
+
+  "faq.cat2": "How Tours Work",
+  "faq.q4": "How do I start a tour?",
+  "faq.a4": "Browse the tour catalogue on the home screen, tap a tour to see its details, then tap \"Start Tour\". There is no fixed start time, no booking, and no guide to wait for — you go at your own pace whenever you like.",
+  "faq.q5": "Can I complete steps in any order?",
+  "faq.a5": "Yes — steps can be completed in any order you choose. Feel free to skip around, double back, or take detours. Only mandatory steps count toward tour completion; optional steps award bonus XP but do not block the finish.",
+  "faq.q6": "How do I get to a step location?",
+  "faq.a6": "Tap \"How to get there\" on any step card. Choose your preferred transport mode — Walking, Cycling, Public Transport, or Driving. The app will open Google Maps (or Apple Maps on iOS) with turn-by-turn directions to the exact location. Once you arrive, switch back to StepUp Tours to confirm your presence and unlock the step.",
+  "faq.q7": "How do I complete a step?",
+  "faq.a7": "When you are physically at the step location, the app detects your position and shows a confirmation prompt: \"Are you at [location name]?\". Tap \"Yes, I'm here\" to unlock the step content — description, audio guide, and Street View. When you are ready, tap the green \"Mark as Completed\" button to record the step.",
+  "faq.q8": "What happens when I complete all steps?",
+  "faq.a8": "A congratulations screen appears showing the XP you have earned. You are invited to rate the tour from 1 to 5 stars, and you can optionally leave a donation to support the guide who created it. Both the rating and the donation are entirely optional.",
+
+  "faq.cat3": "Audio Guide",
+  "faq.q9": "What is the audio guide?",
+  "faq.a9": "Each step includes an AI-generated audio narration of the location description. Tap the play button in the step card to listen while you explore. You can pause, stop, and resume at any time. The audio guide is available in all supported languages except Greek.",
+  "faq.q10": "Can I adjust the playback speed?",
+  "faq.a10": "Yes. The audio player offers five speed options: 0.75×, 1× (normal), 1.25×, 1.5×, and 2×. Tap the speed button in the player to cycle through them.",
+
+  "faq.cat4": "Points & Ranking",
+  "faq.q11": "How do I earn XP points?",
+  "faq.a11": "You earn 20 XP the first time you complete a tour. Optional steps may award bonus XP. Points accumulate in your profile over time.",
+  "faq.q12": "What is the ranking?",
+  "faq.a12": "The global ranking leaderboard lists all users ordered by total XP earned. Your position updates automatically after every tour completion. Tap \"Ranking\" in the navigation menu to see where you stand.",
+  "faq.q13": "What are Favourites?",
+  "faq.a13": "Logged-in users can bookmark any tour by tapping the heart icon on the tour card or detail page. Favourites are saved to your account and accessible from the Favourites tab so you can quickly find tours you want to do later.",
+
+  "faq.cat5": "Donations",
+  "faq.q14": "Are donations mandatory?",
+  "faq.a14": "No — donations are completely voluntary. After completing a tour you will see an optional donation prompt to support the guide who created it. You can close this prompt at any time with no penalty. We will never charge you without your explicit consent.",
+  "faq.q15": "How are donations used?",
+  "faq.a15": "Your donation goes directly to the tour creator (the guide). A small platform fee is deducted to cover payment processing and platform maintenance. The exact revenue split is shown transparently on screen before you confirm any payment.",
+  "faq.q16": "What is the minimum donation amount?",
+  "faq.a16": "The minimum donation is €1. There is no maximum — you are free to contribute as much as you like.",
+
+  "faq.cat6": "Technical",
+  "faq.q17": "Do I need an internet connection?",
+  "faq.a17": "Yes. An active internet connection is required to load tour content, stream the audio guide, show Street View, and save your progress to your account. We recommend using Wi-Fi or a mobile data connection throughout the tour.",
+  "faq.q18": "The audio guide is not available — what happened?",
+  "faq.a18": "The audio guide is currently not available in Greek. If you are using the app in Greek, you will see a notice on the step card. Switch to any other supported language (English, Spanish, French, German, or Italian) to enable the audio guide."
 }

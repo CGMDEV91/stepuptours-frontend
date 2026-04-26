@@ -114,6 +114,7 @@ export default function Footer() {
             </View>
             <FooterLink label={t('footer.home')}   onPress={() => navigate(`/${lang}`)} />
             <FooterLink label={t('nav.ranking')}   onPress={() => navigate(`/${lang}/ranking`)} />
+            <FooterLink label={t('footer.faq')}    onPress={() => navigate(`/${lang}/faq`)} />
             {user && (
                 <>
                   <FooterLink label={t('nav.favourites')} onPress={() => navigate(`/${lang}/favourites`)} />
