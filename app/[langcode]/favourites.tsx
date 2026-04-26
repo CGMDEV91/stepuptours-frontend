@@ -112,11 +112,13 @@ export default function FavouritesScreen() {
 
   // ── Main render ───────────────────────────────────────────────────────────
   return (
+    <View style={styles.root}>
     <PageFlatList
       data={items}
       keyExtractor={(item) => item.activity.tourId}
       numColumns={cols}
       key={`fav-grid-${cols}`}
+      style={styles.list}
       ListHeaderComponent={
         <View>
           <PageBanner
@@ -144,7 +146,6 @@ export default function FavouritesScreen() {
         styles.listContent,
         items.length === 0 && styles.listContentEmpty,
       ]}
-      style={styles.root}
       renderItem={({ item }) => (
         <View
           style={
@@ -169,7 +170,6 @@ export default function FavouritesScreen() {
           />
         </View>
       )}
-      ListFooterComponent={<Footer />}
       ListEmptyComponent={
         <View style={styles.emptyState}>
           <Ionicons name="heart-outline" size={56} color="#D1D5DB" />
@@ -183,6 +183,8 @@ export default function FavouritesScreen() {
         </View>
       }
     />
+    <Footer />
+    </View>
   );
 }
 
@@ -190,6 +192,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  list: {
+    flex: 1,
   },
 
   // ── Centered states ────────────────────────────────────────────────────────

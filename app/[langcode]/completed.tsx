@@ -117,11 +117,13 @@ export default function CompletedScreen() {
 
   // ── Main render ────────────────────────────────────────────────────────────
   return (
+    <View style={styles.root}>
     <PageFlatList
       data={items}
       keyExtractor={(item) => item.activity.tourId}
       numColumns={cols}
       key={`completed-grid-${cols}`}
+      style={styles.list}
       ListHeaderComponent={
         <View>
           <PageBanner
@@ -149,7 +151,6 @@ export default function CompletedScreen() {
         styles.listContent,
         items.length === 0 && styles.listContentEmpty,
       ]}
-      style={styles.root}
       renderItem={({ item }) => (
         <View
           style={
@@ -174,7 +175,6 @@ export default function CompletedScreen() {
           />
         </View>
       )}
-      ListFooterComponent={<Footer />}
       ListEmptyComponent={
         <View style={styles.emptyState}>
           <Ionicons name="trophy-outline" size={56} color="#D1D5DB" />
@@ -188,6 +188,8 @@ export default function CompletedScreen() {
         </View>
       }
     />
+    <Footer />
+    </View>
   );
 }
 
@@ -195,6 +197,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  list: {
+    flex: 1,
   },
 
   // ── Centered states ────────────────────────────────────────────────────────
