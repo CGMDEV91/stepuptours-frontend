@@ -175,17 +175,27 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
   if (sort === 'alphabetical') sortParam = 'sort=title';
   else if (sort === 'popular') sortParam = 'sort=-field_donation_count';
 
-  const params = [
+  const filterStr = [
     buildFilters(drupalFilters),
     minRating ? `filter[rate][condition][path]=field_average_rate&filter[rate][condition][operator]=>=&filter[rate][condition][value]=${minRating}` : '',
     search ? `filter[title][condition][path]=title&filter[title][condition][operator]=CONTAINS&filter[title][condition][value]=${encodeURIComponent(search)}` : '',
+  ].filter(Boolean).join('&');
+
+  const dataParams = [
+    filterStr,
     sortParam,
     buildPage(page, limit),
     buildFields(TOUR_CARD_FIELDS),
     buildInclude(TOUR_CARD_INCLUDE),
   ].filter(Boolean).join('&');
 
-  const { data, meta } = await drupalGetRaw('/node/tour', params);
+  // Count request: base URL (no language prefix) so all published tours are counted
+  // regardless of translation status. Fetches only IDs with a high limit.
+  const [{ data }, allTours] = await Promise.all([
+    drupalGetRaw('/node/tour', dataParams),
+    drupalGetJsonApiBase('/node/tour', 'filter[status]=1&fields[node--tour]=id&page[limit]=500'),
+  ]);
+
   const rawList = Array.isArray(data) ? data : [data];
   const mapped = rawList.map(mapDrupalTour);
 
@@ -198,7 +208,7 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
 
   return {
     data: mapped,
-    total: meta?.count ?? rawList.length,
+    total: allTours.length,
     hasMore: rawList.length === limit,
   };
 }
@@ -234,6 +244,7 @@ export async function getTourById(id: string): Promise<Tour> {
 export async function getTourSteps(tourId: string): Promise<TourStep[]> {
   const params = [
     `filter[field_tour.id]=${tourId}`,
+    'filter[status]=1',
     'sort=field_order',
     buildFields({
       'node--tour_step': [
@@ -465,6 +476,7 @@ export async function getToursByIds(ids: string[]): Promise<Tour[]> {
   );
 
   const params = [
+    'filter[status]=1',
     ...filterParts,
     buildFields(TOUR_CARD_FIELDS),
     buildInclude(TOUR_CARD_INCLUDE),

@@ -489,7 +489,7 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
 
   const {
-    tours, isLoading, hasMore, filters,
+    tours, total, isLoading, hasMore, filters,
     countries, cities, fetchTours, fetchCountries, fetchCities,
     setFilters, clearFilters,
     userActivities, fetchUserActivities, toggleFavorite,
@@ -701,7 +701,7 @@ export default function HomePage() {
             {tours.length > 0 && (
               <View style={[styles.countPillRow, { paddingHorizontal: PADDING }]}>
                 <View style={[styles.countPill, isLoading && { opacity: 0.4 }]}>
-                  <Text style={styles.countPillText}>{tours.length} {t('home.tours')}</Text>
+                  <Text style={styles.countPillText}>{total} {t('home.tours')}</Text>
                 </View>
               </View>
             )}
@@ -1186,7 +1186,8 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 16, color: '#6B7280', fontWeight: '500' },
   loadingState: { flex: 1, paddingVertical: 60, alignItems: 'center', justifyContent: 'center' },
   loadMoreContainer: {
-    paddingBottom: 28,
+    paddingBottom: 25,
+    paddingTop: 10,
     alignItems: 'center',
   },
   loadMoreBtn: {
