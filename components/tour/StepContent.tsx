@@ -141,6 +141,7 @@ interface StepContentProps {
   isExpanded: boolean;
   onComplete: () => void;
   langcode: string;
+  tourId?: string;
   tourTitle?: string;
 }
 
@@ -252,6 +253,7 @@ export function StepContent({
                               isExpanded,
                               onComplete,
                               langcode,
+                              tourId,
                               tourTitle,
                             }: StepContentProps) {
   const { t } = useTranslation();
@@ -593,7 +595,14 @@ export function StepContent({
         </View>
       ) : null}
 
-      {step.featuredBusiness ? <BusinessCard business={step.featuredBusiness} /> : null}
+      {step.featuredBusiness ? (
+        <BusinessCard
+          business={step.featuredBusiness}
+          langcode={langcode}
+          tourId={tourId}
+          stepId={step.id}
+        />
+      ) : null}
 
       {hasLocation && step.location && (confirmed || isCompleted) ? (
         <View style={styles.nearbyContainer}>

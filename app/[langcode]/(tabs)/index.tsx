@@ -1,6 +1,7 @@
 // app/[langcode]/(tabs)/index.tsx
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { useFocusEffect } from 'expo-router';
+import { track } from '../../../services/analytics.service';
 import {
   View,
   Text,
@@ -536,6 +537,12 @@ export default function HomePage() {
     if (user) fetchUserActivities(user.id);
   }, [user?.id]);
 
+  // Track site_view once per visit (fires when langcode is resolved)
+  useEffect(() => {
+    if (!langcode) return;
+    void track('site_view', { langcode, valueStr: `/${langcode}` });
+  }, [langcode]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const cols = width >= 768 ? 3 : width >= 640 ? 2 : 1;
   const GRID_MAX_WIDTH = 1200;
   const PADDING = width >= 768 ? 32 : 16;
@@ -558,9 +565,17 @@ export default function HomePage() {
     return fetchTours({ page: 1 });
   }, []);
 
-  const onSearch = () => {
+  const onSearch = async () => {
     setFilters({ search });
-    fetchTours({ search, page: 1 });
+    await fetchTours({ search, page: 1 });
+    if (search.trim().length >= 3) {
+      const { total: resultCount } = useToursStore.getState();
+      void track('search_query', {
+        langcode: langcode ?? 'en',
+        valueStr: search.trim(),
+        valueInt: resultCount,
+      });
+    }
   };
 
   const handleCountrySelect = (country: string | null) => {
@@ -568,17 +583,26 @@ export default function HomePage() {
     setFilters(next);
     fetchCities(country ?? undefined);
     fetchTours({ ...filters, ...next, page: 1 });
+    if (country) {
+      void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `country:${country}` });
+    }
   };
 
   const handleCitySelect = (city: string | null) => {
     const next = { city: city ?? undefined };
     setFilters(next);
     fetchTours({ ...filters, ...next, page: 1 });
+    if (city) {
+      void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `city:${city}` });
+    }
   };
 
   const handleSortSelect = (sort: TourFilters['sort']) => {
     setFilters({ sort });
     fetchTours({ ...filters, sort, page: 1 });
+    if (sort) {
+      void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `sort:${sort}` });
+    }
   };
 
   const handleClear = () => {
@@ -597,6 +621,10 @@ export default function HomePage() {
     setFilters(next);
     if (country) fetchCities(country);
     fetchTours({ ...filters, ...next });
+    const lang = langcode ?? 'en';
+    if (sort) void track('filter_apply', { langcode: lang, valueStr: `sort:${sort}` });
+    if (country) void track('filter_apply', { langcode: lang, valueStr: `country:${country}` });
+    if (city) void track('filter_apply', { langcode: lang, valueStr: `city:${city}` });
   };
 
   return (

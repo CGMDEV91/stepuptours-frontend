@@ -16,9 +16,14 @@ import { useTranslation } from 'react-i18next';
 import { Business } from '../../types';
 import { imageHeaders } from '../../lib/drupal-client';
 import { stripHtmlText } from '../ui/HtmlText';
+import { track } from '../../services/analytics.service';
 
 interface BusinessCardProps {
   business: Business;
+  // Analytics context — opcionalmente proporcionado por el componente padre
+  langcode?: string;
+  tourId?: string;
+  stepId?: string;
 }
 
 const MAX_DESCRIPTION_LENGTH = 120;
@@ -31,7 +36,7 @@ function getInitials(name: string): string {
     .join('');
 }
 
-export function BusinessCard({ business }: BusinessCardProps) {
+export function BusinessCard({ business, langcode, tourId, stepId }: BusinessCardProps) {
   const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   const shimmerAnim = useRef(new Animated.Value(0)).current;
@@ -50,6 +55,17 @@ export function BusinessCard({ business }: BusinessCardProps) {
   const mapsUrl = business.location
     ? `https://www.google.com/maps/search/?api=1&query=${business.location.lat},${business.location.lon}`
     : null;
+
+  const trackLink = (linkType: 'website' | 'phone' | 'maps') => {
+    if (!langcode) return;
+    void track('business_link_click', {
+      langcode,
+      tourId,
+      stepId,
+      businessId: business.id,
+      valueStr: linkType,
+    });
+  };
 
   const openUrl = (url: string) => Linking.openURL(url).catch(() => {});
 
@@ -127,7 +143,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
           {mapsUrl ? (
             <TouchableOpacity
               style={[styles.actionPrimary, !hasSecondary && { flex: 1 }]}
-              onPress={() => openUrl(mapsUrl)}
+              onPress={() => { trackLink('maps'); openUrl(mapsUrl); }}
               activeOpacity={0.85}
             >
               <Ionicons name="navigate-outline" size={14} color="#ffffff" />
@@ -140,7 +156,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
               {business.phone ? (
                 <TouchableOpacity
                   style={styles.actionSecondary}
-                  onPress={() => openUrl(`tel:${business.phone}`)}
+                  onPress={() => { trackLink('phone'); openUrl(`tel:${business.phone}`); }}
                   activeOpacity={0.7}
                 >
                   <Ionicons name="call-outline" size={15} color="#4b5563" />
@@ -150,7 +166,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
               {business.website ? (
                 <TouchableOpacity
                   style={styles.actionSecondary}
-                  onPress={() => openUrl(business.website!)}
+                  onPress={() => { trackLink('website'); openUrl(business.website!); }}
                   activeOpacity={0.7}
                 >
                   <Ionicons name="globe-outline" size={15} color="#4b5563" />

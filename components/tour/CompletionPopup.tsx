@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { StarRating } from './StarRating';
 import { createDonationIntent, activateDonation } from '../../services/payment.service';
 import { getStripePromise } from '../../lib/stripe';
+import { track } from '../../services/analytics.service';
 
 // Stripe imports — web only (tree-shaken on native)
 let Elements: any = null;
@@ -448,6 +449,13 @@ export function CompletionPopup({
     }).start();
   }, [showPaymentForm]);
 
+  // Track tour_complete when the popup first becomes visible
+  useEffect(() => {
+    if (visible && langcode && tourId) {
+      void track('tour_complete', { langcode, tourId });
+    }
+  }, [visible]);
+
   // Reset state when modal closes
   useEffect(() => {
     if (!visible) {
@@ -571,7 +579,11 @@ export function CompletionPopup({
             {Platform.OS === 'web' && Elements && !showPaymentForm && (
               <TouchableOpacity
                 style={[styles.supportBtn, !isDonationValid && styles.payBtnDisabled]}
-                onPress={() => isDonationValid && setShowPaymentForm(true)}
+                onPress={() => {
+                  if (!isDonationValid) return;
+                  void track('tour_donation_click', { langcode, tourId });
+                  setShowPaymentForm(true);
+                }}
                 disabled={!isDonationValid}
                 activeOpacity={0.85}
               >
@@ -614,7 +626,10 @@ export function CompletionPopup({
             {Platform.OS !== 'web' && (
               <TouchableOpacity
                 style={[styles.payBtn, !isDonationValid && styles.payBtnDisabled]}
-                onPress={handleNativeDonate}
+                onPress={() => {
+                  void track('tour_donation_click', { langcode, tourId });
+                  handleNativeDonate();
+                }}
                 disabled={!isDonationValid}
                 activeOpacity={0.85}
               >

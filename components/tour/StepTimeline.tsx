@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { StepContent } from './StepContent';
 import type { TourStep } from '../../types';
+import { track } from '../../services/analytics.service';
 
 const GREEN  = '#22C55E';
 const ORANGE = '#F59E0B';
@@ -30,6 +31,7 @@ interface StepTimelineProps {
   stepsCompleted: string[];
   onCompleteStep: (stepId: string) => void;
   langcode: string;
+  tourId?: string;
   tourTitle?: string;
   scrollViewRef?: React.RefObject<ScrollView>;
 }
@@ -39,6 +41,7 @@ export function StepTimeline({
                                stepsCompleted,
                                onCompleteStep,
                                langcode,
+                               tourId,
                                tourTitle,
                                scrollViewRef,
                              }: StepTimelineProps) {
@@ -53,6 +56,8 @@ export function StepTimeline({
   const expandAnims  = useRef<Map<number, Animated.Value>>(new Map());
   const circleAnims  = useRef<Map<number, Animated.Value>>(new Map());
   const stepRowRefs  = useRef<Map<number, View | null>>(new Map());
+  // stepId → timestamp when the step was opened (for duration calculation)
+  const stepEnterTimes = useRef<Map<string, number>>(new Map());
 
   const getExpandAnim = (index: number): Animated.Value => {
     if (!expandAnims.current.has(index)) {
@@ -86,12 +91,29 @@ export function StepTimeline({
     }).start();
   };
 
+  const trackStepEnter = (step: TourStep) => {
+    if (stepsCompleted.includes(step.id)) return; // no registrar pasos ya completados
+    stepEnterTimes.current.set(step.id, Date.now());
+    void track('step_view', { langcode, tourId, stepId: step.id });
+  };
+
+  const handleCompleteWithDuration = (stepId: string) => {
+    const enterTime = stepEnterTimes.current.get(stepId);
+    const duration = enterTime ? Math.round((Date.now() - enterTime) / 1000) : 0;
+    stepEnterTimes.current.delete(stepId);
+    // El track de step_complete se emite con la duración real
+    void track('step_complete', { langcode, tourId, stepId, valueInt: duration });
+    onCompleteStep(stepId);
+  };
+
   const toggleStep = (index: number) => {
+    const step = steps[index];
     if (isMobile) {
       // Mobile: open full-screen modal
       setModalStepIndex(index);
-      if (!stepsCompleted.includes(steps[index].id)) {
+      if (!stepsCompleted.includes(step.id)) {
         setManualActiveIndex(index);
+        trackStepEnter(step);
       }
       return;
     }
@@ -113,8 +135,9 @@ export function StepTimeline({
 
     animateExpand(index, willOpen);
 
-    if (willOpen && !stepsCompleted.includes(steps[index].id)) {
+    if (willOpen && !stepsCompleted.includes(step.id)) {
       setManualActiveIndex(index);
+      trackStepEnter(step);
     }
   };
 
@@ -125,7 +148,7 @@ export function StepTimeline({
   };
 
   const handleModalComplete = (stepId: string) => {
-    onCompleteStep(stepId);
+    handleCompleteWithDuration(stepId);
     setModalStepIndex(null);
     setManualActiveIndex(null);
     scrollViewRef?.current?.scrollTo({ y: 0, animated: true });
@@ -277,8 +300,9 @@ export function StepTimeline({
                     isCompleted={state === 'completed'}
                     isActive={state === 'active'}
                     isExpanded={isExpanded}
-                    onComplete={() => onCompleteStep(step.id)}
+                    onComplete={() => handleCompleteWithDuration(step.id)}
                     langcode={langcode}
+                    tourId={tourId}
                     tourTitle={tourTitle}
                   />
                 </Animated.View>
@@ -315,6 +339,7 @@ export function StepTimeline({
                 isExpanded
                 onComplete={() => handleModalComplete(steps[modalStepIndex].id)}
                 langcode={langcode}
+                tourId={tourId}
                 tourTitle={tourTitle}
               />
             </ScrollView>

@@ -17,7 +17,7 @@ interface AuthState {
 
   // Actions
   signIn: (credentials: AuthCredentials) => Promise<void>;
-  signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'professional' }) => Promise<void>;
+  signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'professional'; langcode?: string }) => Promise<void>;
   signInWithGoogle: (googleAccessToken: string, role?: 'professional') => Promise<void>;
   signOut: () => Promise<void>;
   restore: () => Promise<void>;

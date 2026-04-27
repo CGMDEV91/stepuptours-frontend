@@ -6,6 +6,7 @@ import { sessionStorage, inactivityTracker } from '../lib/session';
 import { mapDrupalUser } from '../lib/drupal-client';
 import { getUserById } from './user.service';
 import type { AuthCredentials, AuthSession, User } from '../types';
+import { track } from './analytics.service';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
 
@@ -158,6 +159,7 @@ export async function register(data: {
   email: string;
   password: string;
   role?: 'professional';
+  langcode?: string;
 }): Promise<AuthSession> {
   try {
     const payload: Record<string, string> = {
@@ -181,6 +183,9 @@ export async function register(data: {
     }
     throw new Error(extractErrorMessage(err, 'Error al registrarse'));
   }
+
+  // Track successful registration before logging in
+  void track('user_register', { langcode: data.langcode ?? 'en' });
 
   return login({ username: data.username, password: data.password });
 }

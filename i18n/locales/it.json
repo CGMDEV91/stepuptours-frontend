@@ -266,6 +266,7 @@
   "donation.donated": "Hai donato {{amount}} € a {{tour}}",
   "admin.tabs.businesses": "Attività",
   "admin.tabs.donations": "Donazioni",
+  "admin.tabs.analytics": "Analisi",
   "admin.donations.totalAmount": "Donazioni totali",
   "admin.donations.platformRevenue": "Entrate della piattaforma",
   "admin.donations.guideRevenue": "Entrate della guida",

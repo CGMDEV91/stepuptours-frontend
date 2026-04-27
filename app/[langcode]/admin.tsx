@@ -19,6 +19,7 @@ import { useAuthStore } from '../../stores/auth.store';
 import { SiteSettingsTab } from '../../components/admin/SiteSettingsTab';
 import { TranslationsTab } from '../../components/admin/TranslationsTab';
 import { LegalTab } from '../../components/admin/LegalTab';
+import { AnalyticsTab } from '../../components/admin/AnalyticsTab';
 import { DonationsView } from '../../components/shared/DonationsView';
 import { BusinessTab } from '../../components/dashboard/BusinessTab';
 import PageBanner from '../../components/layout/PageBanner';
@@ -27,7 +28,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'users' | 'legal';
+type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'users' | 'legal' | 'analytics';
 
 interface Tab {
   id: TabId;
@@ -41,10 +42,11 @@ const TABS: Tab[] = [
   { id: 'legal',        labelKey: 'admin.tabs.legal',        icon: 'document-text-outline' },
   { id: 'businesses',   labelKey: 'admin.tabs.businesses',   icon: 'business-outline' },
   { id: 'donations',    labelKey: 'admin.tabs.donations',    icon: 'cash-outline' },
+  { id: 'analytics',    labelKey: 'admin.tabs.analytics',    icon: 'bar-chart-outline' },
   { id: 'users',        labelKey: 'admin.tabs.users',        icon: 'people-outline' },
 ];
 
-const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'users'];
+const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics', 'users'];
 function isValidAdminTab(value: string): value is TabId {
   return VALID_ADMIN_TABS.includes(value as TabId);
 }
@@ -180,6 +182,8 @@ export default function AdminScreen() {
         return <BusinessTab />;
       case 'donations':
         return <DonationsView mode="admin" />;
+      case 'analytics':
+        return <AnalyticsTab />;
       case 'users':
         return (
             <View style={styles.placeholder}>

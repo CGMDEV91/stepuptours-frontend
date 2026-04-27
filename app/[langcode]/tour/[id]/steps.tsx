@@ -247,6 +247,7 @@ export default function TourStepsScreen() {
           stepsCompleted={stepsCompleted}
           onCompleteStep={handleCompleteStep}
           langcode={langcode ?? 'en'}
+          tourId={tour.id}
           tourTitle={tour.title}
           scrollViewRef={scrollViewRef}
         />

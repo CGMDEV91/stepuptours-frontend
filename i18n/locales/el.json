@@ -267,6 +267,7 @@
   "donation.donated": "Δωρίσατε {{amount}}€ στο {{tour}}",
   "admin.tabs.businesses": "Επιχειρήσεις",
   "admin.tabs.donations": "Δωρεές",
+  "admin.tabs.analytics": "Αναλυτικά",
   "admin.donations.totalAmount": "Συνολικές δωρεές",
   "admin.donations.platformRevenue": "Έσοδα πλατφόρμας",
   "admin.donations.guideRevenue": "Έσοδα οδηγού",

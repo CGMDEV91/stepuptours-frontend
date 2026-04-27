@@ -17,6 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth.store';
+import { useLanguageStore } from '../../stores/language.store';
 import { getGoogleAccessToken } from '../../services/googleAuth.service';
 import { getRegistrationSettings } from '../../services/admin.service';
 
@@ -249,6 +250,7 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
 // ── Modal Registro ────────────────────────────────────────────────────────────
 function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: () => void; onSwitch: () => void; fullscreen?: boolean; desktopWeb?: boolean }) {
   const { signUp, signInWithGoogle, isLoading, error, clearError } = useAuthStore();
+  const currentLangcode = useLanguageStore((s) => s.currentLanguage?.id ?? 'en');
   const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [publicName, setPublicName] = useState('');
@@ -298,6 +300,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
       email: email.trim(),
       password,
       role: role === 'professional' ? 'professional' : undefined,
+      langcode: currentLangcode,
     });
     if (!useAuthStore.getState().error) onClose();
   };
