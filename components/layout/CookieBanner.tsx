@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { notifyConsentGranted, notifyConsentRevoked } from '../../services/analytics.service';
 
 const CONSENT_KEY = 'cookie_consent';
 
@@ -60,11 +61,13 @@ export default function CookieBanner() {
 
   const handleAccept = async () => {
     await storage.setItem(CONSENT_KEY, 'accepted');
+    notifyConsentGranted();
     setVisible(false);
   };
 
   const handleDecline = async () => {
     await storage.setItem(CONSENT_KEY, 'declined');
+    notifyConsentRevoked();
     setVisible(false);
   };
 

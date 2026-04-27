@@ -24,9 +24,11 @@ import { HtmlText } from '../../../components/ui/HtmlText';
 import BackButton from '../../../components/layout/BackButton';
 import Footer from '../../../components/layout/Footer';
 import { PageScrollView } from '../../../components/layout/PageScrollView';
+import { TourHead } from '../../../components/seo/TourHead';
 import { webFullHeight } from '../../../lib/web-styles';
 import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
+import { track } from '../../../services/analytics.service';
 
 const AMBER = '#F59E0B';
 const BANNER_HEIGHT = 380;
@@ -63,6 +65,13 @@ export default function TourDetailScreen() {
     }
   }, [id, user?.id]);
 
+  // Track tour view once the tour is loaded
+  useEffect(() => {
+    if (tour && langcode) {
+      void track('tour_view', { langcode, tourId: tour.id });
+    }
+  }, [tour?.id, langcode]);
+
   // Show rating prompt when tour is completed but not yet rated
   useEffect(() => {
     if (activity?.isCompleted && !activity.ratedAt) {
@@ -82,24 +91,35 @@ export default function TourDetailScreen() {
     setPendingRating(0);
   }, []);
 
-  const isFavorite = id ? (userActivities[id]?.isFavorite ?? false) : false;
+  // Use the UUID from the loaded tour for all activity operations —
+  // the `id` param is now a slug (e.g. 'espana-alicante-234'), not a UUID.
+  const tourUuid = tour?.id ?? '';
+  const isFavorite = tourUuid ? (userActivities[tourUuid]?.isFavorite ?? false) : false;
 
   const handleToggleFavorite = useCallback(() => {
     if (!user) {
       openAuthModal('register');
       return;
     }
-    if (id) {
-      toggleFavorite(user.id, id);
+    if (tourUuid) {
+      void track('tour_favorite', {
+        langcode: langcode ?? 'en',
+        tourId: tourUuid,
+        valueInt: isFavorite ? 0 : 1,
+      });
+      toggleFavorite(user.id, tourUuid);
     }
-  }, [user, id, openAuthModal, toggleFavorite]);
+  }, [user, tourUuid, isFavorite, langcode, openAuthModal, toggleFavorite]);
 
   const handleShare = async () => {
-    const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.com';
+    const siteUrl =
+      process.env.EXPO_PUBLIC_SITE_URL ??
+      (typeof window !== 'undefined' ? window.location.origin : 'https://stepuptours.com');
+    void track('tour_share', { langcode: langcode ?? 'en', tourId: tourUuid });
     try {
       await Share.share({
         message: `${tour?.title} - StepUp Tours`,
-        url: `${BASE_URL}/${langcode}/tour/${id}`,
+        url: `${siteUrl}/${langcode}/tour/${id}`,
       });
     } catch {}
   };
@@ -129,7 +149,7 @@ export default function TourDetailScreen() {
       return {
         label: t('tour.startAgain'),
         onPress: async () => {
-          await updateActivity(user.id, id!, { stepsCompleted: [] });
+          await updateActivity(user.id, tourUuid, { stepsCompleted: [] });
           router.push(`/${langcode}/tour/${id}/steps`);
         },
       };
@@ -148,7 +168,7 @@ export default function TourDetailScreen() {
       return {
         label: t('tour.startAgain'),
         onPress: async () => {
-          await updateActivity(user.id, id!, { stepsCompleted: [] });
+          await updateActivity(user.id, tourUuid, { stepsCompleted: [] });
           router.push(`/${langcode}/tour/${id}/steps`);
         },
       };
@@ -159,7 +179,7 @@ export default function TourDetailScreen() {
       label: t('tour.continue'),
       onPress: () => router.push(`/${langcode}/tour/${id}/steps`),
     };
-  }, [user, activity, steps, id, langcode, router, t, openAuthModal, updateActivity]);
+  }, [user, activity, steps, id, tourUuid, langcode, router, t, openAuthModal, updateActivity]);
 
   if (isLoadingDetail || !tour) {
     return (
@@ -168,6 +188,9 @@ export default function TourDetailScreen() {
       </View>
     );
   }
+
+
+
 
   const cta = getCtaConfig();
   const ctaLabel = cta.label;
@@ -188,6 +211,8 @@ export default function TourDetailScreen() {
   const stableDefault = DEFAULT_IMAGES[hashId % DEFAULT_IMAGES.length];
 
   return (
+    <>
+    <TourHead tour={tour} langcode={langcode ?? 'en'} />
     <View style={styles.screen}>
       <PageScrollView
         style={styles.scrollView}
@@ -334,6 +359,7 @@ export default function TourDetailScreen() {
         </View>
       </Modal>
     </View>
+    </>
   );
 }
 

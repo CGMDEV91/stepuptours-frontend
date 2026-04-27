@@ -2,11 +2,13 @@ import "../global.css";
 import "../i18n";
 import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
+import Head from "expo-router/head";
 import { PortalHost } from "@rn-primitives/portal";
 import { useAuthStore } from "../stores/auth.store";
 import { useLanguageStore } from "../stores/language.store";
 import { useFonts } from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
+import { initAnalytics } from "../services/analytics.service";
 
 export default function RootLayout() {
   useFonts({ ...Ionicons.font });
@@ -16,13 +18,18 @@ export default function RootLayout() {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    Promise.all([restore(), fetchLanguages()]).then(() => {
+    Promise.all([restore(), fetchLanguages(), initAnalytics()]).then(() => {
       setInitialized(true);
     });
   }, []);
 
   return (
     <>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow" />
+      </Head>
       <Stack screenOptions={{ headerShown: false }} />
       <PortalHost />
     </>

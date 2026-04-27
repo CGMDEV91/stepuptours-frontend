@@ -22,6 +22,7 @@ import { useToursStore } from '../../../stores/tours.store';
 import { useAuthStore } from '../../../stores/auth.store';
 import { useLanguageStore } from '../../../stores/language.store';
 import { TourCard } from '../../../components/tour/TourCard';
+import { ListingHead } from '../../../components/seo/ListingHead';
 import { Ionicons } from '@expo/vector-icons';
 import type { TourFilters } from '../../../types';
 import Footer from '../../../components/layout/Footer';
@@ -599,6 +600,8 @@ export default function HomePage() {
   };
 
   return (
+    <>
+    <ListingHead langcode={langcode ?? 'en'} />
     <View style={styles.root}>
       <PageFlatList
         data={tours}
@@ -767,6 +770,7 @@ export default function HomePage() {
         }
       />
     </View>
+    </>
   );
 }
 

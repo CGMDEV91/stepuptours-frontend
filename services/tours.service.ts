@@ -30,6 +30,7 @@ import type {
 const TOUR_FIELDS = {
   'node--tour': [
     'title',
+    'drupal_internal__nid',
     'field_description',
     'field_image',
     'field_average_rate',
@@ -72,6 +73,7 @@ const TOUR_INCLUDE = [
 const TOUR_CARD_FIELDS = {
   'node--tour': [
     'title',
+    'drupal_internal__nid',
     'field_image',
     'field_average_rate',
     'field_rating_count',
@@ -230,6 +232,34 @@ export async function getTourById(id: string): Promise<Tour> {
     const steps = await drupalGetJsonApiBase(
       '/node/tour_step',
       `filter[field_tour.id]=${raw.id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
+    );
+    tour.stopsCount = steps.length;
+  } catch {
+    tour.stopsCount = 0;
+  }
+
+  return tour;
+}
+
+// ── Obtener tour por nid (Drupal internal node ID) ────────────────────────────
+
+export async function getTourByNid(nid: number): Promise<Tour> {
+  const params = [
+    `filter[drupal_internal__nid]=${nid}`,
+    'filter[status]=1',
+    buildFields(TOUR_FIELDS),
+    buildInclude([...TOUR_INCLUDE, 'uid']),
+  ].join('&');
+
+  const { data } = await drupalGetRaw('/node/tour', params);
+  const list = Array.isArray(data) ? data : data ? [data] : [];
+  if (list.length === 0) throw new Error(`Tour with nid ${nid} not found`);
+
+  const tour = mapDrupalTour(list[0]);
+  try {
+    const steps = await drupalGetJsonApiBase(
+      '/node/tour_step',
+      `filter[field_tour.id]=${list[0].id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`,
     );
     tour.stopsCount = steps.length;
   } catch {

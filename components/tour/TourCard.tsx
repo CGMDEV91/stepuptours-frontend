@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tour } from '../../types';
 import { StarRating } from './StarRating';
 import { imageHeaders } from '../../lib/drupal-client';
+import { buildTourSlug } from '../../lib/tour-slug';
 
 interface TourCardProps {
   tour: Tour;
@@ -63,7 +64,10 @@ export function TourCard({
   const stableDefault = DEFAULT_IMAGES[hashId % DEFAULT_IMAGES.length];
 
   const handlePress = () => {
-    router.push(`/${langcode}/tour/${tour.id}`);
+    const slug = tour.drupalInternalId
+      ? buildTourSlug({ country: tour.country?.name, city: tour.city?.name, nid: tour.drupalInternalId })
+      : tour.id;
+    router.push(`/${langcode}/tour/${slug}`);
   };
 
   const locationText = [tour.city?.name, tour.country?.name]

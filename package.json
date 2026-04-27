@@ -11,7 +11,9 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "postinstall": "patch-package",
-    "deploy": "mv .env.local .env.local.bak && rm -rf dist/ && npx expo export -p web --clear && wrangler deploy && mv .env.local.bak .env.local"
+    "deploy": "mv .env.local .env.local.bak && rm -rf dist/ && npx expo export -p web --clear && wrangler deploy && mv .env.local.bak .env.local",
+    "sitemap": "ts-node scripts/generate-sitemap.ts",
+    "build:web": "npm run sitemap && expo export --platform web"
   },
   "jest": {
     "preset": "jest-expo"
@@ -84,7 +86,6 @@
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
-    "dotenv-cli": "^11.0.0",
     "jest": "^29.2.1",
     "jest-expo": "~52.0.6",
     "patch-package": "^8.0.1",

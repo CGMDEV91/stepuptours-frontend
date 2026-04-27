@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Block private / authenticated-only routes
+Disallow: /*/dashboard
+Disallow: /*/dashboard/*
+Disallow: /*/profile
+Disallow: /*/favourites
+Disallow: /*/completed
+Disallow: /*/subscription
+
+# Allow all tour pages
+Allow: /*/tour/
+
+Sitemap: https://stepuptours.com/sitemap.xml

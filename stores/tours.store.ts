@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import {
   getTours,
   getTourById,
+  getTourByNid,
   getTourSteps,
   getTourActivity,
   upsertTourActivity,
@@ -12,6 +13,7 @@ import {
   getCountries,
   getCitiesByCountry,
 } from '../services/tours.service';
+import { isUuid, extractNidFromSlug } from '../lib/tour-slug';
 import type {
   Tour,
   TourStep,
@@ -100,18 +102,26 @@ export const useToursStore = create<ToursState>((set, get) => ({
     }
   },
 
-  fetchTourDetail: async (id, userId) => {
+  fetchTourDetail: async (idParam, userId) => {
     set({ isLoadingDetail: true, error: null, currentTour: null, currentSteps: [], currentActivity: null });
     try {
-      const [tour, steps] = await Promise.all([
-        getTourById(id),
-        getTourSteps(id),
-      ]);
+      let tour: Tour;
+      let tourUuid: string;
 
-      let activity: TourActivity | null = null;
-      if (userId) {
-        activity = await getTourActivity(userId, id);
+      if (isUuid(idParam)) {
+        tour = await getTourById(idParam);
+        tourUuid = idParam;
+      } else {
+        const nid = extractNidFromSlug(idParam);
+        if (isNaN(nid)) throw new Error(`Identificador de tour inválido: ${idParam}`);
+        tour = await getTourByNid(nid);
+        tourUuid = tour.id;
       }
+
+      const [steps, activity] = await Promise.all([
+        getTourSteps(tourUuid),
+        userId ? getTourActivity(userId, tourUuid) : Promise.resolve(null),
+      ]);
 
       set({ currentTour: tour, currentSteps: steps, currentActivity: activity, isLoadingDetail: false });
     } catch (err: any) {

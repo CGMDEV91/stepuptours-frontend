@@ -29,6 +29,8 @@ import { TourOnboardingModal, ONBOARDING_STORAGE_KEY } from '../../../../compone
 import BackButton from '../../../../components/layout/BackButton';
 import { CONTENT_MAX_WIDTH } from '../../../../styles/theme';
 import { webFullHeight } from '../../../../lib/web-styles';
+import { track } from '../../../../services/analytics.service';
+import { useAbandonDetector } from '../../../../hooks/useAbandonDetector';
 
 const AMBER = '#F59E0B';
 
@@ -68,6 +70,13 @@ export default function TourStepsScreen() {
       fetchTourDetail(id, user.id);
     }
   }, [id, user?.id]);
+
+  // Track tour start once tour is loaded
+  useEffect(() => {
+    if (tour && langcode) {
+      void track('tour_start', { langcode, tourId: tour.id });
+    }
+  }, [tour?.id, langcode]);
 
   // Fetch guide user when tour data is available
   useEffect(() => {
@@ -155,6 +164,15 @@ export default function TourStepsScreen() {
     setShowCompletion(false);
     router.replace(`/${langcode}`);
   }, [langcode, router]);
+
+  // Detect tour abandon (close tab / app background) — only when tour is loaded
+  useAbandonDetector({
+    tourId: tour?.id ?? '',
+    langcode: langcode ?? 'en',
+    totalSteps,
+    completedSteps: stepsCompleted.length,
+    isCompleted: activity?.isCompleted ?? false,
+  });
 
   // While auth is restoring, show spinner. Once done, layout redirects if no user.
   if (isAuthLoading || !user) {
