@@ -2,6 +2,7 @@
 // Stripe initialization for web
 
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
+import { useAuthStore } from '../stores/auth.store';
 import axios from 'axios';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
@@ -9,11 +10,17 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.si
 let stripePromise: Promise<Stripe | null> | null = null;
 
 export function getStripePromise(): Promise<Stripe | null> {
-  // Don't cache a failed/null result — retry on next call
-  if (!stripePromise) {
-    const attempt = axios
-      .get(`${BASE_URL}/api/payment/config`)
-      .then((res) => {
+    // Don't cache a failed/null result — retry on next call
+    if (!stripePromise) {
+        const session = useAuthStore.getState().session;
+        const headers: Record<string, string> = {};
+        if (session?.token) {
+            headers['Authorization'] = `Basic ${session.token}`;
+        }
+
+        const attempt = axios
+            .get(`${BASE_URL}/api/payment/config`, { headers })
+            .then((res) => {
         const key = res.data?.publishableKey;
         if (!key || key === 'pk_test_PLACEHOLDER') {
           console.warn('Stripe publishable key not configured');
