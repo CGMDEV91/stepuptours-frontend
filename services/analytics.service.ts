@@ -60,6 +60,42 @@ export interface TourSummary {
   avg_abandonment_pct: number;
   shares: number;
   completion_rate: number;
+  avg_step_duration_s?: number; // optional — populated by backend if available
+}
+
+export interface StepAnalytics {
+  step_id: string;
+  title: string;
+  order: number;
+  views: number;                // step_view events = "I'm here" clicks
+  completions: number;          // step_complete events
+  avg_duration_seconds: number; // avg time with step open
+  drop_rate: number;            // 1 - (completions / previous_step_completions)
+}
+
+export interface TourAnalyticsDetail {
+  tour_id: string;
+  title: string;
+  period: { from: string; to: string };
+  views: number;
+  starts: number;
+  completions: number;
+  completion_rate: number;
+  avg_abandonment_pct: number;
+  shares: number;
+  steps: StepAnalytics[];
+}
+
+export interface BusinessSummary {
+  business_id: string;
+  name: string;
+  step_views: number;
+  total_link_clicks: number;
+  website_clicks: number;
+  phone_clicks: number;
+  maps_clicks: number;
+  click_through_rate: number;
+  avg_time_on_step_seconds: number;
 }
 
 export interface DatePoint {
@@ -253,6 +289,33 @@ export async function fetchBusinessAnalytics(
   const session = useAuthStore.getState().session;
   const res = await fetch(
     `${BASE_URL}/api/analytics/business/${businessId}?from=${from}&to=${to}`,
+    { headers: { Authorization: `Basic ${session?.token}` } }
+  );
+  return res.json();
+}
+
+// GET /api/analytics/tour/{tour_id}?from=&to=
+export async function fetchTourAnalytics(
+  tourId: string,
+  from: string,
+  to: string
+): Promise<TourAnalyticsDetail> {
+  const session = useAuthStore.getState().session;
+  const res = await fetch(
+    `${BASE_URL}/api/analytics/tour/${tourId}?from=${from}&to=${to}`,
+    { headers: { Authorization: `Basic ${session?.token}` } }
+  );
+  return res.json();
+}
+
+// GET /api/analytics/businesses?from=&to=  (admin only)
+export async function fetchAllBusinessAnalytics(
+  from: string,
+  to: string
+): Promise<BusinessSummary[]> {
+  const session = useAuthStore.getState().session;
+  const res = await fetch(
+    `${BASE_URL}/api/analytics/businesses?from=${from}&to=${to}`,
     { headers: { Authorization: `Basic ${session?.token}` } }
   );
   return res.json();
