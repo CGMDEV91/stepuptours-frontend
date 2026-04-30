@@ -11,7 +11,7 @@
     "DRUPAL_API_URL": "https://dev-step-up-tours.pantheonsite.io"
   },
   "routes": [
-    { "pattern": "[stepuptours.com](stepuptours.com)", "custom_domain": true },
-    { "pattern": "[www.stepuptours.com](www.stepuptours.com)", "custom_domain": true }
+    { "pattern": "stepuptours.com", "custom_domain": true },
+    { "pattern": "www.stepuptours.com", "custom_domain": true }
   ]
 }
