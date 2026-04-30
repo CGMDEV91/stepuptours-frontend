@@ -48,6 +48,7 @@ export interface SiteSummary {
   registered_views: number;
   new_registrations: number;
   total_searches: number;
+  total_users?: number;
 }
 
 export interface TourSummary {
@@ -294,28 +295,34 @@ export async function fetchBusinessAnalytics(
   return res.json();
 }
 
-// GET /api/analytics/tour/{tour_id}?from=&to=
+// GET /api/analytics/tour/{tour_id}?from=&to=&langcode=
 export async function fetchTourAnalytics(
   tourId: string,
   from: string,
-  to: string
+  to: string,
+  langcode?: string
 ): Promise<TourAnalyticsDetail> {
+  const params = new URLSearchParams({ from, to });
+  if (langcode) params.set('langcode', langcode);
   const session = useAuthStore.getState().session;
   const res = await fetch(
-    `${BASE_URL}/api/analytics/tour/${tourId}?from=${from}&to=${to}`,
+    `${BASE_URL}/api/analytics/tour/${tourId}?${params}`,
     { headers: { Authorization: `Basic ${session?.token}` } }
   );
   return res.json();
 }
 
-// GET /api/analytics/businesses?from=&to=  (admin only)
+// GET /api/analytics/businesses?from=&to=&langcode=  (admin only)
 export async function fetchAllBusinessAnalytics(
   from: string,
-  to: string
+  to: string,
+  langcode?: string
 ): Promise<BusinessSummary[]> {
+  const params = new URLSearchParams({ from, to });
+  if (langcode) params.set('langcode', langcode);
   const session = useAuthStore.getState().session;
   const res = await fetch(
-    `${BASE_URL}/api/analytics/businesses?from=${from}&to=${to}`,
+    `${BASE_URL}/api/analytics/businesses?${params}`,
     { headers: { Authorization: `Basic ${session?.token}` } }
   );
   return res.json();

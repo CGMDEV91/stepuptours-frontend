@@ -6,7 +6,8 @@
       "Bash(powershell.exe -Command \"tree '\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\.claude'\")",
       "Bash(test -f /home/carlos/devel/stepuptours/stepuptours-frontend/app/[langcode]/terms-of-use.tsx)",
       "Read(///wsl.localhost/Ubuntu/home/carlos/devel/stepuptours/stepuptours-frontend/i18n/locales/**)",
-      "Bash(jobs)"
+      "Bash(jobs)",
+      "Bash(npx tsc *)"
     ]
   }
 }

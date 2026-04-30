@@ -107,3 +107,26 @@ body {
     --ring: 38 92% 50%;
   }
 }
+
+/* ── Analytics tables: force visible horizontal scrollbar ── */
+.analytics-table-scroll,
+.analytics-table-scroll::-webkit-scrollbar {
+  display: block !important;
+  scrollbar-width: thin !important;
+  -ms-overflow-style: auto !important;
+}
+.analytics-table-scroll::-webkit-scrollbar {
+  height: 6px !important;
+  width: 6px !important;
+}
+.analytics-table-scroll::-webkit-scrollbar-track {
+  background: #F3F4F6 !important;
+  border-radius: 10px !important;
+}
+.analytics-table-scroll::-webkit-scrollbar-thumb {
+  background-color: #D1D5DB !important;
+  border-radius: 10px !important;
+}
+.analytics-table-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #F59E0B !important;
+}

@@ -229,7 +229,15 @@ export default function AdminScreen() {
                     subtitle="Manage site settings and content"
                     showBack={false}
                 />
-                <View style={{ maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20 }}>
+                <View
+                    style={{
+                      maxWidth: activeTab === 'analytics' ? (isMobile ? CONTENT_MAX_WIDTH : '90%') : CONTENT_MAX_WIDTH,
+                      width: '100%',
+                      alignSelf: 'center',
+                      paddingHorizontal: 16,
+                      paddingTop: 20,
+                    }}
+                >
                   {renderContent()}
                 </View>
               </ScrollView>
