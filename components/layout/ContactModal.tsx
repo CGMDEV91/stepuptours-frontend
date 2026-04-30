@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 
 const BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.com';
 
 interface ContactModalProps {
   visible: boolean;

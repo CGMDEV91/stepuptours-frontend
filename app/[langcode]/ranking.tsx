@@ -225,15 +225,17 @@ export default function RankingScreen() {
       />
 
       {/* Main card: section title + all rows */}
-      <View style={[styles.mainCard, cardStyle]}>
-        {/* Section title */}
-        <View style={styles.sectionTitleRow}>
-          <Ionicons name="star" size={18} color={AMBER} />
-          <Text style={styles.sectionTitleText}>Top Exploradores</Text>
-        </View>
+      <View style={{ flex: 1 }}>
+        <View style={[styles.mainCard, cardStyle]}>
+          {/* Section title */}
+          <View style={styles.sectionTitleRow}>
+            <Ionicons name="star" size={18} color={AMBER} />
+            <Text style={styles.sectionTitleText}>Top Exploradores</Text>
+          </View>
 
-        {/* Rows */}
-        {renderContent()}
+          {/* Rows */}
+          {renderContent()}
+        </View>
       </View>
       <Footer />
     </PageScrollView>
@@ -266,6 +268,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 0,
+    flexGrow: 1,
   },
 
   // ── Centered / error / empty ──────────────────────────────────────────────────

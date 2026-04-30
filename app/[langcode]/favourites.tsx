@@ -20,6 +20,7 @@ import { TourCard } from '../../components/tour/TourCard';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageFlatList } from '../../components/layout/PageFlatList';
+import { webFullHeight } from '../../lib/web-styles';
 
 const AMBER = '#F59E0B';
 
@@ -113,77 +114,79 @@ export default function FavouritesScreen() {
   // ── Main render ───────────────────────────────────────────────────────────
   return (
     <View style={styles.root}>
-    <PageFlatList
-      data={items}
-      keyExtractor={(item) => item.activity.tourId}
-      numColumns={cols}
-      key={`fav-grid-${cols}`}
-      style={styles.list}
-      ListHeaderComponent={
-        <View>
-          <PageBanner
-            icon="heart"
-            iconBgColor="#EC4899"
-            title={t('nav.favourites')}
-            subtitle={t('favourites.subtitle')}
-          />
-          <View style={{ height: 24 }} />
-        </View>
-      }
-      columnWrapperStyle={
-        cols > 1
-          ? {
-              maxWidth: GRID_MAX_WIDTH,
-              alignSelf: 'center',
-              width: '100%',
-              paddingHorizontal: PADDING,
-              justifyContent: 'flex-start',
-              gap: GAP,
+      <PageFlatList
+        data={items}
+        keyExtractor={(item) => item.activity.tourId}
+        numColumns={cols}
+        key={`fav-grid-${cols}`}
+        style={styles.list}
+        ListHeaderComponent={
+          <View>
+            <PageBanner
+              icon="heart"
+              iconBgColor="#EC4899"
+              title={t('nav.favourites')}
+              subtitle={t('favourites.subtitle')}
+            />
+            <View style={{ height: 24 }} />
+          </View>
+        }
+        columnWrapperStyle={
+          cols > 1
+            ? {
+                maxWidth: GRID_MAX_WIDTH,
+                alignSelf: 'center',
+                width: '100%',
+                paddingHorizontal: PADDING,
+                justifyContent: 'flex-start',
+                gap: GAP,
+                paddingBottom: 10,
+              }
+            : undefined
+        }
+        contentContainerStyle={[
+          styles.listContent,
+          items.length === 0 && styles.listContentEmpty,
+        ]}
+        renderItem={({ item }) => (
+          <View
+            style={
+              cols === 1
+                ? {
+                    maxWidth: GRID_MAX_WIDTH,
+                    alignSelf: 'center',
+                    width: '100%',
+                    paddingVertical: 10,
+                    paddingHorizontal: PADDING,
+                  }
+                : undefined
             }
-          : undefined
-      }
-      contentContainerStyle={[
-        styles.listContent,
-        items.length === 0 && styles.listContentEmpty,
-      ]}
-      renderItem={({ item }) => (
-        <View
-          style={
-            cols === 1
-              ? {
-                  maxWidth: GRID_MAX_WIDTH,
-                  alignSelf: 'center',
-                  width: '100%',
-                  paddingHorizontal: PADDING,
-                }
-              : undefined
-          }
-        >
-          <TourCard
-            tour={item.tour}
-            cardWidth={cardWidth}
-            langcode={langcode}
-            isAuthenticated={true}
-            isFavorite={true}
-            isCompleted={item.activity.isCompleted}
-            onToggleFavorite={() => handleToggleFavourite(item)}
-          />
-        </View>
-      )}
-      ListEmptyComponent={
-        <View style={styles.emptyState}>
-          <Ionicons name="heart-outline" size={56} color="#D1D5DB" />
-          <Text style={styles.emptyTitle}>No favourites yet</Text>
-          <TouchableOpacity
-            style={styles.btnPrimary}
-            onPress={() => router.replace(`/${langcode}` as any)}
           >
-            <Text style={styles.btnPrimaryText}>{t('home.allCountries')}</Text>
-          </TouchableOpacity>
-        </View>
-      }
-    />
-    <Footer />
+            <TourCard
+              tour={item.tour}
+              cardWidth={cardWidth}
+              langcode={langcode}
+              isAuthenticated={true}
+              isFavorite={true}
+              isCompleted={item.activity.isCompleted}
+              onToggleFavorite={() => handleToggleFavourite(item)}
+            />
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Ionicons name="heart-outline" size={56} color="#D1D5DB" />
+            <Text style={styles.emptyTitle}>No favourites yet</Text>
+            <TouchableOpacity
+              style={styles.btnPrimary}
+              onPress={() => router.replace(`/${langcode}` as any)}
+            >
+              <Text style={styles.btnPrimaryText}>{t('home.allCountries')}</Text>
+            </TouchableOpacity>
+          </View>
+        }
+      />
+      <Footer />
     </View>
   );
 }
@@ -192,6 +195,7 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+    ...webFullHeight,
   },
   list: {
     flex: 1,
