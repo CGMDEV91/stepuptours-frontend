@@ -39,7 +39,6 @@ export default function Footer() {
   const router = useRouter();
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { width } = useWindowDimensions();
-  const openContactModal = useAuthStore((s) => s.openContactModal);
   const user = useAuthStore((s) => s.user);
   const isDesktop = width >= 768;
 
@@ -132,7 +131,6 @@ export default function Footer() {
             <FooterLink label={t('footer.privacyPolicy')} onPress={() => navigate(`/${lang}/privacy-policy`)} />
             <FooterLink label={t('footer.cookiePolicy')}  onPress={() => navigate(`/${lang}/cookie-policy`)} />
             <FooterLink label={t('footer.termsOfUse')}    onPress={() => navigate(`/${lang}/terms-of-use`)} />
-            <FooterLink label={t('footer.contact')}       onPress={openContactModal} />
           </View>
 
           {/* Col 4 — Contact info */}
@@ -142,7 +140,9 @@ export default function Footer() {
               <View style={styles.colUnderline} />
             </View>
             {!!settings.siteEmail && (
+              <TouchableOpacity onPress={() => Linking.openURL(`mailto:${settings.siteEmail}`)}>
                 <ContactItem icon="mail-outline" text={settings.siteEmail} />
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -237,7 +237,12 @@ const styles = StyleSheet.create({
   linkChevron: { marginRight: 6 },
   footerLinkText: { color: TEXT_LIGHT, fontSize: 13 },
 
-  contactItem: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 12 },
+  contactItem: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 12,
+    alignItems: 'center'
+  },
   contactIconCircle: {
     width: 30, height: 30, borderRadius: 15,
     backgroundColor: ACCENT + '22',

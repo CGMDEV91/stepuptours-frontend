@@ -7,7 +7,6 @@ import { useLanguageStore } from '../../stores/language.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
 import { Navbar } from '../../components/layout/Navbar';
-import ContactModal from '../../components/layout/ContactModal';
 import CookieBanner from '../../components/layout/CookieBanner';
 
 export default function LangcodeLayout() {
@@ -22,10 +21,6 @@ export default function LangcodeLayout() {
   const pendingAuthModal = useAuthStore((s) => s.pendingAuthModal);
   const openAuthModal = useAuthStore((s) => s.openAuthModal);
   const closeAuthModal = useAuthStore((s) => s.closeAuthModal);
-
-  // Contact modal state — driven by Zustand so Footer can trigger it
-  const contactModalOpen = useAuthStore((s) => s.contactModalOpen);
-  const closeContactModal = useAuthStore((s) => s.closeContactModal);
 
   // Auth state for logout redirect
   const user = useAuthStore((s) => s.user);
@@ -100,10 +95,6 @@ export default function LangcodeLayout() {
         visible={pendingAuthModal}
         onClose={closeAuthModal}
         onSwitch={(mode) => openAuthModal(mode)}
-      />
-      <ContactModal
-        visible={contactModalOpen}
-        onClose={closeContactModal}
       />
       {/* Cookie consent banner — position: absolute, renders above content */}
       <CookieBanner />

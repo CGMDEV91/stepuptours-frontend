@@ -31,7 +31,7 @@ import { imageHeaders } from '../../../lib/drupal-client';
 import { track } from '../../../services/analytics.service';
 
 const AMBER = '#F59E0B';
-const BANNER_HEIGHT = 380;
+const BANNER_HEIGHT = 255;
 
 export default function TourDetailScreen() {
   const { id, langcode } = useLocalSearchParams<{ id: string; langcode: string }>();
@@ -260,6 +260,7 @@ export default function TourDetailScreen() {
         </View>
 
         {/* Content wrapper — centered on desktop, full-width on mobile */}
+        <View style={styles.body}>
         <View style={LAYOUT.contentWrapper}>
           {/* Stats row */}
           <View style={[styles.statsRow, isMobile && styles.statsRowMobile]}>
@@ -315,6 +316,7 @@ export default function TourDetailScreen() {
               <Text style={styles.shareButtonText}>{t('tour.share')}</Text>
             </TouchableOpacity>
           </View>
+        </View>
         </View>
         <Footer />
       </PageScrollView>
@@ -379,7 +381,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 0,
+    flexGrow: 1,
+  },
+  body: {
+    flex: 1,
   },
 
   // Banner
@@ -399,7 +404,8 @@ const styles = StyleSheet.create({
   },
   bannerOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.9))',
+    backgroundColor: 'rgba(0,0,0,0)',
   },
   bannerTextContainer: {
     position: 'absolute',
@@ -429,7 +435,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 48,
+    top: 28,
     left: 16,
     justifyContent: 'center',
     alignItems: 'center',
@@ -438,7 +444,7 @@ const styles = StyleSheet.create({
   // Top right actions
   topRightActions: {
     position: 'absolute',
-    top: 48,
+    top: 28,
     right: 16,
     flexDirection: 'row',
     gap: 10,

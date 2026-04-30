@@ -7,7 +7,9 @@
       "Bash(test -f /home/carlos/devel/stepuptours/stepuptours-frontend/app/[langcode]/terms-of-use.tsx)",
       "Read(///wsl.localhost/Ubuntu/home/carlos/devel/stepuptours/stepuptours-frontend/i18n/locales/**)",
       "Bash(jobs)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Read(///wsl.localhost/Ubuntu/home/carlos/devel/stepuptours/stepuptours-frontend/**)",
+      "Read(//mnt/wsl/Ubuntu/home/carlos/devel/stepuptours/stepuptours-frontend/**)"
     ]
   }
 }

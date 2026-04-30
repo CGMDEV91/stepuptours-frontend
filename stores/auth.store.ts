@@ -13,8 +13,6 @@ interface AuthState {
   isNewLogin: boolean;
   error: string | null;
   pendingAuthModal: 'login' | 'register' | null;
-  contactModalOpen: boolean;
-
   // Actions
   signIn: (credentials: AuthCredentials) => Promise<void>;
   signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'professional'; langcode?: string }) => Promise<void>;
@@ -25,8 +23,6 @@ interface AuthState {
   clearNewLogin: () => void;
   openAuthModal: (mode: 'login' | 'register') => void;
   closeAuthModal: () => void;
-  openContactModal: () => void;
-  closeContactModal: () => void;
   updateProfile: (updates: Partial<{ publicName: string; preferredLanguage: string; countryId: string }>) => Promise<void>;
 }
 
@@ -37,8 +33,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isNewLogin: false,
   error: null,
   pendingAuthModal: null,
-  contactModalOpen: false,
-
   signIn: async (credentials) => {
     set({ isLoading: true, error: null });
     try {
@@ -104,9 +98,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   clearNewLogin: () => set({ isNewLogin: false }),
   openAuthModal: (mode) => set({ pendingAuthModal: mode }),
   closeAuthModal: () => set({ pendingAuthModal: null }),
-  openContactModal: () => set({ contactModalOpen: true }),
-  closeContactModal: () => set({ contactModalOpen: false }),
-
   updateProfile: async (updates) => {
     const user = get().user;
     if (!user) return;
