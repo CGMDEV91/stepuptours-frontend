@@ -9,5 +9,9 @@
   },
   "vars": {
     "DRUPAL_API_URL": "https://stepuptours.com"
-  }
+  },
+  "routes": [
+    { "pattern": "stepuptours.com", "custom_domain": true },
+    { "pattern": "www.stepuptours.com", "custom_domain": true }
+  ]
 }
