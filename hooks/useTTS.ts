@@ -33,8 +33,8 @@ interface TtsMeta { tourTitle?: string; stepTitle?: string }
 
 async function fetchPlayableUri(text: string, langcode: string, meta?: TtsMeta): Promise<string> {
   const endpoint = TTS_BASE
-    ? `${TTS_BASE}/tts`
-    : `${API_BASE}/api/tts`;
+      ? `${TTS_BASE}/tts`
+      : `${API_BASE}/api/tts`;
 
   const res = await fetch(endpoint, {
     method:  'POST',
@@ -54,18 +54,10 @@ async function fetchPlayableUri(text: string, langcode: string, meta?: TtsMeta):
     if (!data?.url) throw new Error('TTS response missing url');
     const audioUrl = data.url as string;
 
-    // Native: expo-av loads cross-origin URLs natively without issues.
     if (Platform.OS !== 'web') return audioUrl;
 
-    // Web: <audio src> to a cross-origin/ngrok URL fails with NotSupportedError
-    // because the browser can't send custom headers so ngrok serves its HTML
-    // interstitial instead of the MP3. Fetch the binary ourselves and return
-    // a same-origin blob URL instead.
-    const proxiedUrl = (() => {
-      try { return new URL(audioUrl).pathname; } catch { return audioUrl; }
-    })();
-
-    const audioRes = await fetch(proxiedUrl, {
+    // ✅ Fix: usar audioUrl completo en lugar de solo el pathname
+    const audioRes = await fetch(audioUrl, {
       headers: { 'ngrok-skip-browser-warning': '1' },
     });
 
@@ -87,7 +79,6 @@ async function fetchPlayableUri(text: string, langcode: string, meta?: TtsMeta):
   }
   return `data:audio/mpeg;base64,${btoa(binary)}`;
 }
-
 // ── Audio mode (iOS silent mode) ──────────────────────────────────────────────
 
 let audioModeReady = false;
@@ -241,24 +232,30 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
   // ── Prefetch ──────────────────────────────────────────────────────────────
 
   const prefetch = useCallback(() => {
-    // Never make a network request for unsupported langcodes.
     if (NO_TTS_LANGS.has(langcode)) return;
-
     if (urlCache.has(key) || prefetchingRef.current) return;
     prefetchingRef.current = true;
 
     getUri()
-      .then((uri) => {
-        if (Platform.OS === 'web' && !webPreloadRef.current && !webAudioRef.current) {
-          const audio       = new (window as any).Audio() as HTMLAudioElement;
-          audio.preload     = 'auto';
-          audio.src         = uri;
-          audio.load();
-          webPreloadRef.current = audio;
-        }
-      })
-      .catch(() => {})
-      .finally(() => { prefetchingRef.current = false; });
+        .then((uri) => {
+          if (Platform.OS === 'web' && !webPreloadRef.current && !webAudioRef.current) {
+            if (!uri || uri === '') return;
+
+            const audio       = new (window as any).Audio() as HTMLAudioElement;
+            audio.preload     = 'auto';
+            audio.onerror     = () => {
+              console.warn('[TTS] prefetch audio error, discarding preloaded element');
+              webPreloadRef.current = null;
+            };
+            audio.src         = uri;
+            audio.load();
+            webPreloadRef.current = audio;
+          }
+        })
+        .catch((e) => {
+          console.warn('[TTS] prefetch failed:', e);
+        })
+        .finally(() => { prefetchingRef.current = false; });
   }, [key, getUri, langcode]);
 
   // ── Web helpers ───────────────────────────────────────────────────────────
@@ -344,7 +341,14 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
         stopGlobalTTS = handleStopRef.current;
 
         if (preloaded) {
-          // Audio already fetched and loaded — play with no async gap.
+          // ✅ Fix: verificar que el preloaded tiene src válido
+          if (!preloaded.src || preloaded.src === window.location.href || preloaded.error) {
+            webPreloadRef.current = null;
+            setPlayStateSync('loading');
+            try { await loadAndPlayWeb(); } catch { setPlayStateSync('idle'); }
+            return;
+          }
+
           preloaded.playbackRate  = SPEEDS[speedIndexRef.current];
           webAudioRef.current     = preloaded;
           attachWebListeners(preloaded);
