@@ -8,10 +8,10 @@
     "binding": "ASSETS"
   },
   "vars": {
-    "DRUPAL_API_URL": "https://stepuptours.com"
+    "DRUPAL_API_URL": "https://dev-step-up-tours.pantheonsite.io"
   },
   "routes": [
-    { "pattern": "stepuptours.com", "custom_domain": true },
-    { "pattern": "www.stepuptours.com", "custom_domain": true }
+    { "pattern": "[stepuptours.com](http://stepuptours.com)", "custom_domain": true },
+    { "pattern": "[www.stepuptours.com](http://www.stepuptours.com)", "custom_domain": true }
   ]
 }
