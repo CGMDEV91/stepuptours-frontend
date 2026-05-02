@@ -2,7 +2,7 @@
 // Valida el langcode de la URL, sincroniza stores, renderiza Navbar
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { Slot, useLocalSearchParams, useRouter, useSegments } from 'expo-router';
+import { Slot, useLocalSearchParams, usePathname, useRouter, useSegments } from 'expo-router';
 import { useLanguageStore } from '../../stores/language.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
@@ -16,6 +16,7 @@ export default function LangcodeLayout() {
   const setLanguageByCode = useLanguageStore((s) => s.setLanguageByCode);
   const router = useRouter();
   const segments = useSegments();
+  const pathname = usePathname();
 
   // Auth modal state — driven by Zustand so any page can trigger it
   const pendingAuthModal = useAuthStore((s) => s.pendingAuthModal);
@@ -44,8 +45,8 @@ export default function LangcodeLayout() {
 
     const isValid = languages.some((l) => l.id === langcode);
     if (!isValid) {
-      const restPath = segments.slice(1).join('/');
-      router.replace(`/en/${restPath}` as any);
+      const pathWithoutLang = pathname.replace(/^\/[^\/]+/, '');
+      router.replace(`/en${pathWithoutLang}` as any);
       return;
     }
     if (currentLanguage?.id !== langcode) {
@@ -80,8 +81,8 @@ export default function LangcodeLayout() {
     if (!isAvailable) return;
 
     setLanguageByCode(preferredLang);
-    const restPath = segments.slice(1).join('/');
-    router.replace(`/${preferredLang}/${restPath}` as any);
+    const pathWithoutLang = pathname.replace(/^\/[^\/]+/, '');
+    router.replace(`/${preferredLang}${pathWithoutLang}` as any);
   // isNewLogin intentionally omitted from deps — read as current value when user/languages change
   }, [ready, user?.id, languages]);
 
