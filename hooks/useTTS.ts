@@ -126,8 +126,9 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
   const speedIndexRef  = useRef(1);
   const playStateRef   = useRef<PlayState>('idle');
   const intervalRef    = useRef<ReturnType<typeof setInterval> | null>(null);
-  const prefetchingRef = useRef(false);
-  const key            = cacheKey(langcode, text);
+  const prefetchingRef   = useRef(false);
+  const knownDurationRef = useRef(0);
+  const key              = cacheKey(langcode, text);
 
   // Platform refs
   const soundRef      = useRef<Audio.Sound | null>(null);
@@ -164,7 +165,9 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
         const dur = (status.durationMillis ?? 0) / 1000;
         setElapsed(Math.floor(pos));
         if (dur > 0) {
-          setTotalDuration(Math.floor(dur));
+          const durFloor = Math.floor(dur);
+          knownDurationRef.current = durFloor;
+          setTotalDuration(durFloor);
           progressAnim.setValue(Math.min(pos / dur, 1));
         }
         if (status.didJustFinish) {
@@ -203,7 +206,7 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
     unloadSound();
     setPlayStateSync('idle');
     setElapsed(0);
-    setTotalDuration(0);
+    setTotalDuration(knownDurationRef.current);
     progressAnim.setValue(0);
     if (stopGlobalTTS === handleStopRef.current) stopGlobalTTS = null;
   }, [progressAnim, setPlayStateSync, unloadSound]);
@@ -248,6 +251,12 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
               console.warn('[TTS] prefetch audio error, discarding preloaded element');
               webPreloadRef.current = null;
             };
+            audio.onloadedmetadata = () => {
+              if (isFinite(audio.duration) && audio.duration > 0) {
+                knownDurationRef.current = Math.floor(audio.duration);
+                setTotalDuration(knownDurationRef.current);
+              }
+            };
             audio.src         = uri;
             audio.load();
             webPreloadRef.current = audio;
@@ -268,7 +277,9 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
       const dur = audio.duration;
       setElapsed(Math.floor(pos));
       if (dur > 0 && isFinite(dur)) {
-        setTotalDuration(Math.floor(dur));
+        const durFloor = Math.floor(dur);
+        knownDurationRef.current = durFloor;
+        setTotalDuration(durFloor);
         progressAnim.setValue(Math.min(pos / dur, 1));
       }
     };

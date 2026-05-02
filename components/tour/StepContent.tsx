@@ -21,7 +21,7 @@ import type { TourStep } from '../../types';
 import { useWindowDimensions } from 'react-native';
 import { buildStreetViewUrl } from '../../lib/streetview';
 
-const ORANGE        = '#ea580c';
+const ORANGE        = '#EC8A00';
 const SPEEDS        = [0.75, 1, 1.25, 1.5, 2];
 const BAR_WIDTH     = 2;
 const BAR_GAP       = 2;
@@ -203,6 +203,20 @@ function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function SkipIcon({ direction, color }: { direction: 'back' | 'forward'; color: string }) {
+  return (
+      <View style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}>
+        <Ionicons
+            name="reload-outline"
+            size={32}
+            color={color}
+            style={direction === 'forward' ? { transform: [{ scaleX: -1 }] } : undefined}
+        />
+        <Text style={{ position: 'absolute', fontSize: 9, fontWeight: '700', color }}>15</Text>
+      </View>
+  );
 }
 
 const MAP_HEIGHT = 220;
@@ -525,17 +539,12 @@ export function StepContent({
         {/* 3. CONFIRMACIÓN DE LLEGADA */}
         {isActive && !confirmed && !isCompleted && (
             <View style={styles.arrivalCard}>
-              <View style={styles.arrivalIconWrap}>
-                <Ionicons name="location" size={20} color={ORANGE} />
-              </View>
-              <View style={styles.arrivalBody}>
-                <Text style={styles.arrivalTitle}>{t('step.confirmTitle')}</Text>
-                <Text style={styles.arrivalSub}>{t('step.confirmSubtitle')}</Text>
-                <TouchableOpacity style={styles.arrivalBtn} onPress={handleConfirm} activeOpacity={0.85}>
-                  <Ionicons name="checkmark-circle-outline" size={16} color="#fff" />
-                  <Text style={styles.arrivalBtnText}>{t('step.confirmYes')}</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.arrivalTitle}>{t('step.confirmTitle')}</Text>
+              <Text style={styles.arrivalSub}>{t('step.confirmSubtitle')}</Text>
+              <TouchableOpacity style={styles.arrivalBtn} onPress={handleConfirm} activeOpacity={0.85}>
+                <Ionicons name="location-outline" size={16} color="#FFFFFF" />
+                <Text style={styles.arrivalBtnText}>{t('step.confirmYes')}</Text>
+              </TouchableOpacity>
             </View>
         )}
 
@@ -558,8 +567,45 @@ export function StepContent({
                         </View>
                     ) : (
                         <View style={[styles.playerCard, isDesktop && styles.playerCardDesktop]}>
-                          <View style={styles.playerRow}>
-                            {/* Play / Pause */}
+                          {/* Título + velocidad + stop */}
+                          <View style={styles.playerTopRow}>
+                            <Text style={styles.playerTitle} numberOfLines={1}>{step.title}</Text>
+                            <TouchableOpacity onPress={tts.handleSpeedChange} style={styles.speedChip} activeOpacity={0.7}>
+                              <Text style={styles.speedChipText}>{SPEEDS[tts.speedIndex]}x</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={tts.handleStop} style={styles.stopChip} activeOpacity={0.7}>
+                              <Ionicons name="stop" size={12} color="rgba(255,255,255,0.5)" />
+                            </TouchableOpacity>
+                          </View>
+
+                          {/* Waveform dinámica */}
+                          <View
+                              style={styles.waveform}
+                              onLayout={(e: LayoutChangeEvent) =>
+                                  setWaveContainerWidth(e.nativeEvent.layout.width)
+                              }
+                          >
+                            {Array.from({ length: barCount }, (_, i) => (
+                                <Animated.View
+                                    key={i}
+                                    style={[
+                                      styles.waveBar,
+                                      {
+                                        height: BAR_HEIGHTS_PATTERN[i % BAR_HEIGHTS_PATTERN.length],
+                                        backgroundColor: isPlaying ? ORANGE : 'rgba(255,255,255,0.16)',
+                                        transform: [{ scaleY: waveAnims[i] }],
+                                      },
+                                    ]}
+                                />
+                            ))}
+                          </View>
+
+                          {/* Controles + tiempos en una sola fila */}
+                          <View style={styles.playerControlsRow}>
+                            <Text style={styles.playerTimeActive}>{formatTime(tts.elapsed)}</Text>
+                            <TouchableOpacity onPress={() => tts.handleSeek(-15)} activeOpacity={0.7}>
+                              <SkipIcon direction="forward" color="rgba(255,255,255,0.85)" />
+                            </TouchableOpacity>
                             <TouchableOpacity style={styles.playBtn} onPress={tts.handlePlayPause} activeOpacity={0.8}>
                               {tts.playState === 'loading' ? (
                                   <Ionicons name="ellipsis-horizontal" size={14} color="#FFFFFF" />
@@ -567,66 +613,12 @@ export function StepContent({
                                   <Ionicons name={isPlaying ? 'pause' : 'play'} size={15} color="#FFFFFF" />
                               )}
                             </TouchableOpacity>
-
-                            <View style={styles.playerMeta}>
-                              <Text style={styles.playerTitle} numberOfLines={1}>{step.title}</Text>
-
-                              {/* Waveform dinámica */}
-                              <View
-                                  style={styles.waveform}
-                                  onLayout={(e: LayoutChangeEvent) =>
-                                      setWaveContainerWidth(e.nativeEvent.layout.width)
-                                  }
-                              >
-                                {Array.from({ length: barCount }, (_, i) => (
-                                    <Animated.View
-                                        key={i}
-                                        style={[
-                                          styles.waveBar,
-                                          {
-                                            height: BAR_HEIGHTS_PATTERN[i % BAR_HEIGHTS_PATTERN.length],
-                                            backgroundColor: isPlaying ? ORANGE : 'rgba(255,255,255,0.16)',
-                                            transform: [{ scaleY: waveAnims[i] }],
-                                          },
-                                        ]}
-                                    />
-                                ))}
-                              </View>
-
-                              {/* Tiempos + skip ±15 s */}
-                              <View style={styles.playerSkipRow}>
-                                <Text style={styles.playerTimeActive}>{formatTime(tts.elapsed)}</Text>
-                                <View style={styles.skipBtns}>
-                                  <TouchableOpacity
-                                      onPress={() => tts.handleSeek(-15)}
-                                      style={styles.skipBtn}
-                                      activeOpacity={0.7}
-                                  >
-                                    <Ionicons name="play-back-outline" size={14} color="rgba(255,255,255,0.7)" />
-                                    <Text style={styles.skipBtnText}>15</Text>
-                                  </TouchableOpacity>
-                                  <TouchableOpacity
-                                      onPress={() => tts.handleSeek(15)}
-                                      style={styles.skipBtn}
-                                      activeOpacity={0.7}
-                                  >
-                                    <Text style={styles.skipBtnText}>15</Text>
-                                    <Ionicons name="play-forward-outline" size={14} color="rgba(255,255,255,0.7)" />
-                                  </TouchableOpacity>
-                                </View>
-                                <Text style={styles.playerTimeDim}>{formatTime(tts.totalDuration)}</Text>
-                              </View>
-                            </View>
-
-                            {/* Velocidad */}
-                            <TouchableOpacity onPress={tts.handleSpeedChange} style={styles.speedChip} activeOpacity={0.7}>
-                              <Text style={styles.speedChipText}>{SPEEDS[tts.speedIndex]}x</Text>
+                            <TouchableOpacity onPress={() => tts.handleSeek(15)} activeOpacity={0.7}>
+                              <SkipIcon direction="back" color="rgba(255,255,255,0.85)" />
                             </TouchableOpacity>
-
-                            {/* Stop */}
-                            <TouchableOpacity onPress={tts.handleStop} style={styles.stopChip} activeOpacity={0.7}>
-                              <Ionicons name="stop" size={12} color="rgba(255,255,255,0.5)" />
-                            </TouchableOpacity>
+                            <Text style={styles.playerTimeDim}>
+                              {formatTime(tts.totalDuration > 0 ? Math.round(tts.totalDuration / SPEEDS[tts.speedIndex]) : 0)}
+                            </Text>
                           </View>
                         </View>
                     )}
@@ -667,7 +659,7 @@ export function StepContent({
               {hasLocation && step.location ? (
                   <View style={styles.nearbyContainer}>
                     <Text style={styles.nearbyTitle}>{t('step.nearbyTitle')}</Text>
-                    <View style={styles.nearbyChips}>
+                    <View style={[styles.nearbyChips, isDesktop && styles.nearbyChipsDesktop]}>
                       {[
                         { key: 'step.nearbyRestaurants', query: 'restaurants',         icon: 'restaurant-outline' },
                         { key: 'step.nearbyCafes',       query: 'cafes',               icon: 'cafe-outline' },
@@ -681,6 +673,8 @@ export function StepContent({
                           >
                             <Ionicons name={icon as any} size={15} color={ORANGE} />
                             <Text style={styles.nearbyChipText}>{t(key)}</Text>
+                            <View style={{ flex: 1 }} />
+                            <Ionicons name="chevron-forward" size={14} color={ORANGE} />
                           </TouchableOpacity>
                       ))}
                     </View>
@@ -690,7 +684,7 @@ export function StepContent({
               {/* Botón Completar parada (siempre visible) */}
               {isActive && !isCompleted ? (
                   <TouchableOpacity style={styles.completeBtn} onPress={onComplete} activeOpacity={0.8}>
-                    <Ionicons name="checkmark-circle-outline" size={18} color="#FFFFFF" />
+                    <Ionicons name="checkmark" size={20} color="#FFFFFF" />
                     <Text style={styles.completeBtnText}>{t('step.markCompleted')}</Text>
                   </TouchableOpacity>
               ) : null}
@@ -747,7 +741,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   chipActive: {
-    backgroundColor: '#fff7ed',
+    backgroundColor: '#FFFFFF',
     borderColor: ORANGE,
   },
   chipText: {
@@ -793,16 +787,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: ORANGE,
-    backgroundColor: '#fff7ed',
+    backgroundColor: '#FFFFFF',
     alignSelf: 'stretch',
     justifyContent: 'center',
   },
   streetViewToggleText: {
-    flex: 1,
     fontSize: 14,
     fontWeight: '600',
     color: ORANGE,
-    textAlign: 'center',
   },
 
   // ── Street View embed ───────────────────────────────────────────────────────
@@ -816,54 +808,39 @@ const styles = StyleSheet.create({
 
   // ── Arrival card ────────────────────────────────────────────────────────────
   arrivalCard: {
-    backgroundColor: '#fff7ed',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
     borderColor: ORANGE,
-    borderRadius: 12,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-  },
-  arrivalIconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#ffedd5',
-    borderWidth: 1.5,
-    borderColor: ORANGE,
-    justifyContent: 'center',
+    borderRadius: 14,
+    padding: 16,
     alignItems: 'center',
-    flexShrink: 0,
-  },
-  arrivalBody: {
-    flex: 1,
-    gap: 3,
+    gap: 8,
   },
   arrivalTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#92400e',
+    color: '#1c1917',
+    textAlign: 'center',
   },
   arrivalSub: {
-    fontSize: 12,
-    color: '#a16207',
-    marginBottom: 6,
+    fontSize: 13,
+    color: '#78716c',
+    textAlign: 'center',
   },
   arrivalBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
+    gap: 6,
     backgroundColor: ORANGE,
-    borderRadius: 8,
+    borderRadius: 24,
     paddingVertical: 10,
-    paddingHorizontal: 16,
-    alignSelf: 'flex-start',
+    paddingHorizontal: 20,
+    marginTop: 4,
   },
   arrivalBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
 
@@ -898,15 +875,16 @@ const styles = StyleSheet.create({
   playerCard: {
     backgroundColor: '#1c1917',
     borderRadius: 12,
-    padding: 11,
+    padding: 12,
+    gap: 8,
   },
   playerCardDesktop: {
     alignSelf: 'stretch',
   },
-  playerRow: {
+  playerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 6,
   },
   playBtn: {
     width: 36,
@@ -922,11 +900,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  playerMeta: {
-    flex: 1,
-    gap: 3,
-  },
   playerTitle: {
+    flex: 1,
     fontSize: 13,
     fontWeight: '700',
     color: '#FFFFFF',
@@ -934,6 +909,7 @@ const styles = StyleSheet.create({
   waveform: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: BAR_GAP,
     height: 18,
     overflow: 'hidden',
@@ -943,10 +919,11 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     transformOrigin: 'center',
   },
-  playerSkipRow: {
+  playerControlsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 2,
   },
   playerTimeActive: {
     fontSize: 11,
@@ -957,23 +934,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: 'rgba(255,255,255,0.28)',
     fontVariant: ['tabular-nums'] as any,
-  },
-  skipBtns: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  skipBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  skipBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.7)',
   },
   speedChip: {
     paddingHorizontal: 8,
@@ -1042,23 +1002,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   nearbyChips: {
+    flexDirection: 'column',
+    gap: 6,
+  },
+  nearbyChipsDesktop: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   nearbyChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: '#FFF5EE',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#FDDBC8',
+    borderColor: ORANGE,
   },
   nearbyChipText: {
-    fontSize: 13,
+    fontSize: 14,
     color: ORANGE,
     fontWeight: '500',
   },
