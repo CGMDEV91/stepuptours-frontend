@@ -117,6 +117,7 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({});
+  const [rememberMe, setRememberMe] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const passwordRef = useRef<RNTextInput>(null);
@@ -132,7 +133,7 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
   const handleSubmit = async () => {
     clearError();
     if (!validate()) return;
-    await signIn({ username: username.trim(), password });
+    await signIn({ username: username.trim(), password, rememberMe });
     if (!useAuthStore.getState().error) onClose();
   };
 
@@ -222,6 +223,24 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
         returnKeyType="go"
         onSubmitEditing={handleSubmit}
       />
+
+      {/* Recuérdame */}
+      <TouchableOpacity
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, marginTop: -4 }}
+        onPress={() => setRememberMe((v) => !v)}
+        activeOpacity={0.7}
+      >
+        <View style={{
+          width: 18, height: 18, borderRadius: 4,
+          borderWidth: 1.5,
+          borderColor: rememberMe ? '#EC8A00' : '#D1D5DB',
+          backgroundColor: rememberMe ? '#EC8A00' : '#FFFFFF',
+          alignItems: 'center', justifyContent: 'center',
+        }}>
+          {rememberMe && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
+        </View>
+        <Text style={{ fontSize: 13, color: '#374151' }}>{t('auth.rememberMe')}</Text>
+      </TouchableOpacity>
 
       {/* Botón principal */}
       <TouchableOpacity

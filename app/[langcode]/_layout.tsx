@@ -1,8 +1,9 @@
 // app/[langcode]/_layout.tsx
 // Valida el langcode de la URL, sincroniza stores, renderiza Navbar
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { AppState, Platform, View } from 'react-native';
 import { Slot, useLocalSearchParams, usePathname, useRouter, useSegments } from 'expo-router';
+import { inactivityTracker, subscribeToExternalSessionChange } from '../../lib/session';
 import { useLanguageStore } from '../../stores/language.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
@@ -28,6 +29,27 @@ export default function LangcodeLayout() {
   const isAuthLoading = useAuthStore((s) => s.isLoading);
   const isNewLogin = useAuthStore((s) => s.isNewLogin);
   const clearNewLogin = useAuthStore((s) => s.clearNewLogin);
+
+  // Pause inactivity timer when app goes to background on native
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        inactivityTracker.resume();
+      } else {
+        inactivityTracker.pause();
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Cross-tab session sync: if another tab logs out, sign out here too
+  const signOut = useAuthStore((s) => s.signOut);
+  useEffect(() => {
+    return subscribeToExternalSessionChange(() => {
+      signOut();
+    });
+  }, [signOut]);
 
   // ── Guard: no navegar hasta que el Root Layout esté montado ──────────────
   // router.replace() llamado en el primer render (o síncrono con él) lanza

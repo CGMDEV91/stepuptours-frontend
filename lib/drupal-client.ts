@@ -5,7 +5,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import { Jsona } from 'jsona';
-import { sessionStorage as appSession } from './session';
+import { sessionStorage as appSession, inactivityTracker } from './session';
 import type {
   User,
   Tour,
@@ -124,8 +124,8 @@ const responseErrorHandler = async (error: any) => {
   return Promise.reject(normalizeError(error));
 };
 
-drupalClient.interceptors.response.use((r) => r, responseErrorHandler);
-drupalClientBase.interceptors.response.use((r) => r, responseErrorHandler);
+drupalClient.interceptors.response.use((r) => { inactivityTracker.reset(); return r; }, responseErrorHandler);
+drupalClientBase.interceptors.response.use((r) => { inactivityTracker.reset(); return r; }, responseErrorHandler);
 
 // ── Error normalizer ─────────────────────────────────────────────────────────
 

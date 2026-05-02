@@ -2,7 +2,7 @@
 // Servicio de autenticación — agnóstico del backend
 
 import axios from 'axios';
-import { sessionStorage, inactivityTracker } from '../lib/session';
+import { sessionStorage } from '../lib/session';
 import { mapDrupalUser } from '../lib/drupal-client';
 import { getUserById } from './user.service';
 import type { AuthCredentials, AuthSession, User } from '../types';
@@ -34,7 +34,7 @@ async function fetchUserRoles(userId: string, authHeader: string): Promise<strin
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 
-export async function login(credentials: AuthCredentials): Promise<AuthSession> {
+export async function login(credentials: AuthCredentials, rememberMe = false): Promise<AuthSession> {
   const token = btoa(`${credentials.username}:${credentials.password}`);
   const authHeader = `Basic ${token}`;
 
@@ -83,8 +83,7 @@ export async function login(credentials: AuthCredentials): Promise<AuthSession> 
     expiresAt: null,
   };
 
-  await sessionStorage.saveSession(session);
-  inactivityTracker.start(() => {});
+  await sessionStorage.saveSession(session, rememberMe);
 
   return session;
 }
@@ -139,14 +138,12 @@ export async function restoreSession(): Promise<AuthSession | null> {
       },
     };
 
-    await sessionStorage.saveSession(refreshed);
-    inactivityTracker.start(() => {});
+    await sessionStorage.saveSession(refreshed, refreshed.rememberMe ?? false);
     return refreshed;
 
   } catch {
     // Sin red o error inesperado — usar sesión cacheada como fallback
     // para no bloquear el arranque de la app
-    inactivityTracker.start(() => {});
     return session;
   }
 }
@@ -160,6 +157,7 @@ export async function register(data: {
   password: string;
   role?: 'professional';
   langcode?: string;
+  rememberMe?: boolean;
 }): Promise<AuthSession> {
   try {
     const payload: Record<string, string> = {
@@ -187,7 +185,7 @@ export async function register(data: {
   // Track successful registration before logging in
   void track('user_register', { langcode: data.langcode ?? 'en' });
 
-  return login({ username: data.username, password: data.password });
+  return login({ username: data.username, password: data.password }, data.rememberMe ?? false);
 }
 
 // ── Verificar si está autenticado ─────────────────────────────────────────────
@@ -204,7 +202,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
 // ── Google Auth ───────────────────────────────────────────────────────────────
 
-export async function loginWithGoogle(googleAccessToken: string, role?: 'professional'): Promise<AuthSession> {
+export async function loginWithGoogle(googleAccessToken: string, role?: 'professional', rememberMe = false): Promise<AuthSession> {
   let response: any;
   try {
     response = await axios.post(
@@ -241,7 +239,7 @@ export async function loginWithGoogle(googleAccessToken: string, role?: 'profess
     roles,
   };
   const user = mapDrupalUser(rawUser);
-  const session: AuthSession = { token, tokenType: 'basic', user };
-  await sessionStorage.saveSession(session);
+  const session: AuthSession = { token, tokenType: 'basic', user, expiresAt: null, rememberMe };
+  await sessionStorage.saveSession(session, rememberMe);
   return session;
 }

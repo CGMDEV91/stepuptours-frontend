@@ -36,11 +36,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signIn: async (credentials) => {
     set({ isLoading: true, error: null });
     try {
-      const session = await login(credentials);
+      const session = await login(credentials, credentials.rememberMe ?? false);
       set({ session, user: session.user, isLoading: false, isNewLogin: true });
-      inactivityTracker.start(() => {
-        get().signOut();
-      });
+      inactivityTracker.start(() => { get().signOut(); }, { rememberMe: credentials.rememberMe ?? false });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Error al iniciar sesión' });
     }
@@ -51,9 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const session = await register(data);
       set({ session, user: session.user, isLoading: false, isNewLogin: true });
-      inactivityTracker.start(() => {
-        get().signOut();
-      });
+      inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Error al registrarse' });
     }
@@ -65,7 +61,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { loginWithGoogle } = await import('../services/auth.service');
       const session = await loginWithGoogle(googleAccessToken, role);
       set({ session, user: session.user, isLoading: false, isNewLogin: true });
-      inactivityTracker.start(() => { get().signOut(); });
+      inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Google sign-in failed' });
     }
@@ -83,9 +79,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const session = await restoreSession();
       if (session) {
         set({ session, user: session.user, isNewLogin: false });
-        inactivityTracker.start(() => {
-          get().signOut();
-        });
+        inactivityTracker.start(() => { get().signOut(); }, { rememberMe: session.rememberMe ?? false });
       }
     } catch {
       // Sesión inválida o expirada — no hacer nada

@@ -210,6 +210,7 @@
   "auth.emailPlaceholder": "email@beispiel.com",
   "auth.password": "Passwort",
   "auth.passwordPlaceholder": "••••••••",
+  "auth.rememberMe": "Angemeldet bleiben",
   "auth.confirmPassword": "Passwort bestätigen",
   "auth.confirmPasswordPlaceholder": "Passwort wiederholen",
   "auth.login": "Anmelden",

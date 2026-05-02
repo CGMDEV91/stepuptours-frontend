@@ -211,6 +211,7 @@
   "auth.emailPlaceholder": "email@example.com",
   "auth.password": "Κωδικός πρόσβασης",
   "auth.passwordPlaceholder": "••••••••",
+  "auth.rememberMe": "Να με θυμάσαι",
   "auth.confirmPassword": "Επιβεβαίωση κωδικού",
   "auth.confirmPasswordPlaceholder": "Επαναλάβετε τον κωδικό",
   "auth.login": "Σύνδεση",

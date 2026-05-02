@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Animated, Platform } from 'react-native';
 import { Audio } from 'expo-av';
+import { inactivityTracker } from '../lib/session';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -175,6 +176,7 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
           progressAnim.setValue(1);
           stopInterval();
           if (stopGlobalTTS === handleStopRef.current) stopGlobalTTS = null;
+          inactivityTracker.resume();
         }
       } catch {}
     }, 250);
@@ -209,6 +211,7 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
     setTotalDuration(knownDurationRef.current);
     progressAnim.setValue(0);
     if (stopGlobalTTS === handleStopRef.current) stopGlobalTTS = null;
+    inactivityTracker.resume();
   }, [progressAnim, setPlayStateSync, unloadSound]);
 
   const handleStopRef = useRef(handleStop);
@@ -287,6 +290,7 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
       setPlayStateSync('idle');
       progressAnim.setValue(1);
       if (stopGlobalTTS === handleStopRef.current) stopGlobalTTS = null;
+      inactivityTracker.resume();
     };
   }, [progressAnim, setPlayStateSync]);
 
@@ -327,6 +331,7 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
     try { await sound.setRateAsync(SPEEDS[speedIndexRef.current], true); } catch {}
     await sound.playAsync();
     setPlayStateSync('playing');
+    inactivityTracker.pause();
     startProgressPolling();
   }, [getUri, setPlayStateSync, startProgressPolling, unloadSound]);
 
@@ -368,6 +373,7 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
           try {
             await preloaded.play();
             setPlayStateSync('playing');
+            inactivityTracker.pause();
           } catch (e: any) {
             if (e?.name !== 'NotAllowedError') console.error('[TTS] preloaded.play error:', e);
             setPlayStateSync('idle');
@@ -386,8 +392,9 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
       if (!audio.paused) {
         audio.pause();
         setPlayStateSync('paused');
+        inactivityTracker.resume();
       } else {
-        try { await audio.play(); setPlayStateSync('playing'); }
+        try { await audio.play(); setPlayStateSync('playing'); inactivityTracker.pause(); }
         catch { setPlayStateSync('idle'); }
       }
       return;
@@ -410,9 +417,11 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
         try { await soundRef.current.pauseAsync(); } catch {}
         stopInterval();
         setPlayStateSync('paused');
+        inactivityTracker.resume();
       } else {
         try { await soundRef.current.playAsync(); } catch {}
         setPlayStateSync('playing');
+        inactivityTracker.pause();
         startProgressPolling();
       }
     } catch {

@@ -210,6 +210,7 @@
   "auth.emailPlaceholder": "correo@ejemplo.com",
   "auth.password": "Contraseña",
   "auth.passwordPlaceholder": "••••••••",
+  "auth.rememberMe": "Recuérdame",
   "auth.confirmPassword": "Confirmar contraseña",
   "auth.confirmPasswordPlaceholder": "Repite la contraseña",
   "auth.login": "Iniciar sesión",

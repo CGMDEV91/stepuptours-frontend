@@ -185,6 +185,7 @@ export interface TourFilters {
 export interface AuthCredentials {
   username: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface AuthSession {
@@ -192,6 +193,7 @@ export interface AuthSession {
   tokenType: 'basic' | 'bearer';
   user: User;
   expiresAt: string | null;
+  rememberMe?: boolean;
 }
 
 // Ranking
