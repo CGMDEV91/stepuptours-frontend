@@ -412,6 +412,11 @@ export function mapDrupalTourStep(raw: any): TourStep {
     featuredBusiness: raw.field_featured_business
       ? mapDrupalBusiness(raw.field_featured_business)
       : null,
+    embedSrc: raw.field_url    ?? null,
+    panoid:   raw.field_panoid ?? null,
+    heading:  raw.field_heading != null ? parseFloat(raw.field_heading) : null,
+    pitch:    raw.field_pitch   != null ? parseFloat(raw.field_pitch)   : null,
+    fov:      raw.field_fov     != null ? parseFloat(raw.field_fov)     : null,
   };
 }
 

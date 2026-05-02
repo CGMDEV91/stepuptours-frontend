@@ -18,6 +18,7 @@ import { BusinessCard } from './BusinessCard';
 import { HtmlText, stripHtmlText } from '../ui/HtmlText';
 import type { TourStep } from '../../types';
 import { useWindowDimensions } from 'react-native';
+import { buildStreetViewUrl } from '../../lib/streetview';
 
 const ORANGE        = '#ea580c';
 const SPEEDS        = [0.75, 1, 1.25, 1.5, 2];
@@ -355,9 +356,7 @@ export function StepContent({
 
   const hasLocation = !!step.location;
 
-  const streetViewUrl = step.location
-    ? `https://maps.google.com/maps?q=&layer=c&cbll=${step.location.lat},${step.location.lon}&cbp=12,0,0,0,0&output=svembed&hl=es`
-    : null;
+  const streetViewUrl = buildStreetViewUrl(step);
 
   const staticMapUrl = step.location
     ? `https://maps.google.com/maps?q=${step.location.lat},${step.location.lon}&z=17&output=embed`

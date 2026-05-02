@@ -48,6 +48,11 @@ export interface TourStep {
   location: GeoLocation | null;
   totalCompleted: number;
   featuredBusiness: Business | null;
+  embedSrc: string | null;
+  panoid: string | null;
+  heading: number | null;
+  pitch: number | null;
+  fov: number | null;
 }
 
 export interface Tour {
