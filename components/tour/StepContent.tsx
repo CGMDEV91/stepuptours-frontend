@@ -305,13 +305,21 @@ function NavBlock({
 
               {/* Botones */}
               <View style={[styles.navActionsWrap, isDesktop && styles.navActionsWrapDesktop]}>
-                <TouchableOpacity style={styles.startRouteBtn} onPress={onGoToSite} activeOpacity={0.85}>
+                <TouchableOpacity
+                    style={[styles.startRouteBtn, isDesktop && { flex: 1 }]}
+                    onPress={onGoToSite}
+                    activeOpacity={0.85}
+                >
                   <Ionicons name="navigate" size={16} color="#ffffff" />
                   <Text style={styles.startRouteBtnText}>{t('step.goToSite')}</Text>
                 </TouchableOpacity>
 
                 {hasStreetView && (
-                    <TouchableOpacity style={styles.streetViewToggle} onPress={onToggleStreetView} activeOpacity={0.8}>
+                    <TouchableOpacity
+                        style={[styles.streetViewToggle, isDesktop && { flex: 1 }]}
+                        onPress={onToggleStreetView}
+                        activeOpacity={0.8}
+                    >
                       <Ionicons name={showingSV ? 'map-outline' : 'eye-outline'} size={16} color={ORANGE} />
                       <Text style={styles.streetViewToggleText}>
                         {showingSV ? t('step.showMap') : t('step.streetView')}
@@ -757,9 +765,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   navContentDesktop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
+    gap: 10,
   },
   navMapWrap: {
     borderRadius: 11,
@@ -767,14 +773,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e5e1d8',
   },
-  navMapWrapDesktop: {
-    flex: 2,
-  },
+  navMapWrapDesktop: {},
   navActionsWrap: {
     gap: 8,
   },
   navActionsWrapDesktop: {
-    flex: 1,
+    flexDirection: 'row',
     gap: 10,
   },
 

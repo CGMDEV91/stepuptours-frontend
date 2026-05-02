@@ -233,6 +233,18 @@ export function StepTimeline({
           >
             {/* Timeline column */}
             <View style={styles.timelineCol}>
+              {/* Segmento superior: conecta con la línea de la card anterior y centra el círculo */}
+              <View
+                style={[
+                  styles.lineSegmentTop,
+                  {
+                    backgroundColor: index === 0
+                      ? 'transparent'
+                      : (stepsCompleted.includes(steps[index - 1].id) ? GREEN : '#E5E7EB'),
+                  },
+                ]}
+              />
+
               <Animated.View style={{ transform: [{ scale: circleAnim }] }}>
                 <View
                   style={[
@@ -360,6 +372,10 @@ const styles = StyleSheet.create({
   timelineCol: {
     width: 32,
     alignItems: 'center',
+  },
+  lineSegmentTop: {
+    width: 2,
+    height: 20,
   },
   circle: {
     width: 28,
