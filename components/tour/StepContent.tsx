@@ -226,31 +226,43 @@ const MAP_HEIGHT = 220;
 interface NavBlockProps {
   step: TourStep;
   selectedMode: string | null;
-  dirHeightAnim: Animated.Value;
   directionsUrl: string | null;
   activeMode: NavMode | undefined;
   streetViewExpanded: boolean;
   hasStreetView: boolean;
+  streetViewUrl: string | null;
+  svKey: number;
+  svAvailable: boolean;
+  isDesktop: boolean;
   onModeSelect: (mode: NavMode) => void;
   onGoToSite: () => void;
   onToggleStreetView: () => void;
+  onSvUnavailable: () => void;
   t: (key: string) => string;
 }
 
 function NavBlock({
                     step,
                     selectedMode,
-                    dirHeightAnim,
                     directionsUrl,
                     activeMode,
                     streetViewExpanded,
                     hasStreetView,
+                    streetViewUrl,
+                    svKey,
+                    svAvailable,
+                    isDesktop,
                     onModeSelect,
                     onGoToSite,
                     onToggleStreetView,
+                    onSvUnavailable,
                     t,
                   }: NavBlockProps) {
   if (!step.location) return null;
+
+  const showingSV  = streetViewExpanded && hasStreetView;
+  const mapUri     = showingSV ? streetViewUrl : directionsUrl;
+  const mapHeight  = showingSV ? 320 : (isDesktop ? 300 : MAP_HEIGHT);
 
   return (
       <>
@@ -278,33 +290,36 @@ function NavBlock({
           })}
         </View>
 
-        <Animated.View
-            style={[
-              styles.directionsWrap,
-              {
-                height:  dirHeightAnim,
-                opacity: dirHeightAnim.interpolate({ inputRange: [0, 80], outputRange: [0, 1] }),
-              },
-            ]}
-        >
-          {directionsUrl ? (
-              <GoogleEmbed uri={directionsUrl} height={MAP_HEIGHT} interactive={false} />
-          ) : null}
-        </Animated.View>
+        {activeMode && mapUri && (
+            <View style={[styles.navContent, isDesktop && styles.navContentDesktop]}>
+              {/* Mapa o Street View */}
+              <View style={[styles.navMapWrap, isDesktop && styles.navMapWrapDesktop]}>
+                <GoogleEmbed
+                    key={showingSV ? `sv-${svKey}` : `map-${selectedMode}`}
+                    uri={mapUri}
+                    height={mapHeight}
+                    interactive={showingSV}
+                    onUnavailable={showingSV ? onSvUnavailable : undefined}
+                />
+              </View>
 
-        {activeMode && (
-            <TouchableOpacity style={styles.startRouteBtn} onPress={onGoToSite} activeOpacity={0.85}>
-              <Ionicons name="navigate" size={16} color="#ffffff" />
-              <Text style={styles.startRouteBtnText}>{t('step.openNavigation')}</Text>
-            </TouchableOpacity>
-        )}
+              {/* Botones */}
+              <View style={[styles.navActionsWrap, isDesktop && styles.navActionsWrapDesktop]}>
+                <TouchableOpacity style={styles.startRouteBtn} onPress={onGoToSite} activeOpacity={0.85}>
+                  <Ionicons name="navigate" size={16} color="#ffffff" />
+                  <Text style={styles.startRouteBtnText}>{t('step.goToSite')}</Text>
+                </TouchableOpacity>
 
-        {hasStreetView && (
-            <TouchableOpacity style={styles.streetViewToggle} onPress={onToggleStreetView} activeOpacity={0.8}>
-              <Ionicons name="eye-outline" size={16} color={ORANGE} />
-              <Text style={styles.streetViewToggleText}>{t('step.streetView')}</Text>
-              <Ionicons name={streetViewExpanded ? 'chevron-up' : 'chevron-down'} size={14} color={ORANGE} />
-            </TouchableOpacity>
+                {hasStreetView && (
+                    <TouchableOpacity style={styles.streetViewToggle} onPress={onToggleStreetView} activeOpacity={0.8}>
+                      <Ionicons name={showingSV ? 'map-outline' : 'eye-outline'} size={16} color={ORANGE} />
+                      <Text style={styles.streetViewToggleText}>
+                        {showingSV ? t('step.showMap') : t('step.streetView')}
+                      </Text>
+                    </TouchableOpacity>
+                )}
+              </View>
+            </View>
         )}
       </>
   );
@@ -338,8 +353,6 @@ export function StepContent({
 
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
-
-  const dirHeightAnim = useRef(new Animated.Value(MAP_HEIGHT)).current;
 
   const descriptionText = step.description ?? '';
   const ttsText         = stripHtmlText(descriptionText);
@@ -411,7 +424,6 @@ export function StepContent({
       setHistoryOpen(true);
       setStreetViewExpanded(false);
       setSelectedMode('walking');
-      dirHeightAnim.setValue(MAP_HEIGHT);
     }
   }, [isCompleted]);
 
@@ -446,19 +458,15 @@ export function StepContent({
 
   const handleModeSelect = (mode: NavMode) => {
     if (selectedMode === mode.travelmode) {
-      Animated.timing(dirHeightAnim, { toValue: 0, duration: 260, useNativeDriver: false }).start(
-          () => setSelectedMode(null)
-      );
+      setSelectedMode(null);
     } else {
       setSelectedMode(mode.travelmode);
-      Animated.timing(dirHeightAnim, { toValue: MAP_HEIGHT, duration: 320, useNativeDriver: false }).start();
+      if (streetViewExpanded) setStreetViewExpanded(false);
     }
   };
 
   const resetNavState = () => {
-    Animated.timing(dirHeightAnim, { toValue: 0, duration: 260, useNativeDriver: false }).start(
-        () => setSelectedMode(null)
-    );
+    setSelectedMode(null);
   };
 
   const handleConfirm = () => {
@@ -511,29 +519,20 @@ export function StepContent({
             <NavBlock
                 step={step}
                 selectedMode={selectedMode}
-                dirHeightAnim={dirHeightAnim}
                 directionsUrl={directionsUrl}
                 activeMode={activeMode}
                 streetViewExpanded={streetViewExpanded}
                 hasStreetView={!!(svAvailable && streetViewUrl)}
+                streetViewUrl={streetViewUrl}
+                svKey={svKey}
+                svAvailable={svAvailable}
+                isDesktop={isDesktop}
                 onModeSelect={handleModeSelect}
                 onGoToSite={handleGoToSite}
                 onToggleStreetView={() => setStreetViewExpanded((v) => !v)}
+                onSvUnavailable={handleSvUnavailable}
                 t={t}
             />
-        )}
-
-        {/* 2. STREET VIEW (debajo del NavBlock, colapsable) */}
-        {streetViewExpanded && hasLocation && (svAvailable ? streetViewUrl : staticMapUrl) && (
-            <View style={styles.mapOuter}>
-              <GoogleEmbed
-                  key={svKey}
-                  uri={svAvailable && streetViewUrl ? streetViewUrl : staticMapUrl!}
-                  height={svAvailable && streetViewUrl ? 320 : 140}
-                  interactive={svAvailable}
-                  onUnavailable={svAvailable ? handleSvUnavailable : undefined}
-              />
-            </View>
         )}
 
         {/* 3. CONFIRMACIÓN DE LLEGADA */}
@@ -753,12 +752,32 @@ const styles = StyleSheet.create({
   chipTextActive: {
     color: ORANGE,
   },
-  directionsWrap: {
+  // ── Nav content layout ──────────────────────────────────────────────────────
+  navContent: {
+    gap: 10,
+  },
+  navContentDesktop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  navMapWrap: {
     borderRadius: 11,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#e5e1d8',
   },
+  navMapWrapDesktop: {
+    flex: 2,
+  },
+  navActionsWrap: {
+    gap: 8,
+  },
+  navActionsWrapDesktop: {
+    flex: 1,
+    gap: 10,
+  },
+
   startRouteBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -795,15 +814,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: ORANGE,
-  },
-
-  // ── Street View embed ───────────────────────────────────────────────────────
-  mapOuter: {
-    position: 'relative',
-    borderRadius: 11,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#e5e1d8',
   },
 
   // ── Arrival card ────────────────────────────────────────────────────────────
