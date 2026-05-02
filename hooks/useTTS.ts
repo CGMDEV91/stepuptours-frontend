@@ -111,6 +111,7 @@ export interface UseTTSReturn {
   handlePlayPause:   () => void;
   handleStop:        () => void;
   handleSpeedChange: () => void;
+  handleSeek:        (delta: number) => void;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -423,6 +424,26 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
     }
   }, []);
 
+  // ── Seek ±N seconds ───────────────────────────────────────────────────────
+
+  const handleSeek = useCallback((delta: number) => {
+    if (Platform.OS === 'web') {
+      const audio = webAudioRef.current;
+      if (audio && !isNaN(audio.duration)) {
+        audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
+      }
+    } else if (soundRef.current) {
+      soundRef.current.getStatusAsync().then((status) => {
+        if (!status.isLoaded) return;
+        const newMs = Math.max(
+          0,
+          Math.min(status.durationMillis ?? 0, (status.positionMillis ?? 0) + delta * 1000)
+        );
+        soundRef.current?.setPositionAsync(newMs);
+      });
+    }
+  }, []);
+
   // ── Cleanup ───────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -435,5 +456,5 @@ export function useTTS(text: string, langcode: string, meta?: TtsMeta): UseTTSRe
     };
   }, [unloadSound]);
 
-  return { playState, elapsed, totalDuration, progressAnim, speedIndex, prefetch, handlePlayPause, handleStop, handleSpeedChange };
+  return { playState, elapsed, totalDuration, progressAnim, speedIndex, prefetch, handlePlayPause, handleStop, handleSpeedChange, handleSeek };
 }
