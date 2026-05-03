@@ -2,7 +2,7 @@
 // Servicio de autenticación — agnóstico del backend
 
 import axios from 'axios';
-import { sessionStorage } from '../lib/session';
+import { sessionStorage, inactivityTracker } from '../lib/session';
 import { mapDrupalUser } from '../lib/drupal-client';
 import { getUserById } from './user.service';
 import type { AuthCredentials, AuthSession, User } from '../types';
