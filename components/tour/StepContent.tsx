@@ -69,6 +69,19 @@ interface EmbedProps {
 
 function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedProps) {
   const SV_WEB_TIMEOUT = 7_000;
+  const iframeRef  = useRef<HTMLIFrameElement>(null);
+  const isMounted  = useRef(true);
+
+  React.useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      // Set src to about:blank before DOM removal to abort in-flight Google Maps
+      // async ops (GeoPhotoService.GetMetadata) that would otherwise fire
+      // callbacks against a destroyed panorama instance.
+      if (iframeRef.current) iframeRef.current.src = 'about:blank';
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!onUnavailable) return;
@@ -78,7 +91,7 @@ function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable }: Emb
     window.addEventListener('blur', onBlur);
 
     const timer = setTimeout(() => {
-      if (!interacted) onUnavailable();
+      if (!interacted && isMounted.current) onUnavailable();
     }, SV_WEB_TIMEOUT);
 
     return () => {
@@ -92,6 +105,7 @@ function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable }: Emb
       <View style={wrapStyle}>
         {/* @ts-ignore */}
         <iframe
+            ref={iframeRef}
             src={uri}
             style={{ width: '100%', height: '100%', border: 'none', pointerEvents: interactive ? 'auto' : 'none' }}
             loading="lazy"
@@ -105,7 +119,12 @@ function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable }: Emb
 }
 
 function GoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedProps) {
-  const wrapStyle = { height, overflow: 'hidden' as const, position: 'relative' as const };
+  const wrapStyle    = { height, overflow: 'hidden' as const, position: 'relative' as const };
+  const webViewRef   = useRef<WebView>(null);
+
+  useEffect(() => {
+    return () => { webViewRef.current?.stopLoading(); };
+  }, []);
 
   if (Platform.OS === 'web') {
     return <WebGoogleEmbed uri={uri} height={height} interactive={interactive} onUnavailable={onUnavailable} />;
@@ -114,6 +133,7 @@ function GoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedP
   return (
       <View style={wrapStyle}>
         <WebView
+            ref={webViewRef}
             source={{ uri }}
             scrollEnabled={interactive}
             javaScriptEnabled
