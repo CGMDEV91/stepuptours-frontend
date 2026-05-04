@@ -38,8 +38,9 @@ const HERO_IMAGE =
 interface DesktopChipRowProps {
   filters: TourFilters;
   countries: { id: string; name: string }[];
-  cities: { id: string; name: string }[];
-  onCountrySelect: (c: string | null) => void;
+  cities: { id: string; name: string; countryName?: string }[];
+  onCountryToggle: (c: string) => void;
+  onCountryClear: () => void;
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
   onClear: () => void;
@@ -56,7 +57,8 @@ function DesktopChipRow({
   filters,
   countries,
   cities,
-  onCountrySelect,
+  onCountryToggle,
+  onCountryClear,
   onCitySelect,
   onSortSelect,
   onClear,
@@ -78,7 +80,8 @@ function DesktopChipRow({
 
   const activeSortLabel =
     sortOptions.find((o) => o.key === (filters.sort ?? 'rating'))?.label ?? t('filter.sort');
-  const hasActive = !!(filters.country || filters.city || filters.sort);
+  const selectedCountries = filters.countries ?? [];
+  const hasActive = !!(selectedCountries.length || filters.city || filters.sort);
 
   const openFilter = (ref: React.RefObject<any>, type: 'sort' | 'country' | 'city') => {
     ref.current?.measureInWindow((x: number, y: number, w: number, h: number) => {
@@ -121,12 +124,12 @@ function DesktopChipRow({
     if (type === 'country') {
       const filtered = q ? countries.filter((c) => c.name.toLowerCase().includes(q)) : countries;
       return [
-        renderOption('all', t('filter.selectCountry'), !filters.country, 'earth-outline', () => {
-          onCountrySelect(null); close();
+        renderOption('all', t('filter.selectCountry'), selectedCountries.length === 0, 'earth-outline', () => {
+          onCountryClear(); close();
         }),
         ...filtered.map((c) =>
-          renderOption(c.id, c.name, filters.country === c.name, null, () => {
-            onCountrySelect(c.name); close();
+          renderOption(c.id, c.name, selectedCountries.includes(c.name), null, () => {
+            onCountryToggle(c.name); close();
           }),
         ),
       ];
@@ -163,24 +166,26 @@ function DesktopChipRow({
         </View>
         <View ref={countryRef}>
           <TouchableOpacity
-            style={styles.chip}
+            style={[styles.chip, selectedCountries.length > 0 && styles.chipActive]}
             onPress={() => openFilter(countryRef, 'country')}
             activeOpacity={0.7}
           >
-            <Ionicons name="earth-outline" size={13} color="#374151" />
-            <Text style={styles.chipText}>{t('filter.country')}</Text>
-            <Ionicons name="chevron-down" size={11} color="#9CA3AF" />
+            <Ionicons name="earth-outline" size={13} color={selectedCountries.length > 0 ? '#fff' : '#374151'} />
+            <Text style={[styles.chipText, selectedCountries.length > 0 && styles.chipTextActive]}>
+              {selectedCountries.length > 0 ? `${t('filter.country')} (${selectedCountries.length})` : t('filter.country')}
+            </Text>
+            <Ionicons name="chevron-down" size={11} color={selectedCountries.length > 0 ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
           </TouchableOpacity>
         </View>
         <View ref={cityRef}>
           <TouchableOpacity
-            style={styles.chip}
+            style={[styles.chip, filters.city && styles.chipActive]}
             onPress={() => openFilter(cityRef, 'city')}
             activeOpacity={0.7}
           >
-            <Ionicons name="location-outline" size={13} color="#374151" />
-            <Text style={styles.chipText}>{t('filter.city')}</Text>
-            <Ionicons name="chevron-down" size={11} color="#9CA3AF" />
+            <Ionicons name="location-outline" size={13} color={filters.city ? '#fff' : '#374151'} />
+            <Text style={[styles.chipText, filters.city && styles.chipTextActive]}>{filters.city ?? t('filter.city')}</Text>
+            <Ionicons name="chevron-down" size={11} color={filters.city ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
           </TouchableOpacity>
         </View>
         {hasActive && (
@@ -232,11 +237,12 @@ function DesktopChipRow({
 interface MobileFilterBarProps {
   filters: TourFilters;
   countries: { id: string; name: string }[];
-  cities: { id: string; name: string }[];
-  onCountrySelect: (c: string | null) => void;
+  cities: { id: string; name: string; countryName?: string }[];
+  onCountryToggle: (c: string) => void;
+  onCountryClear: () => void;
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
-  onFetchCities: (country?: string) => void;
+  onFetchCities: (countries?: string[]) => void;
   cardPadding: number;
 }
 
@@ -244,7 +250,8 @@ function MobileFilterBar({
   filters,
   countries,
   cities,
-  onCountrySelect,
+  onCountryToggle,
+  onCountryClear,
   onCitySelect,
   onSortSelect,
   onFetchCities,
@@ -262,7 +269,8 @@ function MobileFilterBar({
     { key: 'popular', label: t('filter.sortPopular'), icon: 'flame-outline' },
   ];
 
-  const activeCount = [filters.sort, filters.country, filters.city].filter(Boolean).length;
+  const selectedCountriesMobile = filters.countries ?? [];
+  const activeCount = [...selectedCountriesMobile, filters.city, filters.sort].filter(Boolean).length;
   const hasActive = activeCount > 0;
   const currentSortLabel = sortOptions.find((o) => o.key === (filters.sort ?? 'rating'))?.label ?? '';
 
@@ -270,7 +278,7 @@ function MobileFilterBar({
     setCountrySearch('');
     setCitySearch('');
     setExpandedSection(null);
-    onFetchCities(filters.country);
+    onFetchCities(selectedCountriesMobile.length ? selectedCountriesMobile : undefined);
     setOpen(true);
   };
 
@@ -338,7 +346,9 @@ function MobileFilterBar({
               <TouchableOpacity style={styles.filterSectionRow} onPress={() => toggleSection('country')} activeOpacity={0.7}>
                 <Text style={styles.mobileSectionLabel}>{t('filter.country')}</Text>
                 <View style={styles.filterSectionRight}>
-                  <Text style={styles.filterSectionValue} numberOfLines={1}>{t('filter.selectCountry')}</Text>
+                  <Text style={styles.filterSectionValue} numberOfLines={1}>
+                    {selectedCountriesMobile.length > 0 ? `${selectedCountriesMobile.length} ${t('filter.selected')}` : t('filter.selectCountry')}
+                  </Text>
                   <Ionicons name={expandedSection === 'country' ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
                 </View>
               </TouchableOpacity>
@@ -362,17 +372,21 @@ function MobileFilterBar({
                   <ScrollView style={{ maxHeight: 220 }} bounces={false} nestedScrollEnabled keyboardShouldPersistTaps="handled">
                     {countries.filter((c) =>
                       !countrySearch.trim() || c.name.toLowerCase().includes(countrySearch.trim().toLowerCase())
-                    ).map((c) => (
-                      <TouchableOpacity
-                        key={c.id}
-                        style={styles.mobileOption}
-                        onPress={() => { onCountrySelect(c.name); close(); }}
-                        activeOpacity={0.7}
-                      >
-                        <Ionicons name="earth-outline" size={18} color="#6B7280" />
-                        <Text style={styles.mobileOptionText}>{c.name}</Text>
-                      </TouchableOpacity>
-                    ))}
+                    ).map((c) => {
+                      const isActive = selectedCountriesMobile.includes(c.name);
+                      return (
+                        <TouchableOpacity
+                          key={c.id}
+                          style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
+                          onPress={() => onCountryToggle(c.name)}
+                          activeOpacity={0.7}
+                        >
+                          <Ionicons name="earth-outline" size={18} color={isActive ? AMBER : '#6B7280'} />
+                          <Text style={[styles.mobileOptionText, isActive && styles.mobileOptionTextActive]}>{c.name}</Text>
+                          {isActive && <Ionicons name="checkmark" size={18} color={AMBER} />}
+                        </TouchableOpacity>
+                      );
+                    })}
                   </ScrollView>
                 </>
               )}
@@ -430,36 +444,32 @@ function MobileFilterBar({
   );
 }
 
-// ── Facet summary chips (país / ciudad activos) ───────────────────────────────
+// ── Facet summary chips (países / ciudad activos) ─────────────────────────────
 interface FacetSummaryRowProps {
   filters: TourFilters;
-  onRemoveCountry: () => void;
+  onRemoveCountry: (country: string) => void;
   onRemoveCity: () => void;
-  onClear: () => void;
   padding: number;
 }
 
-function FacetSummaryRow({ filters, onRemoveCountry, onRemoveCity, onClear, padding }: FacetSummaryRowProps) {
+function FacetSummaryRow({ filters, onRemoveCountry, onRemoveCity, padding }: FacetSummaryRowProps) {
   const { t } = useTranslation();
-  if (!filters.country && !filters.city) return null;
+  const selectedCountries = filters.countries ?? [];
+  if (!selectedCountries.length && !filters.city) return null;
   return (
     <View style={[styles.facetSummaryRow, { paddingHorizontal: padding }]}>
-      {filters.country && (
-        <TouchableOpacity style={styles.facetChip} onPress={onRemoveCountry} activeOpacity={0.7}>
-          <Text style={styles.facetChipText}>{filters.country}</Text>
+      {selectedCountries.map((country) => (
+        <TouchableOpacity key={country} style={styles.facetChip} onPress={() => onRemoveCountry(country)} activeOpacity={0.7}>
+          <Text style={styles.facetChipText}>{country}</Text>
           <Ionicons name="close" size={13} color="#D97706" />
         </TouchableOpacity>
-      )}
+      ))}
       {filters.city && (
         <TouchableOpacity style={styles.facetChip} onPress={onRemoveCity} activeOpacity={0.7}>
           <Text style={styles.facetChipText}>{filters.city}</Text>
           <Ionicons name="close" size={13} color="#D97706" />
         </TouchableOpacity>
       )}
-      <TouchableOpacity style={styles.clearChip} onPress={onClear} activeOpacity={0.7}>
-        <Ionicons name="close-circle" size={14} color="#EF4444" />
-        <Text style={styles.clearChipText}>{t('filter.clear')}</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -559,18 +569,36 @@ export default function HomePage() {
     }
   };
 
-  const handleCountrySelect = (country: string | null) => {
-    const next = country ? { country, city: undefined } : { country: undefined, city: undefined };
+  const handleCountryToggle = (country: string) => {
+    const current = filters.countries ?? [];
+    const updated = current.includes(country)
+      ? current.filter((c) => c !== country)
+      : [...current, country];
+    const next: Partial<TourFilters> = { countries: updated.length ? updated : undefined, city: undefined };
     setFilters(next);
-    fetchCities(country ?? undefined);
+    fetchCities(updated);
     fetchTours({ ...filters, ...next, page: 1 });
-    if (country) {
-      void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `country:${country}` });
-    }
+    void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `country:${country}` });
+  };
+
+  const handleCountryClear = () => {
+    const next: Partial<TourFilters> = { countries: undefined, city: undefined };
+    setFilters(next);
+    fetchCities([]);
+    fetchTours({ ...filters, ...next, page: 1 });
   };
 
   const handleCitySelect = (city: string | null) => {
-    const next = { city: city ?? undefined };
+    const next: Partial<TourFilters> = { city: city ?? undefined };
+    if (city) {
+      const cityObj = cities.find((c) => c.name === city);
+      if (cityObj?.countryName) {
+        const current = filters.countries ?? [];
+        if (!current.includes(cityObj.countryName)) {
+          next.countries = [...current, cityObj.countryName];
+        }
+      }
+    }
     setFilters(next);
     fetchTours({ ...filters, ...next, page: 1 });
     if (city) {
@@ -674,7 +702,8 @@ export default function HomePage() {
                 filters={filters}
                 countries={countries}
                 cities={cities}
-                onCountrySelect={handleCountrySelect}
+                onCountryToggle={handleCountryToggle}
+                onCountryClear={handleCountryClear}
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
                 onClear={handleClear}
@@ -684,7 +713,8 @@ export default function HomePage() {
                 filters={filters}
                 countries={countries}
                 cities={cities}
-                onCountrySelect={handleCountrySelect}
+                onCountryToggle={handleCountryToggle}
+                onCountryClear={handleCountryClear}
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
                 onFetchCities={fetchCities}
@@ -695,9 +725,8 @@ export default function HomePage() {
             {/* ── FACET SUMMARY ── */}
             <FacetSummaryRow
               filters={filters}
-              onRemoveCountry={() => handleCountrySelect(null)}
+              onRemoveCountry={(country) => handleCountryToggle(country)}
               onRemoveCity={() => handleCitySelect(null)}
-              onClear={handleClear}
               padding={PADDING}
             />
 
@@ -1169,6 +1198,17 @@ const styles = StyleSheet.create({
   ddOptionTextActive: {
     color: '#D97706',
     fontWeight: '700',
+  },
+  ddDoneBtn: {
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  ddDoneBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: AMBER,
   },
   emptyState: {
     flex: 1,

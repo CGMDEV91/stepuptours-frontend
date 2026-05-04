@@ -67,6 +67,8 @@
   "filter.apply": "Applica",
   "filter.selectCountry": "Tutti i paesi",
   "filter.selectCity": "Tutte le città",
+  "filter.done": "Fatto",
+  "filter.selected": "selezionati",
   "ranking.title": "Classifica",
   "ranking.position": "#",
   "ranking.name": "Nome",

@@ -68,6 +68,8 @@
   "filter.apply": "Εφαρμογή",
   "filter.selectCountry": "Όλες οι χώρες",
   "filter.selectCity": "Όλες οι πόλεις",
+  "filter.done": "Έτοιμο",
+  "filter.selected": "επιλεγμένα",
   "ranking.title": "Κατάταξη",
   "ranking.position": "#",
   "ranking.name": "Όνομα",

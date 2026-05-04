@@ -166,11 +166,23 @@ async function batchGetStepCounts(tourIds: string[]): Promise<Record<string, num
 
 // ── Obtener listado de tours ───────────────────────────────────────────────────
 
+function buildCountriesFilter(countries: string[]): string {
+  if (!countries.length) return '';
+  if (countries.length === 1) return `filter[field_country.name]=${encodeURIComponent(countries[0])}`;
+  const parts = ['filter[cg][group][conjunction]=OR'];
+  countries.forEach((c, i) => {
+    parts.push(`filter[c${i}][condition][path]=field_country.name`);
+    parts.push(`filter[c${i}][condition][operator]=%3D`);
+    parts.push(`filter[c${i}][condition][value]=${encodeURIComponent(c)}`);
+    parts.push(`filter[c${i}][condition][memberOf]=cg`);
+  });
+  return parts.join('&');
+}
+
 export async function getTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
-  const { page = 1, limit = 20, country, city, minRating, search, sort } = filters;
+  const { page = 1, limit = 20, countries, city, minRating, search, sort } = filters;
 
   const drupalFilters: Record<string, any> = { status: 1 };
-  if (country) drupalFilters['field_country.name'] = country;
   if (city) drupalFilters['field_city.name'] = city;
 
   let sortParam = 'sort=-field_average_rate';
@@ -179,6 +191,7 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
 
   const filterStr = [
     buildFilters(drupalFilters),
+    buildCountriesFilter(countries ?? []),
     minRating ? `filter[rate][condition][path]=field_average_rate&filter[rate][condition][operator]=>=&filter[rate][condition][value]=${minRating}` : '',
     search ? `filter[title][condition][path]=title&filter[title][condition][operator]=CONTAINS&filter[title][condition][value]=${encodeURIComponent(search)}` : '',
   ].filter(Boolean).join('&');
@@ -547,24 +560,45 @@ export async function getCountries(): Promise<{ id: string; name: string }[]> {
   return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-// ── Obtener ciudades por país ─────────────────────────────────────────────────
+// ── Obtener ciudades por países ───────────────────────────────────────────────
 
-export async function getCitiesByCountry(countryName?: string): Promise<{ id: string; name: string }[]> {
+async function fetchCitiesForCountry(countryName?: string): Promise<{ id: string; name: string; countryName?: string }[]> {
   const parts = [
     'filter[status]=1',
     'page[limit]=500',
-    'fields[node--tour]=field_city',
+    'fields[node--tour]=field_city,field_country',
     'fields[taxonomy_term--cities]=name',
-    'include=field_city',
+    'fields[taxonomy_term--countries]=name',
+    'include=field_city,field_country',
   ];
   if (countryName) {
     parts.push(`filter[field_country.name]=${encodeURIComponent(countryName)}`);
   }
   const tours = await drupalGet<any[]>('/node/tour', parts.join('&'));
-  const seen = new Map<string, { id: string; name: string }>();
+  const seen = new Map<string, { id: string; name: string; countryName?: string }>();
   for (const tour of (Array.isArray(tours) ? tours : [])) {
-    const c = tour.field_city;
-    if (c?.id && c?.name) seen.set(c.id, { id: c.id, name: c.name });
+    const city = tour.field_city;
+    const country = tour.field_country;
+    if (city?.id && city?.name) {
+      seen.set(city.id, { id: city.id, name: city.name, countryName: country?.name });
+    }
+  }
+  return [...seen.values()];
+}
+
+export async function getCitiesByCountry(countries?: string[]): Promise<{ id: string; name: string; countryName?: string }[]> {
+  if (!countries?.length) {
+    const all = await fetchCitiesForCountry();
+    return all.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  if (countries.length === 1) {
+    const result = await fetchCitiesForCountry(countries[0]);
+    return result.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  const results = await Promise.all(countries.map((c) => fetchCitiesForCountry(c)));
+  const seen = new Map<string, { id: string; name: string; countryName?: string }>();
+  for (const list of results) {
+    for (const city of list) seen.set(city.id, city);
   }
   return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
 }

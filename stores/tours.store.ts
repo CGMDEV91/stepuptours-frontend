@@ -42,7 +42,7 @@ interface ToursState {
 
   // Filtros
   countries: { id: string; name: string }[];
-  cities: { id: string; name: string }[];
+  cities: { id: string; name: string; countryName?: string }[];
 
   // Actions
   fetchTours: (filters?: TourFilters, append?: boolean) => Promise<void>;
@@ -55,7 +55,7 @@ interface ToursState {
   fetchUserActivities: (userId: string) => Promise<void>;
   toggleFavorite: (userId: string, tourId: string) => Promise<void>;
   fetchCountries: () => Promise<void>;
-  fetchCities: (country?: string) => Promise<void>;
+  fetchCities: (countries?: string[]) => Promise<void>;
   setFilters: (filters: Partial<TourFilters>) => void;
   clearFilters: () => void;
   clearError: () => void;
@@ -222,9 +222,9 @@ updateActivity: async (userId, tourId, updates) => {
     }
   },
 
-  fetchCities: async (country?: string) => {
+  fetchCities: async (countries?: string[]) => {
     try {
-      const cities = await getCitiesByCountry(country);
+      const cities = await getCitiesByCountry(countries);
       set({ cities });
     } catch {
       // No crítico

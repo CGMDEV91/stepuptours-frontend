@@ -171,7 +171,7 @@ export interface PaginatedResult<T> {
 }
 
 export interface TourFilters {
-  country?: string;
+  countries?: string[];
   city?: string;
   minRating?: number;
   maxDuration?: number;
