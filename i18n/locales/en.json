@@ -238,6 +238,8 @@
   "auth.continueWithGoogle": "Continue with Google",
   "auth.orDivider": "or",
   "auth.googleError": "Google sign-in failed. Please try again.",
+  "auth.preferredLanguage": "Preferred language",
+  "auth.selectLanguage": "Select a language",
   "card.favourite": "Add to Favourites",
   "card.unfavourite": "Remove from Favourites",
   "business.directions": "Get Directions",

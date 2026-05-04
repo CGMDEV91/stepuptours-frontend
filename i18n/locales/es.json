@@ -238,6 +238,8 @@
   "auth.continueWithGoogle": "Continuar con Google",
   "auth.orDivider": "o",
   "auth.googleError": "Error con Google. Inténtalo de nuevo.",
+  "auth.preferredLanguage": "Idioma preferido",
+  "auth.selectLanguage": "Selecciona un idioma",
   "card.favourite": "Añadir a Favoritos",
   "card.unfavourite": "Quitar de Favoritos",
   "business.directions": "Cómo Llegar",

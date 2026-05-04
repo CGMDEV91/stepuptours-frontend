@@ -238,6 +238,8 @@
   "auth.continueWithGoogle": "Mit Google fortfahren",
   "auth.orDivider": "oder",
   "auth.googleError": "Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+  "auth.preferredLanguage": "Bevorzugte Sprache",
+  "auth.selectLanguage": "Sprache auswählen",
   "card.favourite": "Zu Favoriten hinzufügen",
   "card.unfavourite": "Aus Favoriten entfernen",
   "business.directions": "Wegbeschreibung",

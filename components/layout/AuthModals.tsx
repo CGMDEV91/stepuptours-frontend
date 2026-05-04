@@ -20,6 +20,8 @@ import { useAuthStore } from '../../stores/auth.store';
 import { useLanguageStore } from '../../stores/language.store';
 import { getGoogleAccessToken } from '../../services/googleAuth.service';
 import { getRegistrationSettings } from '../../services/admin.service';
+import { Picker } from './Picker';
+import type { PickerItem } from './Picker';
 
 interface Props {
   visible: 'login' | 'register' | null;
@@ -270,6 +272,7 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
 function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: () => void; onSwitch: () => void; fullscreen?: boolean; desktopWeb?: boolean }) {
   const { signUp, signInWithGoogle, isLoading, error, clearError } = useAuthStore();
   const currentLangcode = useLanguageStore((s) => s.currentLanguage?.id ?? 'en');
+  const languages = useLanguageStore((s) => s.languages ?? []);
   const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [publicName, setPublicName] = useState('');
@@ -277,6 +280,9 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [role, setRole] = useState<'traveller' | 'professional'>('traveller');
+  const [selectedLangCode, setSelectedLangCode] = useState(currentLangcode);
+  const [selectedLangLabel, setSelectedLangLabel] = useState('');
+  const [langPickerVisible, setLangPickerVisible] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string; publicName?: string; email?: string; password?: string; confirm?: string;
   }>({});
@@ -289,6 +295,13 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
       setAllowProfessional(s.allowProfessionalRegistration)
     );
   }, []);
+
+  useEffect(() => {
+    const found = languages.find((l) => l.id === selectedLangCode);
+    if (found) setSelectedLangLabel(found.name);
+  }, [languages, selectedLangCode]);
+
+  const langButtonRef = useRef<any>(null);
   const publicNameRef = useRef<RNTextInput>(null);
   const emailRef = useRef<RNTextInput>(null);
   const passwordRef = useRef<RNTextInput>(null);
@@ -310,6 +323,8 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     return !Object.keys(errors).length;
   };
 
+  const langItems: PickerItem[] = languages.map((l) => ({ id: l.id, label: l.name }));
+
   const handleSubmit = async () => {
     clearError();
     if (!validate()) return;
@@ -320,6 +335,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
       password,
       role: role === 'professional' ? 'professional' : undefined,
       langcode: currentLangcode,
+      preferredLanguage: selectedLangCode,
     });
     if (!useAuthStore.getState().error) onClose();
   };
@@ -483,6 +499,20 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
         onSubmitEditing={handleSubmit}
       />
 
+      {/* Idioma preferido */}
+      <Text style={modalStyles.fieldLabel}>{t('auth.preferredLanguage')}</Text>
+      <TouchableOpacity
+        ref={langButtonRef}
+        style={modalStyles.pickerButton}
+        onPress={() => setLangPickerVisible(true)}
+        activeOpacity={0.8}
+      >
+        <Text style={modalStyles.pickerButtonText}>
+          {selectedLangLabel || t('auth.selectLanguage')}
+        </Text>
+        <Ionicons name="chevron-down" size={16} color="#6B7280" />
+      </TouchableOpacity>
+
       {/* Botón principal */}
       <TouchableOpacity
         style={[modalStyles.btnPrimary, isLoading && { opacity: 0.7 }]}
@@ -503,6 +533,17 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
           <Text style={modalStyles.switchLink}>{t('auth.switchToLogin')}</Text>
         </TouchableOpacity>
       </View>
+
+      <Picker
+        visible={langPickerVisible}
+        title={t('auth.preferredLanguage')}
+        items={langItems}
+        selectedId={selectedLangCode}
+        onSelect={(id, label) => { setSelectedLangCode(id); setSelectedLangLabel(label); }}
+        onClose={() => setLangPickerVisible(false)}
+        isDesktop={desktopWeb ?? false}
+        anchorRef={langButtonRef}
+      />
     </View>
   );
 }
@@ -691,6 +732,25 @@ const modalStyles = {
     color: '#9CA3AF',
     fontWeight: '500' as const,
   },
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#374151',
+    marginBottom: 6,
+  },
+  pickerButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    height: 44,
+    backgroundColor: '#fff',
+    marginBottom: 14,
+  },
+  pickerButtonText: { fontSize: 14, color: '#111827', flex: 1 },
   btnPrimary: {
     backgroundColor: '#F59E0B',
     paddingVertical: 14, borderRadius: 14,

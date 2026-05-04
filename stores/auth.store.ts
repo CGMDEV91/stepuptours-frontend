@@ -15,7 +15,7 @@ interface AuthState {
   pendingAuthModal: 'login' | 'register' | null;
   // Actions
   signIn: (credentials: AuthCredentials) => Promise<void>;
-  signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'professional'; langcode?: string }) => Promise<void>;
+  signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'professional'; langcode?: string; preferredLanguage?: string }) => Promise<void>;
   signInWithGoogle: (googleAccessToken: string, role?: 'professional') => Promise<void>;
   signOut: () => Promise<void>;
   restore: () => Promise<void>;
@@ -48,11 +48,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await register(data);
-      set({ session, user: session.user, isLoading: false, isNewLogin: true });
+      set({ session, user: session.user, isNewLogin: true });
       inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
+      if (data.preferredLanguage) {
+        await get().updateProfile({ preferredLanguage: data.preferredLanguage });
+      }
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Error al registrarse' });
+      return;
     }
+    set({ isLoading: false });
   },
 
   signInWithGoogle: async (googleAccessToken, role) => {

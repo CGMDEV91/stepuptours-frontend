@@ -239,6 +239,8 @@
   "auth.continueWithGoogle": "Συνέχεια με Google",
   "auth.orDivider": "ή",
   "auth.googleError": "Η σύνδεση με Google απέτυχε. Παρακαλώ δοκιμάστε ξανά.",
+  "auth.preferredLanguage": "Προτιμώμενη γλώσσα",
+  "auth.selectLanguage": "Επιλέξτε γλώσσα",
   "card.favourite": "Προσθήκη στα αγαπημένα",
   "card.unfavourite": "Αφαίρεση από τα αγαπημένα",
   "business.directions": "Οδηγίες",

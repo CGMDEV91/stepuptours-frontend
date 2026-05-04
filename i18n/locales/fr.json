@@ -238,6 +238,8 @@
   "auth.continueWithGoogle": "Continuer avec Google",
   "auth.orDivider": "ou",
   "auth.googleError": "La connexion avec Google a échoué. Veuillez réessayer.",
+  "auth.preferredLanguage": "Langue préférée",
+  "auth.selectLanguage": "Sélectionnez une langue",
   "card.favourite": "Ajouter aux favoris",
   "card.unfavourite": "Retirer des favoris",
   "business.directions": "Obtenir l'itinéraire",
