@@ -191,11 +191,12 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
     buildInclude(TOUR_CARD_INCLUDE),
   ].filter(Boolean).join('&');
 
-  // Count request: base URL (no language prefix) so all published tours are counted
-  // regardless of translation status. Fetches only IDs with a high limit.
+  // Count request: same filters as data query but no pagination, base URL so all
+  // published tours matching the filters are counted regardless of translation status.
+  const countParams = [filterStr, 'fields[node--tour]=id', 'page[limit]=500'].filter(Boolean).join('&');
   const [{ data }, allTours] = await Promise.all([
     drupalGetRaw('/node/tour', dataParams),
-    drupalGetJsonApiBase('/node/tour', 'filter[status]=1&fields[node--tour]=id&page[limit]=500'),
+    drupalGetJsonApiBase('/node/tour', countParams),
   ]);
 
   const rawList = Array.isArray(data) ? data : [data];

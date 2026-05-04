@@ -12,7 +12,9 @@
       "Read(//mnt/wsl/Ubuntu/home/carlos/devel/stepuptours/stepuptours-frontend/**)",
       "Read(///wsl.localhost/Ubuntu/home/carlos/devel/**)",
       "Read(///wsl.localhost/Ubuntu/home/carlos/**)",
-      "Read(//c/Users/cgonzale/**)"
+      "Read(//c/Users/cgonzale/**)",
+      "Bash(xargs grep *)",
+      "PowerShell(wsl -e bash -c \"cd /home/carlos/devel/stepuptours/stepuptours-frontend && npx tsc --noEmit 2>&1 | head -60\")"
     ]
   }
 }

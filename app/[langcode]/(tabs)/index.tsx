@@ -163,28 +163,24 @@ function DesktopChipRow({
         </View>
         <View ref={countryRef}>
           <TouchableOpacity
-            style={[styles.chip, filters.country && styles.chipActive]}
+            style={styles.chip}
             onPress={() => openFilter(countryRef, 'country')}
             activeOpacity={0.7}
           >
-            <Ionicons name="earth-outline" size={13} color={filters.country ? '#fff' : '#374151'} />
-            <Text style={[styles.chipText, filters.country && styles.chipTextActive]}>
-              {filters.country ?? t('filter.country')}
-            </Text>
-            <Ionicons name="chevron-down" size={11} color={filters.country ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
+            <Ionicons name="earth-outline" size={13} color="#374151" />
+            <Text style={styles.chipText}>{t('filter.country')}</Text>
+            <Ionicons name="chevron-down" size={11} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
         <View ref={cityRef}>
           <TouchableOpacity
-            style={[styles.chip, filters.city && styles.chipActive]}
+            style={styles.chip}
             onPress={() => openFilter(cityRef, 'city')}
             activeOpacity={0.7}
           >
-            <Ionicons name="location-outline" size={13} color={filters.city ? '#fff' : '#374151'} />
-            <Text style={[styles.chipText, filters.city && styles.chipTextActive]}>
-              {filters.city ?? t('filter.city')}
-            </Text>
-            <Ionicons name="chevron-down" size={11} color={filters.city ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
+            <Ionicons name="location-outline" size={13} color="#374151" />
+            <Text style={styles.chipText}>{t('filter.city')}</Text>
+            <Ionicons name="chevron-down" size={11} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
         {hasActive && (
@@ -237,8 +233,9 @@ interface MobileFilterBarProps {
   filters: TourFilters;
   countries: { id: string; name: string }[];
   cities: { id: string; name: string }[];
-  onApplyAll: (sort: TourFilters['sort'], country: string | null, city: string | null) => void;
-  onClear: () => void;
+  onCountrySelect: (c: string | null) => void;
+  onCitySelect: (c: string | null) => void;
+  onSortSelect: (s: TourFilters['sort']) => void;
   onFetchCities: (country?: string) => void;
   cardPadding: number;
 }
@@ -247,16 +244,14 @@ function MobileFilterBar({
   filters,
   countries,
   cities,
-  onApplyAll,
-  onClear,
+  onCountrySelect,
+  onCitySelect,
+  onSortSelect,
   onFetchCities,
   cardPadding,
 }: MobileFilterBarProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [pendingSort, setPendingSort] = useState<TourFilters['sort']>(filters.sort);
-  const [pendingCountry, setPendingCountry] = useState<string | undefined>(filters.country);
-  const [pendingCity, setPendingCity] = useState<string | undefined>(filters.city);
   const [countrySearch, setCountrySearch] = useState('');
   const [citySearch, setCitySearch] = useState('');
   const [expandedSection, setExpandedSection] = useState<'sort' | 'country' | 'city' | null>(null);
@@ -269,12 +264,9 @@ function MobileFilterBar({
 
   const activeCount = [filters.sort, filters.country, filters.city].filter(Boolean).length;
   const hasActive = activeCount > 0;
-  const currentSortLabel = sortOptions.find((o) => o.key === (pendingSort ?? 'rating'))?.label ?? '';
+  const currentSortLabel = sortOptions.find((o) => o.key === (filters.sort ?? 'rating'))?.label ?? '';
 
   const openModal = () => {
-    setPendingSort(filters.sort);
-    setPendingCountry(filters.country);
-    setPendingCity(filters.city);
     setCountrySearch('');
     setCitySearch('');
     setExpandedSection(null);
@@ -283,19 +275,6 @@ function MobileFilterBar({
   };
 
   const close = () => setOpen(false);
-
-  const handleApply = () => {
-    onApplyAll(pendingSort, pendingCountry ?? null, pendingCity ?? null);
-    close();
-  };
-
-  const handleClearPending = () => {
-    setPendingSort(undefined);
-    setPendingCountry(undefined);
-    setPendingCity(undefined);
-    onClear();
-    close();
-  };
 
   const toggleSection = (section: 'sort' | 'country' | 'city') => {
     setExpandedSection((prev) => (prev === section ? null : section));
@@ -314,30 +293,16 @@ function MobileFilterBar({
           )}
           <Ionicons name="chevron-down" size={13} color="#9CA3AF" />
         </TouchableOpacity>
-        {hasActive && (
-          <TouchableOpacity onPress={() => { onClear(); }} activeOpacity={0.7} style={styles.mobileClearBtn}>
-            <Ionicons name="close-circle" size={14} color="#EF4444" />
-            <Text style={styles.mobileClearText}>{t('filter.clear')}</Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={close}>
         <Pressable style={styles.mobileModalBackdrop} onPress={close} focusable={false} />
         <View style={styles.mobileModalSheet}>
           <View style={styles.mobileModalHeader}>
-            <TouchableOpacity onPress={handleClearPending} activeOpacity={0.7} style={styles.mobileModalClearBtn}>
-              <Text style={styles.mobileModalClearText}>{t('filter.clear')}</Text>
-            </TouchableOpacity>
             <Text style={styles.mobileModalTitle}>{t('filter.filters')}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <TouchableOpacity onPress={handleApply} activeOpacity={0.8} style={styles.mobileModalApplyBtn}>
-                <Text style={styles.mobileModalApplyText}>{t('filter.apply')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={close} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close" size={22} color="#6B7280" />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={close} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="close" size={22} color="#6B7280" />
+            </TouchableOpacity>
           </View>
 
           <ScrollView bounces={false} style={{ flex: 1 }}>
@@ -352,12 +317,12 @@ function MobileFilterBar({
                 </View>
               </TouchableOpacity>
               {expandedSection === 'sort' && sortOptions.map((o) => {
-                const isActive = (pendingSort ?? 'rating') === o.key;
+                const isActive = (filters.sort ?? 'rating') === o.key;
                 return (
                   <TouchableOpacity
                     key={o.key}
                     style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
-                    onPress={() => { setPendingSort(o.key); setExpandedSection(null); }}
+                    onPress={() => { onSortSelect(o.key); close(); }}
                     activeOpacity={0.7}
                   >
                     <Ionicons name={o.icon} size={18} color={isActive ? AMBER : '#6B7280'} />
@@ -373,9 +338,7 @@ function MobileFilterBar({
               <TouchableOpacity style={styles.filterSectionRow} onPress={() => toggleSection('country')} activeOpacity={0.7}>
                 <Text style={styles.mobileSectionLabel}>{t('filter.country')}</Text>
                 <View style={styles.filterSectionRight}>
-                  <Text style={styles.filterSectionValue} numberOfLines={1}>
-                    {pendingCountry || t('filter.selectCountry')}
-                  </Text>
+                  <Text style={styles.filterSectionValue} numberOfLines={1}>{t('filter.selectCountry')}</Text>
                   <Ionicons name={expandedSection === 'country' ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
                 </View>
               </TouchableOpacity>
@@ -397,29 +360,19 @@ function MobileFilterBar({
                     )}
                   </View>
                   <ScrollView style={{ maxHeight: 220 }} bounces={false} nestedScrollEnabled keyboardShouldPersistTaps="handled">
-                    {[{ id: 'all', name: t('filter.selectCountry') }, ...countries.filter((c) =>
+                    {countries.filter((c) =>
                       !countrySearch.trim() || c.name.toLowerCase().includes(countrySearch.trim().toLowerCase())
-                    )].map((c) => {
-                      const isActive = c.id === 'all' ? !pendingCountry : pendingCountry === c.name;
-                      return (
-                        <TouchableOpacity
-                          key={c.id}
-                          style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
-                          onPress={() => {
-                            const newCountry = c.id === 'all' ? undefined : c.name;
-                            setPendingCountry(newCountry);
-                            if (!newCountry) setPendingCity(undefined);
-                            onFetchCities(newCountry);
-                            setExpandedSection(null);
-                          }}
-                          activeOpacity={0.7}
-                        >
-                          <Ionicons name="earth-outline" size={18} color={isActive ? AMBER : '#6B7280'} />
-                          <Text style={[styles.mobileOptionText, isActive && styles.mobileOptionTextActive]}>{c.name}</Text>
-                          {isActive && <Ionicons name="checkmark" size={18} color={AMBER} />}
-                        </TouchableOpacity>
-                      );
-                    })}
+                    ).map((c) => (
+                      <TouchableOpacity
+                        key={c.id}
+                        style={styles.mobileOption}
+                        onPress={() => { onCountrySelect(c.name); close(); }}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons name="earth-outline" size={18} color="#6B7280" />
+                        <Text style={styles.mobileOptionText}>{c.name}</Text>
+                      </TouchableOpacity>
+                    ))}
                   </ScrollView>
                 </>
               )}
@@ -430,9 +383,7 @@ function MobileFilterBar({
               <TouchableOpacity style={styles.filterSectionRow} onPress={() => toggleSection('city')} activeOpacity={0.7}>
                 <Text style={styles.mobileSectionLabel}>{t('filter.city')}</Text>
                 <View style={styles.filterSectionRight}>
-                  <Text style={styles.filterSectionValue} numberOfLines={1}>
-                    {pendingCity || t('filter.selectCity')}
-                  </Text>
+                  <Text style={styles.filterSectionValue} numberOfLines={1}>{t('filter.selectCity')}</Text>
                   <Ionicons name={expandedSection === 'city' ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
                 </View>
               </TouchableOpacity>
@@ -454,23 +405,19 @@ function MobileFilterBar({
                     )}
                   </View>
                   <ScrollView style={{ maxHeight: 220 }} bounces={false} nestedScrollEnabled keyboardShouldPersistTaps="handled">
-                    {[{ id: 'all', name: t('filter.selectCity') }, ...cities.filter((c) =>
+                    {cities.filter((c) =>
                       !citySearch.trim() || c.name.toLowerCase().includes(citySearch.trim().toLowerCase())
-                    )].map((c) => {
-                      const isActive = c.id === 'all' ? !pendingCity : pendingCity === c.name;
-                      return (
-                        <TouchableOpacity
-                          key={c.id}
-                          style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
-                          onPress={() => { setPendingCity(c.id === 'all' ? undefined : c.name); setExpandedSection(null); }}
-                          activeOpacity={0.7}
-                        >
-                          <Ionicons name="location-outline" size={18} color={isActive ? AMBER : '#6B7280'} />
-                          <Text style={[styles.mobileOptionText, isActive && styles.mobileOptionTextActive]}>{c.name}</Text>
-                          {isActive && <Ionicons name="checkmark" size={18} color={AMBER} />}
-                        </TouchableOpacity>
-                      );
-                    })}
+                    ).map((c) => (
+                      <TouchableOpacity
+                        key={c.id}
+                        style={styles.mobileOption}
+                        onPress={() => { onCitySelect(c.name); close(); }}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons name="location-outline" size={18} color="#6B7280" />
+                        <Text style={styles.mobileOptionText}>{c.name}</Text>
+                      </TouchableOpacity>
+                    ))}
                   </ScrollView>
                 </>
               )}
@@ -480,6 +427,40 @@ function MobileFilterBar({
         </View>
       </Modal>
     </>
+  );
+}
+
+// ── Facet summary chips (país / ciudad activos) ───────────────────────────────
+interface FacetSummaryRowProps {
+  filters: TourFilters;
+  onRemoveCountry: () => void;
+  onRemoveCity: () => void;
+  onClear: () => void;
+  padding: number;
+}
+
+function FacetSummaryRow({ filters, onRemoveCountry, onRemoveCity, onClear, padding }: FacetSummaryRowProps) {
+  const { t } = useTranslation();
+  if (!filters.country && !filters.city) return null;
+  return (
+    <View style={[styles.facetSummaryRow, { paddingHorizontal: padding }]}>
+      {filters.country && (
+        <TouchableOpacity style={styles.facetChip} onPress={onRemoveCountry} activeOpacity={0.7}>
+          <Text style={styles.facetChipText}>{filters.country}</Text>
+          <Ionicons name="close" size={13} color="#D97706" />
+        </TouchableOpacity>
+      )}
+      {filters.city && (
+        <TouchableOpacity style={styles.facetChip} onPress={onRemoveCity} activeOpacity={0.7}>
+          <Text style={styles.facetChipText}>{filters.city}</Text>
+          <Ionicons name="close" size={13} color="#D97706" />
+        </TouchableOpacity>
+      )}
+      <TouchableOpacity style={styles.clearChip} onPress={onClear} activeOpacity={0.7}>
+        <Ionicons name="close-circle" size={14} color="#EF4444" />
+        <Text style={styles.clearChipText}>{t('filter.clear')}</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -611,22 +592,6 @@ export default function HomePage() {
     fetchTours({});
   };
 
-  const handleApplyAll = (sort: TourFilters['sort'], country: string | null, city: string | null) => {
-    const next: Partial<TourFilters> = {
-      sort: sort ?? undefined,
-      country: country ?? undefined,
-      city: city ?? undefined,
-      page: 1,
-    };
-    setFilters(next);
-    if (country) fetchCities(country);
-    fetchTours({ ...filters, ...next });
-    const lang = langcode ?? 'en';
-    if (sort) void track('filter_apply', { langcode: lang, valueStr: `sort:${sort}` });
-    if (country) void track('filter_apply', { langcode: lang, valueStr: `country:${country}` });
-    if (city) void track('filter_apply', { langcode: lang, valueStr: `city:${city}` });
-  };
-
   return (
     <>
     <ListingHead langcode={langcode ?? 'en'} />
@@ -719,12 +684,22 @@ export default function HomePage() {
                 filters={filters}
                 countries={countries}
                 cities={cities}
-                onApplyAll={handleApplyAll}
-                onClear={handleClear}
+                onCountrySelect={handleCountrySelect}
+                onCitySelect={handleCitySelect}
+                onSortSelect={handleSortSelect}
                 onFetchCities={fetchCities}
                 cardPadding={PADDING}
               />
             )}
+
+            {/* ── FACET SUMMARY ── */}
+            <FacetSummaryRow
+              filters={filters}
+              onRemoveCountry={() => handleCountrySelect(null)}
+              onRemoveCity={() => handleCitySelect(null)}
+              onClear={handleClear}
+              padding={PADDING}
+            />
 
             {/* ── TOUR COUNT PILL ── */}
             {/* Shown whenever there are tours (loading or not) so the pill never
@@ -956,22 +931,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
-  mobileClearBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: '#FECACA',
-    backgroundColor: '#FFF5F5',
-  },
-  mobileClearText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#EF4444',
-  },
   mobileModalBackdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.38)',
@@ -995,30 +954,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111827',
     flex: 1,
-    textAlign: 'center',
-  },
-  mobileModalClearBtn: {
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-    minWidth: 60,
-  },
-  mobileModalClearText: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  mobileModalApplyBtn: {
-    backgroundColor: AMBER,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    minWidth: 60,
-    alignItems: 'center',
-  },
-  mobileModalApplyText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#FFFFFF',
   },
   mobileSection: {
     paddingTop: 8,
@@ -1078,8 +1013,35 @@ const styles = StyleSheet.create({
     color: '#D97706',
     fontWeight: '600',
   },
+  facetSummaryRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 8,
+    paddingTop: 10,
+    paddingBottom: 4,
+    maxWidth: 1200,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  facetChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#D97706',
+    backgroundColor: '#FFFBEB',
+  },
+  facetChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#92400E',
+  },
   countPillRow: {
-    paddingTop: 20,
+    paddingTop: 10,
     paddingBottom: 10,
     maxWidth: 1200,
     alignSelf: 'center',
