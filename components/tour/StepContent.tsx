@@ -240,7 +240,7 @@ function SkipIcon({ direction, color }: { direction: 'back' | 'forward'; color: 
   );
 }
 
-const MAP_HEIGHT = 220;
+const MAP_HEIGHT = 290;
 
 // ─── NavBlock ─────────────────────────────────────────────────────────────────
 
