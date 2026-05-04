@@ -286,11 +286,6 @@ function NavBlock({
 
   return (
       <>
-        <View style={styles.sectionLabel}>
-          <Text style={styles.sectionLabelText}>{t('step.howToGet')}</Text>
-          <View style={styles.sectionLine} />
-        </View>
-
         <View style={styles.chipsRow}>
           {NAV_MODES.map((mode) => {
             const active = selectedMode === mode.travelmode;
@@ -374,6 +369,7 @@ export function StepContent({
   const [svKey, setSvKey]                       = useState(0);
   const [streetViewExpanded, setStreetViewExpanded] = useState(false);
   const [historyOpen, setHistoryOpen]           = useState(isCompleted);
+  const [navOpen, setNavOpen]                   = useState(true);
   const [waveContainerWidth, setWaveContainerWidth] = useState(0);
 
   const svRetriesRef = useRef(0);
@@ -450,6 +446,7 @@ export function StepContent({
     if (isCompleted) {
       setConfirmed(false);
       setHistoryOpen(true);
+      setNavOpen(false);
       setStreetViewExpanded(false);
       setSelectedMode('walking');
     }
@@ -498,8 +495,7 @@ export function StepContent({
   };
 
   const handleConfirm = () => {
-    resetNavState();
-    setStreetViewExpanded(false);
+    setNavOpen(false);
     setConfirmed(true);
   };
 
@@ -544,23 +540,30 @@ export function StepContent({
 
         {/* 1. NAVEGACIÓN */}
         {hasLocation && (
-            <NavBlock
-                step={step}
-                selectedMode={selectedMode}
-                directionsUrl={directionsUrl}
-                activeMode={activeMode}
-                streetViewExpanded={streetViewExpanded}
-                hasStreetView={!!(svAvailable && streetViewUrl)}
-                streetViewUrl={streetViewUrl}
-                svKey={svKey}
-                svAvailable={svAvailable}
-                isDesktop={isDesktop}
-                onModeSelect={handleModeSelect}
-                onGoToSite={handleGoToSite}
-                onToggleStreetView={() => setStreetViewExpanded((v) => !v)}
-                onSvUnavailable={handleSvUnavailable}
-                t={t}
-            />
+            <AccordionSection
+                icon="map-outline"
+                title={t('step.howToGet')}
+                open={navOpen}
+                onToggle={() => setNavOpen((v) => !v)}
+            >
+              <NavBlock
+                  step={step}
+                  selectedMode={selectedMode}
+                  directionsUrl={directionsUrl}
+                  activeMode={activeMode}
+                  streetViewExpanded={streetViewExpanded}
+                  hasStreetView={!!(svAvailable && streetViewUrl)}
+                  streetViewUrl={streetViewUrl}
+                  svKey={svKey}
+                  svAvailable={svAvailable}
+                  isDesktop={isDesktop}
+                  onModeSelect={handleModeSelect}
+                  onGoToSite={handleGoToSite}
+                  onToggleStreetView={() => setStreetViewExpanded((v) => !v)}
+                  onSvUnavailable={handleSvUnavailable}
+                  t={t}
+              />
+            </AccordionSection>
         )}
 
         {/* 3. CONFIRMACIÓN DE LLEGADA */}
