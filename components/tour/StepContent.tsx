@@ -157,9 +157,10 @@ interface AccordionSectionProps {
   open: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  style?: object;
 }
 
-function AccordionSection({ icon, title, open, onToggle, children }: AccordionSectionProps) {
+function AccordionSection({ icon, title, open, onToggle, children, style }: AccordionSectionProps) {
   const anim = useRef(new Animated.Value(open ? 1 : 0)).current;
 
   useEffect(() => {
@@ -171,8 +172,8 @@ function AccordionSection({ icon, title, open, onToggle, children }: AccordionSe
   }, [open]);
 
   return (
-      <View style={styles.accordionWrap}>
-        <TouchableOpacity style={styles.accordionHeader} onPress={onToggle} activeOpacity={0.75}>
+      <View style={[styles.accordionWrap, style]}>
+        <TouchableOpacity style={[styles.accordionHeader, open && styles.accordionHeaderOpen]} onPress={onToggle} activeOpacity={0.75}>
           <Ionicons name={icon} size={18} color={ORANGE} />
           <Text style={styles.accordionTitle}>{title}</Text>
           <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={16} color="#78716c" />
@@ -296,7 +297,7 @@ function NavBlock({
                     onPress={() => onModeSelect(mode)}
                     activeOpacity={0.7}
                 >
-                  <Ionicons name={mode.icon} size={17} color={active ? ORANGE : '#57534e'} />
+                  <Ionicons name={mode.icon} size={15} color={active ? ORANGE : '#78716c'} />
                   <Text style={[styles.chipText, active && styles.chipTextActive]}>
                     {t(mode.labelKey)}
                   </Text>
@@ -545,6 +546,7 @@ export function StepContent({
                 title={t('step.howToGet')}
                 open={navOpen}
                 onToggle={() => setNavOpen((v) => !v)}
+                style={!isDesktop ? styles.accordionFullWidth : undefined}
             >
               <NavBlock
                   step={step}
@@ -588,6 +590,7 @@ export function StepContent({
                       title={t('step.historyAndAudio')}
                       open={historyOpen}
                       onToggle={() => setHistoryOpen((v) => !v)}
+                      style={!isDesktop ? styles.accordionFullWidth : undefined}
                   >
                     {/* Reproductor de audio o aviso sin soporte */}
                     {NO_TTS_LANGS.has(langcode) ? (
@@ -756,29 +759,35 @@ const styles = StyleSheet.create({
   },
   chipsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
   },
   chip: {
-    flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingVertical: 9,
-    paddingHorizontal: 4,
-    backgroundColor: '#f5f4f0',
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 11,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
-    borderColor: '#e5e1d8',
-    borderRadius: 10,
+    borderColor: '#d6d0c8',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
   },
   chipActive: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5E6',
     borderColor: ORANGE,
+    shadowColor: ORANGE,
+    shadowOpacity: 0.15,
   },
   chipText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#78716c',
-    textAlign: 'center',
   },
   chipTextActive: {
     color: ORANGE,
@@ -889,12 +898,24 @@ const styles = StyleSheet.create({
     borderColor: '#ece9e3',
     overflow: 'hidden',
   },
+  accordionFullWidth: {
+    marginHorizontal: -16,
+    borderRadius: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    borderTopWidth: 0,
+  },
   accordionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  accordionHeaderOpen: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ece9e3',
   },
   accordionTitle: {
     flex: 1,
@@ -904,6 +925,7 @@ const styles = StyleSheet.create({
   },
   accordionBody: {
     paddingHorizontal: 12,
+    paddingTop: 12,
     paddingBottom: 14,
     gap: 10,
   },
@@ -1027,8 +1049,6 @@ const styles = StyleSheet.create({
   nearbyContainer: {
     marginTop: 2,
     paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
   },
   nearbyTitle: {
     fontSize: 11,
