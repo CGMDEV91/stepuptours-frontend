@@ -732,7 +732,7 @@ export function StepContent({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
+    marginTop: 2,
     gap: 10,
     paddingBottom: 4,
   },
@@ -909,8 +909,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 0,
+    height: 48,
     backgroundColor: '#FFFFFF',
   },
   accordionHeaderOpen: {
@@ -922,6 +923,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#44403c',
+    lineHeight: 18,
   },
   accordionBody: {
     paddingHorizontal: 12,
