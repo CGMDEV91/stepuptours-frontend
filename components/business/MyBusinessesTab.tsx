@@ -1,5 +1,4 @@
 // components/business/MyBusinessesTab.tsx
-// Lista los negocios del usuario business con acceso a "Administrar" por cada uno.
 
 import React, { useCallback, useState } from 'react';
 import {
@@ -13,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { getBusinessesByAuthor } from '../../services/business.service';
 import type { Business } from '../../types';
 
@@ -24,6 +24,7 @@ interface MyBusinessesTabProps {
 }
 
 export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
+  const { t } = useTranslation();
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -40,11 +41,11 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
       const data = await getBusinessesByAuthor(userId);
       setBusinesses(data);
     } catch {
-      setError('No se pudieron cargar los negocios.');
+      setError(t('business.myBusinesses.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, t]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -66,12 +67,11 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
 
   return (
     <View>
-      {/* Header con botón Crear */}
       <View style={styles.headerRow}>
-        <Text style={styles.heading}>Mis Negocios</Text>
+        <Text style={styles.heading}>{t('business.myBusinesses.title')}</Text>
         <TouchableOpacity style={styles.createBtn} onPress={handleCreate} activeOpacity={0.8}>
           <Ionicons name="add" size={18} color="#fff" />
-          <Text style={styles.createBtnText}>Nuevo negocio</Text>
+          <Text style={styles.createBtnText}>{t('business.myBusinesses.newBusiness')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -85,25 +85,22 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
       {!loading && businesses.length === 0 && (
         <View style={styles.emptyBox}>
           <Ionicons name="storefront-outline" size={48} color="#D1D5DB" />
-          <Text style={styles.emptyTitle}>Aún no tienes negocios</Text>
-          <Text style={styles.emptySubtitle}>
-            Crea tu primer negocio para empezar a publicitarte en tours.
-          </Text>
+          <Text style={styles.emptyTitle}>{t('business.myBusinesses.emptyTitle')}</Text>
+          <Text style={styles.emptySubtitle}>{t('business.myBusinesses.emptySubtitle')}</Text>
           <TouchableOpacity style={styles.createBtn} onPress={handleCreate} activeOpacity={0.8}>
             <Ionicons name="add" size={18} color="#fff" />
-            <Text style={styles.createBtnText}>Crear negocio</Text>
+            <Text style={styles.createBtnText}>{t('business.myBusinesses.createBusiness')}</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {isDesktop ? (
-        // ── Desktop: tabla ──────────────────────────────────────────────────────
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeader]}>
-            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 2 }]}>Nombre</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 1.5 }]}>Categoría</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 1 }]}>Estado</Text>
-            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 1 }]}>Acciones</Text>
+            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 2 }]}>{t('business.myBusinesses.colName')}</Text>
+            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 1.5 }]}>{t('business.myBusinesses.colCategory')}</Text>
+            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 1 }]}>{t('business.myBusinesses.colStatus')}</Text>
+            <Text style={[styles.tableCell, styles.tableHeaderText, { flex: 1 }]}>{t('business.myBusinesses.colActions')}</Text>
           </View>
           {businesses.map((b) => (
             <View key={b.id} style={styles.tableRow}>
@@ -122,7 +119,7 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
               </Text>
               <View style={[styles.tableCell, { flex: 1 }]}>
                 <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>Activo</Text>
+                  <Text style={styles.statusText}>{t('business.myBusinesses.statusActive')}</Text>
                 </View>
               </View>
               <View style={[styles.tableCell, { flex: 1 }]}>
@@ -131,14 +128,13 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
                   onPress={() => handleAdminister(b.id)}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.adminBtnText}>Administrar</Text>
+                  <Text style={styles.adminBtnText}>{t('business.myBusinesses.manage')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           ))}
         </View>
       ) : (
-        // ── Mobile: tarjetas ────────────────────────────────────────────────────
         <View style={{ gap: 12 }}>
           {businesses.map((b) => (
             <View key={b.id} style={styles.card}>
@@ -153,11 +149,11 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardName} numberOfLines={1}>{b.name}</Text>
                   <Text style={styles.cardCategory} numberOfLines={1}>
-                    {b.category?.name ?? 'Sin categoría'}
+                    {b.category?.name ?? t('business.myBusinesses.noCategory')}
                   </Text>
                 </View>
                 <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>Activo</Text>
+                  <Text style={styles.statusText}>{t('business.myBusinesses.statusActive')}</Text>
                 </View>
               </View>
               <TouchableOpacity
@@ -166,7 +162,7 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
                 activeOpacity={0.8}
               >
                 <Ionicons name="settings-outline" size={16} color={GREEN_DARK} />
-                <Text style={styles.adminBtnFullText}>Administrar</Text>
+                <Text style={styles.adminBtnFullText}>{t('business.myBusinesses.manage')}</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -227,8 +223,6 @@ const styles = StyleSheet.create({
   },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
   emptySubtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', maxWidth: 280 },
-
-  // Tabla desktop
   table: {
     borderRadius: 12,
     borderWidth: 1,
@@ -244,9 +238,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },
-  tableHeader: {
-    backgroundColor: '#F9FAFB',
-  },
+  tableHeader: { backgroundColor: '#F9FAFB' },
   tableHeaderText: {
     fontSize: 12,
     fontWeight: '600',
@@ -254,15 +246,8 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  tableCell: {
-    fontSize: 14,
-    color: '#111827',
-  },
-  logoThumb: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-  },
+  tableCell: { fontSize: 14, color: '#111827' },
+  logoThumb: { width: 32, height: 32, borderRadius: 8 },
   logoPlaceholder: {
     backgroundColor: '#F3F4F6',
     alignItems: 'center',
@@ -280,11 +265,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 20,
   },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#065F46',
-  },
+  statusText: { fontSize: 12, fontWeight: '600', color: '#065F46' },
   adminBtn: {
     backgroundColor: '#ECFDF5',
     borderWidth: 1,
@@ -294,13 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'flex-start',
   },
-  adminBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: GREEN_DARK,
-  },
-
-  // Tarjetas mobile
+  adminBtnText: { fontSize: 13, fontWeight: '600', color: GREEN_DARK },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -309,26 +284,10 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
   },
-  cardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  cardLogo: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
-  },
-  cardName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  cardCategory: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginTop: 2,
-  },
+  cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  cardLogo: { width: 48, height: 48, borderRadius: 10 },
+  cardName: { fontSize: 15, fontWeight: '700', color: '#111827' },
+  cardCategory: { fontSize: 13, color: '#6B7280', marginTop: 2 },
   adminBtnFull: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -340,9 +299,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: '#ECFDF5',
   },
-  adminBtnFullText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: GREEN_DARK,
-  },
+  adminBtnFullText: { fontSize: 14, fontWeight: '600', color: GREEN_DARK },
 });

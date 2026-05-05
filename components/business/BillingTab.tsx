@@ -1,7 +1,4 @@
 // components/business/BillingTab.tsx
-// Facturación del usuario business.
-// Sección 1 — Suscripciones activas por slot (cada slot tiene su propia sub Stripe).
-// Sección 2 — Historial de pagos (misma tabla que el guide dashboard).
 
 import React, { useState, useCallback, useEffect } from 'react';
 import {
@@ -17,6 +14,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { getPaymentHistoryByUser } from '../../services/dashboard.service';
 import {
   getPromotionsByUser,
@@ -40,6 +38,7 @@ function formatDate(dateStr: string | null | undefined): string {
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function TypeBadge({ type }: { type: PromotionTargetType }) {
+  const { t } = useTranslation();
   const isTour = type === 'tour_detail';
   return (
     <View style={{
@@ -53,13 +52,14 @@ function TypeBadge({ type }: { type: PromotionTargetType }) {
         color={isTour ? '#1D4ED8' : GREEN_DARK}
       />
       <Text style={{ fontSize: 11, fontWeight: '600', color: isTour ? '#1D4ED8' : GREEN_DARK }}>
-        {isTour ? 'Tour' : 'Paso'}
+        {isTour ? t('business.billing.typeTour') : t('business.billing.typeStep')}
       </Text>
     </View>
   );
 }
 
 function PlanBadge({ planType }: { planType: string | null }) {
+  const { t } = useTranslation();
   if (!planType) return null;
   const isAnnual = planType === 'business_annual';
   return (
@@ -68,38 +68,42 @@ function PlanBadge({ planType }: { planType: string | null }) {
       paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
     }}>
       <Text style={{ fontSize: 11, fontWeight: '700', color: isAnnual ? '#5B21B6' : '#0369A1' }}>
-        {isAnnual ? 'Anual' : 'Mensual'}
+        {isAnnual ? t('business.billing.planAnnual') : t('business.billing.planMonthly')}
       </Text>
     </View>
   );
 }
 
 function SubStatusBadge({ status }: { status: string | null }) {
+  const { t } = useTranslation();
   if (!status) return null;
-  const map: Record<string, { bg: string; text: string; label: string }> = {
-    active:    { bg: '#D1FAE5', text: '#065F46', label: 'Activa' },
-    cancelled: { bg: '#FEF3C7', text: '#92400E', label: 'Cancela al vencer' },
-    expired:   { bg: '#F3F4F6', text: '#6B7280', label: 'Expirada' },
+  const map: Record<string, { bg: string; text: string; labelKey: string }> = {
+    active:    { bg: '#D1FAE5', text: '#065F46', labelKey: 'business.billing.statusActive' },
+    cancelled: { bg: '#FEF3C7', text: '#92400E', labelKey: 'business.billing.statusCancelled' },
+    expired:   { bg: '#F3F4F6', text: '#6B7280', labelKey: 'business.billing.statusExpired' },
   };
-  const c = map[status] ?? { bg: '#F3F4F6', text: '#6B7280', label: status };
+  const c = map[status] ?? { bg: '#F3F4F6', text: '#6B7280', labelKey: '' };
+  const label = c.labelKey ? t(c.labelKey) : status;
   return (
     <View style={{ backgroundColor: c.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>
-      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{c.label}</Text>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{label}</Text>
     </View>
   );
 }
 
 function PaymentStatusBadge({ status }: { status: string }) {
-  const config: Record<string, { bg: string; text: string; label: string }> = {
-    succeeded: { bg: '#D1FAE5', text: '#065F46', label: 'Pagado' },
-    succeed:   { bg: '#D1FAE5', text: '#065F46', label: 'Pagado' },
-    failed:    { bg: '#FEE2E2', text: '#991B1B', label: 'Fallido' },
-    refunded:  { bg: '#E0E7FF', text: '#3730A3', label: 'Reembolsado' },
+  const { t } = useTranslation();
+  const config: Record<string, { bg: string; text: string; labelKey: string }> = {
+    succeeded: { bg: '#D1FAE5', text: '#065F46', labelKey: 'business.billing.payStatusPaid' },
+    succeed:   { bg: '#D1FAE5', text: '#065F46', labelKey: 'business.billing.payStatusPaid' },
+    failed:    { bg: '#FEE2E2', text: '#991B1B', labelKey: 'business.billing.payStatusFailed' },
+    refunded:  { bg: '#E0E7FF', text: '#3730A3', labelKey: 'business.billing.payStatusRefunded' },
   };
-  const c = config[status] ?? { bg: '#F3F4F6', text: '#6B7280', label: status };
+  const c = config[status] ?? { bg: '#F3F4F6', text: '#6B7280', labelKey: '' };
+  const label = c.labelKey ? t(c.labelKey) : status;
   return (
     <View style={{ backgroundColor: c.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>
-      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{c.label}</Text>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{label}</Text>
     </View>
   );
 }
@@ -115,6 +119,7 @@ interface CancelSlotModalProps {
 }
 
 function CancelSlotModal({ visible, promotion, onConfirm, onClose, loading }: CancelSlotModalProps) {
+  const { t } = useTranslation();
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -124,15 +129,13 @@ function CancelSlotModal({ visible, promotion, onConfirm, onClose, loading }: Ca
               <Ionicons name="close-circle-outline" size={24} color="#EF4444" />
             </View>
           </View>
-          <Text style={styles.modalTitle}>Cancelar slot</Text>
+          <Text style={styles.modalTitle}>{t('business.billing.cancelSlotTitle')}</Text>
           <Text style={styles.modalBody}>
-            ¿Cancelar la suscripción del slot en{' '}
-            <Text style={{ fontWeight: '700' }}>{promotion?.targetName}</Text>?
-            {'\n\n'}La suscripción Stripe se cancelará y el slot expirará al final del período actual.
+            {t('business.billing.cancelSlotBody', { name: promotion?.targetName ?? '' })}
           </Text>
           <View style={styles.modalActions}>
             <TouchableOpacity style={styles.modalBtnBack} onPress={onClose} activeOpacity={0.8}>
-              <Text style={styles.modalBtnBackText}>Mantener</Text>
+              <Text style={styles.modalBtnBackText}>{t('business.billing.cancelSlotKeep')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.modalBtnDo, loading && { opacity: 0.6 }]}
@@ -142,7 +145,7 @@ function CancelSlotModal({ visible, promotion, onConfirm, onClose, loading }: Ca
             >
               {loading
                 ? <ActivityIndicator size="small" color="#fff" />
-                : <Text style={styles.modalBtnDoText}>Confirmar</Text>
+                : <Text style={styles.modalBtnDoText}>{t('business.billing.cancelSlotConfirm')}</Text>
               }
             </TouchableOpacity>
           </View>
@@ -159,6 +162,7 @@ interface SlotSubscriptionsSectionProps {
 }
 
 function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -174,18 +178,17 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
     setError(null);
     try {
       const all = await getPromotionsByUser(userId);
-      // Only show slots that have (or had) a subscription
       const withSub = all.filter(
         (p) => p.subscriptionId !== null &&
                (p.subscriptionStatus === 'active' || p.subscriptionStatus === 'cancelled'),
       );
       setPromotions(withSub);
     } catch {
-      setError('No se pudieron cargar las suscripciones de slots.');
+      setError(t('business.billing.slotLoadError'));
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, t]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -199,7 +202,7 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
         )
       );
     } catch {
-      setError('Error al actualizar la renovación. Inténtalo de nuevo.');
+      setError(t('business.billing.renewalError'));
     } finally {
       setRenewalLoading((prev) => ({ ...prev, [p.id]: false }));
     }
@@ -213,7 +216,7 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
       setPromotions((prev) => prev.filter((p) => p.id !== cancelTarget.id));
       setCancelTarget(null);
     } catch {
-      setError('Error al cancelar el slot. Inténtalo de nuevo.');
+      setError(t('business.billing.cancelError'));
     } finally {
       setCancelling(false);
     }
@@ -221,7 +224,7 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
 
   return (
     <>
-      <Text style={styles.sectionTitle}>Suscripciones activas por slot</Text>
+      <Text style={styles.sectionTitle}>{t('business.billing.sectionSlots')}</Text>
 
       {error && (
         <View style={styles.errorBox}>
@@ -235,19 +238,24 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
       {!loading && promotions.length === 0 && (
         <View style={styles.emptyBox}>
           <Ionicons name="megaphone-outline" size={40} color="#D1D5DB" />
-          <Text style={styles.emptyTitle}>Sin slots de pago activos</Text>
-          <Text style={styles.emptySubtitle}>
-            Cuando contrates un slot de publicidad en "Buscar Tours" aparecerá aquí.
-          </Text>
+          <Text style={styles.emptyTitle}>{t('business.billing.emptySlots')}</Text>
+          <Text style={styles.emptySubtitle}>{t('business.billing.emptySlotsSubtitle')}</Text>
         </View>
       )}
 
       {!loading && promotions.length > 0 && (
         isDesktop ? (
-          // Desktop table
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
-              {['Slot', 'Tipo', 'Plan', 'Estado', 'Vence', 'Renovación auto', 'Acciones'].map((h) => (
+              {[
+                t('business.billing.colSlot'),
+                t('business.billing.colType'),
+                t('business.billing.colPlan'),
+                t('business.billing.colStatus'),
+                t('business.billing.colExpiry'),
+                t('business.billing.colAutoRenewal'),
+                t('business.billing.colActions'),
+              ].map((h) => (
                 <Text key={h} style={styles.tableHeaderCell}>{h}</Text>
               ))}
             </View>
@@ -286,7 +294,7 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
                       onPress={() => setCancelTarget(p)}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.cancelBtnText}>Cancelar</Text>
+                      <Text style={styles.cancelBtnText}>{t('business.billing.cancelSlot')}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -294,7 +302,6 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
             })}
           </View>
         ) : (
-          // Mobile cards
           <View style={{ gap: 10 }}>
             {promotions.map((p) => {
               const renewBusy = !!renewalLoading[p.id];
@@ -310,11 +317,11 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
                   </View>
                   {p.subscriptionEndDate && (
                     <Text style={styles.slotCardDate}>
-                      Vence: {formatDate(p.subscriptionEndDate)}
+                      {t('business.billing.expiresOn', { date: formatDate(p.subscriptionEndDate) })}
                     </Text>
                   )}
                   <View style={styles.renewalRow}>
-                    <Text style={styles.renewalLabel}>Renovación automática</Text>
+                    <Text style={styles.renewalLabel}>{t('business.billing.autoRenewal')}</Text>
                     {renewBusy ? (
                       <ActivityIndicator size="small" color={GREEN} />
                     ) : (
@@ -332,7 +339,7 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
                     activeOpacity={0.8}
                   >
                     <Ionicons name="close-circle-outline" size={16} color="#DC2626" />
-                    <Text style={styles.cancelBtnFullText}>Cancelar slot</Text>
+                    <Text style={styles.cancelBtnFullText}>{t('business.billing.cancelSlot')}</Text>
                   </TouchableOpacity>
                 </View>
               );
@@ -355,6 +362,7 @@ function SlotSubscriptionsSection({ userId }: SlotSubscriptionsSectionProps) {
 // ── Section 2: Payment history ────────────────────────────────────────────────
 
 function PaymentHistorySection({ userId }: { userId: string }) {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const [payments, setPayments] = useState<SubscriptionPayment[]>([]);
@@ -369,17 +377,15 @@ function PaymentHistorySection({ userId }: { userId: string }) {
 
   return (
     <>
-      <Text style={[styles.sectionTitle, { marginTop: 28 }]}>Historial de pagos</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 28 }]}>{t('business.billing.sectionPayments')}</Text>
 
       {loading && <ActivityIndicator color={GREEN} style={{ marginVertical: 16 }} />}
 
       {!loading && payments.length === 0 && (
         <View style={styles.emptyBox}>
           <Ionicons name="receipt-outline" size={40} color="#D1D5DB" />
-          <Text style={styles.emptyTitle}>Sin pagos registrados</Text>
-          <Text style={styles.emptySubtitle}>
-            Aquí aparecerán tus facturas una vez contrates un slot de publicidad.
-          </Text>
+          <Text style={styles.emptyTitle}>{t('business.billing.emptyPayments')}</Text>
+          <Text style={styles.emptySubtitle}>{t('business.billing.emptyPaymentsSubtitle')}</Text>
         </View>
       )}
 
@@ -387,7 +393,13 @@ function PaymentHistorySection({ userId }: { userId: string }) {
         isDesktop ? (
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
-              {['Fecha', 'Plan', 'Período', 'Importe', 'Estado'].map((h) => (
+              {[
+                t('business.billing.colDate'),
+                t('business.billing.colPlan'),
+                t('business.billing.colPeriod'),
+                t('business.billing.colAmount'),
+                t('business.billing.colPayStatus'),
+              ].map((h) => (
                 <Text key={h} style={styles.tableHeaderCell}>{h}</Text>
               ))}
             </View>
@@ -437,18 +449,16 @@ interface BillingTabProps {
 }
 
 export function BillingTab({ userId }: BillingTabProps) {
+  const { t } = useTranslation();
   return (
     <View style={{ paddingBottom: 32 }}>
-      <Text style={styles.heading}>Facturación</Text>
+      <Text style={styles.heading}>{t('business.billing.title')}</Text>
 
-      {/* Información de referencia */}
       <View style={styles.infoBox}>
         <Ionicons name="information-circle-outline" size={18} color="#0369A1" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.infoTitle}>Modelo de publicidad por slot</Text>
-          <Text style={styles.infoText}>
-            Cada slot publicitario tiene su propia suscripción independiente. Puedes añadir y cancelar slots individualmente desde "Buscar Tours".
-          </Text>
+          <Text style={styles.infoTitle}>{t('business.billing.infoTitle')}</Text>
+          <Text style={styles.infoText}>{t('business.billing.infoText')}</Text>
         </View>
       </View>
 
@@ -483,7 +493,6 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 15, fontWeight: '700', color: '#374151' },
   emptySubtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', maxWidth: 280 },
 
-  // Desktop table
   table: {
     borderRadius: 12, borderWidth: 1, borderColor: '#E5E7EB',
     overflow: 'hidden', backgroundColor: '#fff', marginBottom: 8,
@@ -505,7 +514,6 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: { fontSize: 12, fontWeight: '600', color: '#DC2626' },
 
-  // Mobile slot cards
   slotCard: {
     backgroundColor: '#fff', borderRadius: 12,
     borderWidth: 1, borderColor: '#E5E7EB', padding: 14, gap: 8,
@@ -527,7 +535,6 @@ const styles = StyleSheet.create({
   },
   cancelBtnFullText: { fontSize: 13, fontWeight: '600', color: '#DC2626' },
 
-  // Mobile payment cards
   payCard: {
     backgroundColor: '#fff', borderRadius: 12,
     borderWidth: 1, borderColor: '#E5E7EB', padding: 14, gap: 8,
@@ -538,7 +545,6 @@ const styles = StyleSheet.create({
   payCardBottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   payCardMeta: { fontSize: 12, color: '#6B7280' },
 
-  // Cancel modal
   backdrop: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center', alignItems: 'center', padding: 20,

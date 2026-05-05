@@ -311,6 +311,9 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const passwordRef = useRef<RNTextInput>(null);
   const confirmRef = useRef<RNTextInput>(null);
 
+  const needsConsent = (role === 'guide' || role === 'business') && allowProfessional;
+  const isSubmitDisabled = isLoading || !privacyAccepted || (needsConsent && !consent);
+
   const handleRoleSelect = (selected: 'traveller' | 'guide' | 'business') => {
     setRole(selected);
     setConsent(false);
@@ -586,9 +589,9 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
 
       {/* Botón principal */}
       <TouchableOpacity
-        style={[modalStyles.btnPrimary, isLoading && { opacity: 0.7 }]}
+        style={[modalStyles.btnPrimary, isSubmitDisabled && { opacity: 0.45 }]}
         onPress={handleSubmit}
-        disabled={isLoading}
+        disabled={isSubmitDisabled}
       >
         {isLoading ? (
           <ActivityIndicator color="#fff" size="small" />
@@ -845,73 +848,59 @@ const proStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
     paddingTop: 16,
+    gap: 8,
   },
   question: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 4,
   },
   card: {
-    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    borderRadius: 14,
-    borderWidth: 2,
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: '#E5E7EB',
     backgroundColor: '#F9FAFB',
-    position: 'relative',
   },
-  cardGuide: {
-    borderColor: '#F59E0B',
-    backgroundColor: '#FFFBEB',
-  },
-  cardBusiness: {
-    borderColor: '#10B981',
-    backgroundColor: '#ECFDF5',
-  },
-  checkBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
+  cardGuide:     { borderColor: '#F59E0B', backgroundColor: '#FFFBEB' },
+  cardBusiness:  { borderColor: '#10B981', backgroundColor: '#ECFDF5' },
+  radio: {
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#F59E0B',
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
+  radioGuide:    { borderColor: '#F59E0B', backgroundColor: '#F59E0B' },
+  radioBusiness: { borderColor: '#10B981', backgroundColor: '#10B981' },
+  cardText: { flex: 1 },
   cardTitle: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#374151',
-    marginTop: 6,
-    textAlign: 'center',
   },
-  cardTitleGuide: {
-    color: '#D97706',
-  },
-  cardTitleBusiness: {
-    color: '#059669',
-  },
+  cardTitleGuide:    { color: '#D97706' },
+  cardTitleBusiness: { color: '#059669' },
   cardHint: {
     fontSize: 11,
     color: '#9CA3AF',
-    marginTop: 3,
-    textAlign: 'center',
+    marginTop: 1,
     lineHeight: 15,
   },
   consentRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
-    marginTop: 12,
+    marginTop: 4,
   },
   checkbox: {
     width: 20,
@@ -945,24 +934,6 @@ const proStyles = StyleSheet.create({
     fontSize: 11,
     color: '#EF4444',
     marginTop: 4,
-    marginLeft: 30,
-  },
-  deselectChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'center',
-    gap: 6,
-    marginTop: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
-  },
-  deselectChipText: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '500',
+    marginLeft: 28,
   },
 });

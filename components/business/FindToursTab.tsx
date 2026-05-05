@@ -18,6 +18,7 @@ import {
   Switch,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout,
@@ -54,12 +55,13 @@ interface SlotModalProps {
 }
 
 function SlotModal({ visible, tour, onSelectSlot, onClose, adding }: SlotModalProps) {
+  const { t } = useTranslation();
   if (!tour) return null;
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
         <Pressable style={styles.modalBox} onPress={() => {}}>
-          <Text style={styles.modalTitle}>Selecciona dónde publicitarte</Text>
+          <Text style={styles.modalTitle}>{t('business.findTours.slotModalTitle')}</Text>
           <Text style={styles.modalSubtitle} numberOfLines={2}>{tour.tourTitle}</Text>
 
           {tour.hasDetailSlot && (
@@ -71,8 +73,8 @@ function SlotModal({ visible, tour, onSelectSlot, onClose, adding }: SlotModalPr
             >
               <Ionicons name="map-outline" size={20} color={GREEN_DARK} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.slotBtnTitle}>Página del tour</Text>
-                <Text style={styles.slotBtnHint}>Aparece en la descripción principal del tour</Text>
+                <Text style={styles.slotBtnTitle}>{t('business.findTours.slotTourPage')}</Text>
+                <Text style={styles.slotBtnHint}>{t('business.findTours.slotTourPageHint')}</Text>
               </View>
               {adding
                 ? <ActivityIndicator size="small" color={GREEN} />
@@ -90,8 +92,10 @@ function SlotModal({ visible, tour, onSelectSlot, onClose, adding }: SlotModalPr
             >
               <Ionicons name="location-outline" size={20} color={GREEN_DARK} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.slotBtnTitle}>Paso {step.order}: {step.stepTitle}</Text>
-                <Text style={styles.slotBtnHint}>Aparece en este paso del tour</Text>
+                <Text style={styles.slotBtnTitle}>
+                  {t('business.findTours.stepLabel', { order: step.order, title: step.stepTitle })}
+                </Text>
+                <Text style={styles.slotBtnHint}>{t('business.findTours.slotStepHint')}</Text>
               </View>
               {adding
                 ? <ActivityIndicator size="small" color={GREEN} />
@@ -100,7 +104,7 @@ function SlotModal({ visible, tour, onSelectSlot, onClose, adding }: SlotModalPr
           ))}
 
           <TouchableOpacity style={styles.modalCancelBtn} onPress={onClose} activeOpacity={0.8}>
-            <Text style={styles.modalCancelText}>Cancelar</Text>
+            <Text style={styles.modalCancelText}>{t('business.findTours.cancel')}</Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>
@@ -121,13 +125,13 @@ interface SlotCheckoutModalProps {
 }
 
 function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: SlotCheckoutModalProps) {
+  const { t } = useTranslation();
   const [step, setStep]                   = useState<CheckoutStep>('plan-picker');
   const [selectedPlan, setSelectedPlan]   = useState<SubscriptionPlan | null>(null);
   const [clientSecret, setClientSecret]   = useState<string | null>(null);
   const [sessionId, setSessionId]         = useState<string | null>(null);
   const [error, setError]                 = useState('');
 
-  // Reset on open
   useEffect(() => {
     if (visible) {
       setStep('plan-picker');
@@ -152,7 +156,7 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
       setSessionId(result.checkoutSessionId);
       setStep('checkout');
     } catch (err: any) {
-      setError(err?.response?.data?.error ?? err.message ?? 'Error al iniciar el pago.');
+      setError(err?.response?.data?.error ?? err.message ?? t('business.findTours.paymentError'));
       setStep('error');
     }
   };
@@ -170,11 +174,11 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
         });
         onSuccess(promo);
       } else {
-        setError('El pago no se completó. Inténtalo de nuevo.');
+        setError(t('business.findTours.paymentIncomplete'));
         setStep('error');
       }
     } catch (err: any) {
-      setError(err?.message ?? 'Error al confirmar la promoción.');
+      setError(err?.message ?? t('business.findTours.confirmError'));
       setStep('error');
     }
   };
@@ -186,18 +190,18 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
       <Pressable style={styles.modalBackdrop} onPress={step === 'plan-picker' ? onClose : undefined}>
         <Pressable style={[styles.modalBox, step === 'checkout' && styles.modalBoxWide]} onPress={() => {}}>
 
-          {/* Plan picker */}
           {step === 'plan-picker' && (
             <>
               <View style={styles.checkoutHeader}>
                 <Ionicons name="megaphone-outline" size={28} color={GREEN} />
               </View>
-              <Text style={styles.modalTitle}>Elige tu plan de publicidad</Text>
+              <Text style={styles.modalTitle}>{t('business.findTours.chooseYourPlan')}</Text>
               <Text style={styles.modalSubtitle} numberOfLines={2}>{slotData.tourTitle}</Text>
 
               <View style={{ gap: 10, width: '100%' }}>
                 {plans.map((plan) => {
                   const isSelected = selectedPlan?.id === plan.id;
+                  const isAnnual = plan.billingCycle === 'annual';
                   return (
                     <TouchableOpacity
                       key={plan.id}
@@ -208,9 +212,9 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
                       <View style={{ flex: 1 }}>
                         <Text style={styles.planCardTitle}>{plan.title}</Text>
                         <Text style={styles.planCardCycle}>
-                          {plan.billingCycle === 'monthly' ? 'Mensual' : 'Anual'}
-                          {plan.billingCycle === 'annual' && (
-                            <Text style={styles.planCardSaving}> · Ahorra 99€</Text>
+                          {isAnnual ? t('business.findTours.planAnnual') : t('business.findTours.planMonthly')}
+                          {isAnnual && (
+                            <Text style={styles.planCardSaving}> {t('business.findTours.planSaving')}</Text>
                           )}
                         </Text>
                       </View>
@@ -219,7 +223,7 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
                           {plan.price.toFixed(2)} €
                         </Text>
                         <Text style={styles.planCardPriceUnit}>
-                          / {plan.billingCycle === 'monthly' ? 'mes' : 'año'}
+                          {isAnnual ? t('business.findTours.perYear') : t('business.findTours.perMonth')}
                         </Text>
                       </View>
                       <View style={[styles.planRadio, isSelected && styles.planRadioSelected]}>
@@ -238,30 +242,28 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
               >
                 <Ionicons name="card-outline" size={18} color="#fff" />
                 <Text style={styles.checkoutBtnText}>
-                  Pagar {selectedPlan ? `${selectedPlan.price.toFixed(2)} €` : ''}
+                  {t('business.findTours.payBtn', { price: selectedPlan ? selectedPlan.price.toFixed(2) : '' })}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.modalCancelBtn} onPress={onClose} activeOpacity={0.8}>
-                <Text style={styles.modalCancelText}>Cancelar</Text>
+                <Text style={styles.modalCancelText}>{t('business.findTours.cancel')}</Text>
               </TouchableOpacity>
             </>
           )}
 
-          {/* Loading checkout session */}
           {step === 'loading' && (
             <>
               <ActivityIndicator size="large" color={GREEN} style={{ marginVertical: 32 }} />
-              <Text style={{ color: '#6B7280', textAlign: 'center' }}>Preparando el pago…</Text>
+              <Text style={{ color: '#6B7280', textAlign: 'center' }}>{t('business.findTours.preparingPayment')}</Text>
             </>
           )}
 
-          {/* Stripe EmbeddedCheckout */}
           {step === 'checkout' && clientSecret && Platform.OS === 'web' && (
             <>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center', marginBottom: 8 }}>
                 <Ionicons name="lock-closed-outline" size={13} color="#6B7280" />
-                <Text style={{ fontSize: 12, color: '#6B7280' }}>Pago seguro con Stripe</Text>
+                <Text style={{ fontSize: 12, color: '#6B7280' }}>{t('business.findTours.securePayment')}</Text>
               </View>
               <View style={{ minHeight: 400, width: '100%' }}>
                 <EmbeddedCheckoutProvider
@@ -272,33 +274,30 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
                 </EmbeddedCheckoutProvider>
               </View>
               <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setStep('plan-picker')} activeOpacity={0.8}>
-                <Text style={styles.modalCancelText}>← Volver a planes</Text>
+                <Text style={styles.modalCancelText}>{t('business.findTours.backToPlans')}</Text>
               </TouchableOpacity>
             </>
           )}
 
-          {/* Checkout en nativo (no disponible) */}
           {step === 'checkout' && Platform.OS !== 'web' && (
             <>
               <Ionicons name="phone-portrait-outline" size={40} color="#9CA3AF" style={{ alignSelf: 'center', marginVertical: 16 }} />
               <Text style={{ color: '#6B7280', textAlign: 'center', paddingHorizontal: 16 }}>
-                El pago está disponible en la versión web.
+                {t('business.findTours.paymentWebOnly')}
               </Text>
               <TouchableOpacity style={styles.modalCancelBtn} onPress={onClose} activeOpacity={0.8}>
-                <Text style={styles.modalCancelText}>Cerrar</Text>
+                <Text style={styles.modalCancelText}>{t('business.findTours.cancel')}</Text>
               </TouchableOpacity>
             </>
           )}
 
-          {/* Confirmando */}
           {step === 'confirming' && (
             <>
               <ActivityIndicator size="large" color={GREEN} style={{ marginVertical: 32 }} />
-              <Text style={{ color: '#6B7280', textAlign: 'center' }}>Activando tu slot publicitario…</Text>
+              <Text style={{ color: '#6B7280', textAlign: 'center' }}>{t('business.findTours.activatingSlot')}</Text>
             </>
           )}
 
-          {/* Error */}
           {step === 'error' && (
             <>
               <View style={{ alignItems: 'center', marginVertical: 16 }}>
@@ -306,10 +305,10 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
               </View>
               <Text style={{ color: '#DC2626', textAlign: 'center', marginBottom: 16 }}>{error}</Text>
               <TouchableOpacity style={styles.checkoutBtn} onPress={() => setStep('plan-picker')} activeOpacity={0.85}>
-                <Text style={styles.checkoutBtnText}>Volver a intentarlo</Text>
+                <Text style={styles.checkoutBtnText}>{t('business.findTours.retryBtn')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalCancelBtn} onPress={onClose} activeOpacity={0.8}>
-                <Text style={styles.modalCancelText}>Cancelar</Text>
+                <Text style={styles.modalCancelText}>{t('business.findTours.cancel')}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -322,6 +321,7 @@ function SlotCheckoutModal({ visible, slotData, plans, onSuccess, onClose }: Slo
 // ── Tab principal ─────────────────────────────────────────────────────────────
 
 export function FindToursTab({ userId }: FindToursTabProps) {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
 
   const [search, setSearch]     = useState('');
@@ -333,19 +333,14 @@ export function FindToursTab({ userId }: FindToursTabProps) {
   const [selectedBusiness, setSelectedBusiness]   = useState<Business | null>(null);
   const [bizPickerVisible, setBizPickerVisible]   = useState(false);
 
-  // Planes cargados una sola vez
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-
-  // Estado trial: promotions activas
   const [currentPromos, setCurrentPromos] = useState<BusinessPromotion[]>([]);
 
-  // Modal selección de slot (trial)
   const [slotTour, setSlotTour]           = useState<TourWithSlots | null>(null);
   const [slotModalVisible, setSlotModalVisible] = useState(false);
   const [adding, setAdding]               = useState(false);
   const [addError, setAddError]           = useState<string | null>(null);
 
-  // Modal checkout (cuando trial agotado)
   const [pendingSlot, setPendingSlot] = useState<{
     tourTitle: string;
     targetType: PromotionTargetType;
@@ -377,11 +372,11 @@ export function FindToursTab({ userId }: FindToursTabProps) {
       const results = await getAvailableTourSlots({ search: query });
       setTours(results);
     } catch {
-      setError('Error al buscar tours. Inténtalo de nuevo.');
+      setError(t('business.findTours.loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
@@ -391,26 +386,15 @@ export function FindToursTab({ userId }: FindToursTabProps) {
 
   const handleOpenSlotModal = (tour: TourWithSlots) => {
     if (!selectedBusiness) return;
-    const activePromos = currentPromos.filter((p) => p.status !== 'expired');
-    if (activePromos.length >= MAX_FREE_SLOTS) {
-      // Trial agotado → abrir checkout modal (necesitamos saber qué slot)
-      // Guardamos el tour para que el usuario elija dentro del SlotCheckoutModal
-      // simplificación: abrimos slot picker primero y luego checkout
-      setSlotTour(tour);
-      setAddError(null);
-      setSlotModalVisible(true);
-    } else {
-      setSlotTour(tour);
-      setAddError(null);
-      setSlotModalVisible(true);
-    }
+    setSlotTour(tour);
+    setAddError(null);
+    setSlotModalVisible(true);
   };
 
   const handleSelectSlot = async (targetType: PromotionTargetType, targetId: string) => {
     if (!selectedBusiness || !slotTour) return;
     const activePromos = currentPromos.filter((p) => p.status !== 'expired');
 
-    // Trial disponible → añadir gratis
     if (activePromos.length < MAX_FREE_SLOTS) {
       setAdding(true);
       setAddError(null);
@@ -426,18 +410,16 @@ export function FindToursTab({ userId }: FindToursTabProps) {
       } catch (err: any) {
         const code = err?.response?.data?.error;
         if (code === 'TRIAL_LIMIT_REACHED') {
-          // Race condition: abrimos checkout en su lugar
           setSlotModalVisible(false);
           setPendingSlot({ tourTitle: slotTour.tourTitle, targetType, targetId, businessId: selectedBusiness.id });
           setCheckoutModalVisible(true);
         } else {
-          setAddError('Error al añadir el slot. Inténtalo de nuevo.');
+          setAddError(t('business.findTours.slotError'));
         }
       } finally {
         setAdding(false);
       }
     } else {
-      // Trial agotado → checkout
       setSlotModalVisible(false);
       setPendingSlot({ tourTitle: slotTour.tourTitle, targetType, targetId, businessId: selectedBusiness.id });
       setCheckoutModalVisible(true);
@@ -455,24 +437,22 @@ export function FindToursTab({ userId }: FindToursTabProps) {
 
   return (
     <View>
-      {/* Selector de negocio */}
       {businesses.length > 1 && (
         <View style={styles.bizSelector}>
-          <Text style={styles.bizSelectorLabel}>Publicitar como:</Text>
+          <Text style={styles.bizSelectorLabel}>{t('business.findTours.advertiseAs')}</Text>
           <TouchableOpacity
             style={styles.bizSelectorBtn}
             onPress={() => setBizPickerVisible(true)}
             activeOpacity={0.8}
           >
             <Text style={styles.bizSelectorBtnText} numberOfLines={1}>
-              {selectedBusiness?.name ?? 'Selecciona un negocio'}
+              {selectedBusiness?.name ?? t('business.findTours.selectBusiness')}
             </Text>
             <Ionicons name="chevron-down" size={16} color="#6B7280" />
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Banner trial */}
       <View style={[styles.trialBanner, activePromoCount >= MAX_FREE_SLOTS && styles.trialBannerFull]}>
         <Ionicons
           name={activePromoCount >= MAX_FREE_SLOTS ? 'warning-outline' : 'information-circle-outline'}
@@ -481,18 +461,17 @@ export function FindToursTab({ userId }: FindToursTabProps) {
         />
         <Text style={[styles.trialText, activePromoCount >= MAX_FREE_SLOTS && styles.trialTextFull]}>
           {activePromoCount >= MAX_FREE_SLOTS
-            ? `Trial agotado (${activePromoCount}/${MAX_FREE_SLOTS} slots). Los nuevos slots requieren suscripción (29€/mes o 249€/año).`
-            : `Plan gratuito: ${activePromoCount}/${MAX_FREE_SLOTS} slots usados · 7 días de prueba · sin tarjeta`}
+            ? t('business.findTours.trialFull', { used: activePromoCount, max: MAX_FREE_SLOTS })
+            : t('business.findTours.trialAvailable', { used: activePromoCount, max: MAX_FREE_SLOTS })}
         </Text>
       </View>
 
-      {/* Buscador */}
       <View style={styles.searchRow}>
         <View style={styles.searchInput}>
           <Ionicons name="search-outline" size={18} color="#9CA3AF" />
           <TextInput
             style={styles.searchField}
-            placeholder="Buscar tours por nombre o ciudad..."
+            placeholder={t('business.findTours.searchPlaceholder')}
             placeholderTextColor="#9CA3AF"
             value={search}
             onChangeText={setSearch}
@@ -517,12 +496,11 @@ export function FindToursTab({ userId }: FindToursTabProps) {
       {!loading && tours.length === 0 && !error && (
         <View style={styles.emptyBox}>
           <Ionicons name="search-outline" size={48} color="#D1D5DB" />
-          <Text style={styles.emptyTitle}>No se encontraron tours</Text>
-          <Text style={styles.emptySubtitle}>Prueba a buscar por nombre de tour o ciudad.</Text>
+          <Text style={styles.emptyTitle}>{t('business.findTours.emptyTitle')}</Text>
+          <Text style={styles.emptySubtitle}>{t('business.findTours.emptySubtitle')}</Text>
         </View>
       )}
 
-      {/* Lista de tours */}
       <View style={{ gap: 12, marginTop: 8 }}>
         {tours.map((tour) => {
           const totalSlots = (tour.hasDetailSlot ? 1 : 0) + tour.availableStepSlots.length;
@@ -539,7 +517,7 @@ export function FindToursTab({ userId }: FindToursTabProps) {
                   )}
                 </View>
                 <View style={styles.slotCountBadge}>
-                  <Text style={styles.slotCountText}>{totalSlots} slots</Text>
+                  <Text style={styles.slotCountText}>{t('business.findTours.slots', { count: totalSlots })}</Text>
                 </View>
               </View>
 
@@ -547,18 +525,18 @@ export function FindToursTab({ userId }: FindToursTabProps) {
                 {tour.hasDetailSlot && (
                   <View style={styles.slotPill}>
                     <Ionicons name="map-outline" size={12} color={GREEN_DARK} />
-                    <Text style={styles.slotPillText}>Tour</Text>
+                    <Text style={styles.slotPillText}>{t('business.findTours.typeTour')}</Text>
                   </View>
                 )}
                 {tour.availableStepSlots.slice(0, 3).map((s) => (
                   <View key={s.stepId} style={styles.slotPill}>
                     <Ionicons name="location-outline" size={12} color={GREEN_DARK} />
-                    <Text style={styles.slotPillText}>Paso {s.order}</Text>
+                    <Text style={styles.slotPillText}>{t('business.findTours.typeStep')} {s.order}</Text>
                   </View>
                 ))}
                 {tour.availableStepSlots.length > 3 && (
                   <View style={styles.slotPill}>
-                    <Text style={styles.slotPillText}>+{tour.availableStepSlots.length - 3} más</Text>
+                    <Text style={styles.slotPillText}>+{tour.availableStepSlots.length - 3}</Text>
                   </View>
                 )}
               </View>
@@ -575,7 +553,9 @@ export function FindToursTab({ userId }: FindToursTabProps) {
                   color={selectedBusiness ? '#fff' : '#9CA3AF'}
                 />
                 <Text style={[styles.addToTourBtnText, !selectedBusiness && { color: '#9CA3AF' }]}>
-                  {activePromoCount >= MAX_FREE_SLOTS ? 'Publicitar (con suscripción)' : 'Publicitar aquí'}
+                  {activePromoCount >= MAX_FREE_SLOTS
+                    ? t('business.findTours.advertiseWithSub')
+                    : t('business.findTours.advertiseHere')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -589,7 +569,6 @@ export function FindToursTab({ userId }: FindToursTabProps) {
         </View>
       )}
 
-      {/* Modal selección de slot */}
       <SlotModal
         visible={slotModalVisible}
         tour={slotTour}
@@ -598,7 +577,6 @@ export function FindToursTab({ userId }: FindToursTabProps) {
         adding={adding}
       />
 
-      {/* Modal checkout (plan picker + Stripe) */}
       <SlotCheckoutModal
         visible={checkoutModalVisible}
         slotData={pendingSlot}
@@ -607,12 +585,11 @@ export function FindToursTab({ userId }: FindToursTabProps) {
         onClose={() => { setCheckoutModalVisible(false); setPendingSlot(null); }}
       />
 
-      {/* Business picker */}
       {bizPickerVisible && (
         <Modal transparent animationType="fade" visible onRequestClose={() => setBizPickerVisible(false)}>
           <Pressable style={styles.modalBackdrop} onPress={() => setBizPickerVisible(false)}>
             <Pressable style={styles.modalBox} onPress={() => {}}>
-              <Text style={styles.modalTitle}>Selecciona tu negocio</Text>
+              <Text style={styles.modalTitle}>{t('business.findTours.selectBizTitle')}</Text>
               {businesses.map((b) => (
                 <TouchableOpacity
                   key={b.id}
@@ -707,7 +684,6 @@ const styles = StyleSheet.create({
   addToTourBtnDisabled: { backgroundColor: '#F3F4F6' },
   addToTourBtnText: { fontSize: 14, fontWeight: '600', color: '#fff' },
 
-  // Modales
   modalBackdrop: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center', alignItems: 'center', padding: 20,
@@ -736,7 +712,6 @@ const styles = StyleSheet.create({
   },
   modalCancelText: { fontSize: 14, fontWeight: '600', color: '#6B7280' },
 
-  // Checkout modal
   checkoutHeader: { alignItems: 'center', paddingVertical: 4 },
   planCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12,

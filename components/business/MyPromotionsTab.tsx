@@ -1,6 +1,4 @@
 // components/business/MyPromotionsTab.tsx
-// Tabla de todas las promociones activas/expiradas del usuario business.
-// Por slot: badge de plan, toggle de renovación automática y botón de cancelar.
 
 import React, { useState, useCallback } from 'react';
 import {
@@ -17,6 +15,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import {
   getPromotionsByUser,
   removePromotion,
@@ -29,7 +28,6 @@ const GREEN_DARK = '#059669';
 
 interface MyPromotionsTabProps {
   userId: string;
-  /** Si se pasa, filtra solo las promociones de ese negocio */
   businessId?: string;
 }
 
@@ -41,20 +39,22 @@ function formatDate(dateStr: string | null | undefined): string {
 }
 
 function StatusBadge({ status }: { status: PromotionStatus }) {
-  const config: Record<PromotionStatus, { bg: string; text: string; label: string }> = {
-    active: { bg: '#D1FAE5', text: '#065F46', label: 'Activo' },
-    trial:  { bg: '#FEF3C7', text: '#92400E', label: 'Prueba' },
-    expired:{ bg: '#F3F4F6', text: '#6B7280', label: 'Expirado' },
+  const { t } = useTranslation();
+  const config: Record<PromotionStatus, { bg: string; text: string; labelKey: string }> = {
+    active:  { bg: '#D1FAE5', text: '#065F46', labelKey: 'business.myPromotions.statusActive' },
+    trial:   { bg: '#FEF3C7', text: '#92400E', labelKey: 'business.myPromotions.statusTrial' },
+    expired: { bg: '#F3F4F6', text: '#6B7280', labelKey: 'business.myPromotions.statusExpired' },
   };
   const c = config[status] ?? config.expired;
   return (
     <View style={{ backgroundColor: c.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>
-      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{c.label}</Text>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{t(c.labelKey)}</Text>
     </View>
   );
 }
 
 function TypeBadge({ type }: { type: PromotionTargetType }) {
+  const { t } = useTranslation();
   const isTour = type === 'tour_detail';
   return (
     <View style={{
@@ -68,13 +68,14 @@ function TypeBadge({ type }: { type: PromotionTargetType }) {
         color={isTour ? '#1D4ED8' : GREEN_DARK}
       />
       <Text style={{ fontSize: 11, fontWeight: '600', color: isTour ? '#1D4ED8' : GREEN_DARK }}>
-        {isTour ? 'Tour' : 'Paso'}
+        {isTour ? t('business.myPromotions.typeTour') : t('business.myPromotions.typeStep')}
       </Text>
     </View>
   );
 }
 
 function PlanBadge({ planType }: { planType: string | null }) {
+  const { t } = useTranslation();
   if (!planType) return null;
   const isAnnual = planType === 'business_annual';
   return (
@@ -83,7 +84,7 @@ function PlanBadge({ planType }: { planType: string | null }) {
       paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
     }}>
       <Text style={{ fontSize: 11, fontWeight: '700', color: isAnnual ? '#5B21B6' : '#0369A1' }}>
-        {isAnnual ? 'Anual' : 'Mensual'}
+        {isAnnual ? t('business.myPromotions.planAnnual') : t('business.myPromotions.planMonthly')}
       </Text>
     </View>
   );
@@ -98,6 +99,7 @@ interface CancelModalProps {
 }
 
 function CancelModal({ visible, promotion, onConfirm, onCancel, loading }: CancelModalProps) {
+  const { t } = useTranslation();
   const hasSubscription = !!promotion?.subscriptionId;
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onCancel}>
@@ -108,17 +110,17 @@ function CancelModal({ visible, promotion, onConfirm, onCancel, loading }: Cance
               <Ionicons name="close-circle-outline" size={24} color="#EF4444" />
             </View>
           </View>
-          <Text style={styles.modalTitle}>Cancelar promoción</Text>
+          <Text style={styles.modalTitle}>{t('business.myPromotions.cancelModalTitle')}</Text>
           <Text style={styles.modalBody}>
-            ¿Estás seguro de que quieres cancelar la promoción en{' '}
-            <Text style={{ fontWeight: '700' }}>{promotion?.targetName}</Text>?
+            {t('business.myPromotions.cancelModalBody', { name: promotion?.targetName ?? '' })}
+            {'\n'}
             {hasSubscription
-              ? '\nSe cancelará también la suscripción Stripe de este slot. Mantendrás el acceso hasta el final del período actual.'
-              : '\nEsta acción no se puede deshacer.'}
+              ? t('business.myPromotions.cancelModalBodySub')
+              : t('business.myPromotions.cancelModalBodyNoSub')}
           </Text>
           <View style={styles.modalActions}>
             <TouchableOpacity style={styles.modalBtnCancel} onPress={onCancel} activeOpacity={0.8}>
-              <Text style={styles.modalBtnCancelText}>No cancelar</Text>
+              <Text style={styles.modalBtnCancelText}>{t('business.myPromotions.cancelModalKeep')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.modalBtnDelete, loading && { opacity: 0.6 }]}
@@ -128,7 +130,7 @@ function CancelModal({ visible, promotion, onConfirm, onCancel, loading }: Cance
             >
               {loading
                 ? <ActivityIndicator size="small" color="#fff" />
-                : <Text style={styles.modalBtnDeleteText}>Sí, cancelar</Text>
+                : <Text style={styles.modalBtnDeleteText}>{t('business.myPromotions.cancelModalConfirm')}</Text>
               }
             </TouchableOpacity>
           </View>
@@ -139,6 +141,7 @@ function CancelModal({ visible, promotion, onConfirm, onCancel, loading }: Cance
 }
 
 export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -148,7 +151,6 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
   const [filterStatus, setFilterStatus] = useState<'all' | PromotionStatus>('all');
   const [cancelTarget, setCancelTarget] = useState<BusinessPromotion | null>(null);
   const [cancelling, setCancelling]     = useState(false);
-  // { [promotionId]: true } mientras se actualiza la renovación de ese slot
   const [renewalLoading, setRenewalLoading] = useState<Record<string, boolean>>({});
 
   const load = useCallback(async () => {
@@ -159,11 +161,11 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
       const filtered = businessId ? all.filter((p) => p.businessId === businessId) : all;
       setPromotions(filtered);
     } catch {
-      setError('No se pudieron cargar las promociones.');
+      setError(t('business.myPromotions.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [userId, businessId]);
+  }, [userId, businessId, t]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -175,7 +177,7 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
       setPromotions((prev) => prev.filter((p) => p.id !== cancelTarget.id));
       setCancelTarget(null);
     } catch {
-      setError('Error al cancelar la promoción. Inténtalo de nuevo.');
+      setError(t('business.myPromotions.cancelError'));
     } finally {
       setCancelling(false);
     }
@@ -191,7 +193,7 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
         )
       );
     } catch {
-      setError('Error al actualizar la renovación automática.');
+      setError(t('business.myPromotions.renewalError'));
     } finally {
       setRenewalLoading((prev) => ({ ...prev, [p.id]: false }));
     }
@@ -200,6 +202,13 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
   const displayed = promotions.filter(
     (p) => filterStatus === 'all' || p.status === filterStatus,
   );
+
+  const filterLabels: Record<string, string> = {
+    all:     t('business.myPromotions.filterAll'),
+    active:  t('business.myPromotions.filterActive'),
+    trial:   t('business.myPromotions.filterTrial'),
+    expired: t('business.myPromotions.filterExpired'),
+  };
 
   if (loading) {
     return (
@@ -211,7 +220,7 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
 
   return (
     <View>
-      <Text style={styles.heading}>Mis Promociones</Text>
+      <Text style={styles.heading}>{t('business.myPromotions.title')}</Text>
 
       {error && (
         <View style={styles.errorBox}>
@@ -220,7 +229,6 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
         </View>
       )}
 
-      {/* Filtros de estado */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
         {(['all', 'active', 'trial', 'expired'] as const).map((s) => (
           <TouchableOpacity
@@ -230,7 +238,7 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
             activeOpacity={0.8}
           >
             <Text style={[styles.filterChipText, filterStatus === s && styles.filterChipTextActive]}>
-              {s === 'all' ? 'Todas' : s === 'active' ? 'Activas' : s === 'trial' ? 'En prueba' : 'Expiradas'}
+              {filterLabels[s]}
             </Text>
           </TouchableOpacity>
         ))}
@@ -239,19 +247,25 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
       {displayed.length === 0 && (
         <View style={styles.emptyBox}>
           <Ionicons name="megaphone-outline" size={48} color="#D1D5DB" />
-          <Text style={styles.emptyTitle}>Sin promociones</Text>
-          <Text style={styles.emptySubtitle}>
-            Ve a "Buscar Tours" para añadir tu negocio a un tour o paso.
-          </Text>
+          <Text style={styles.emptyTitle}>{t('business.myPromotions.emptyTitle')}</Text>
+          <Text style={styles.emptySubtitle}>{t('business.myPromotions.emptySubtitle')}</Text>
         </View>
       )}
 
       {isDesktop ? (
-        // ── Desktop: tabla ────────────────────────────────────────────────────
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeader]}>
-            {['Nombre', 'Tipo', 'Inicio', 'Estado', 'Plan', 'Vence', 'Auto-renovación', ''].map((h) => (
-              <Text key={h} style={styles.tableHeaderCell}>{h}</Text>
+            {[
+              t('business.myPromotions.colName'),
+              t('business.myPromotions.colType'),
+              t('business.myPromotions.colStart'),
+              t('business.myPromotions.colStatus'),
+              t('business.myPromotions.colPlan'),
+              t('business.myPromotions.colExpiry'),
+              t('business.myPromotions.colAutoRenewal'),
+              '',
+            ].map((h, i) => (
+              <Text key={i} style={styles.tableHeaderCell}>{h}</Text>
             ))}
           </View>
           {displayed.map((p) => {
@@ -296,7 +310,7 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
                       style={styles.cancelBtn}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.cancelBtnText}>Cancelar</Text>
+                      <Text style={styles.cancelBtnText}>{t('business.myPromotions.cancel')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -305,7 +319,6 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
           })}
         </View>
       ) : (
-        // ── Mobile: tarjetas ─────────────────────────────────────────────────
         <View style={{ gap: 10 }}>
           {displayed.map((p) => {
             const canRenew = p.status === 'active' && !!p.subscriptionId;
@@ -319,22 +332,20 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
                 <View style={styles.cardMetaRow}>
                   <TypeBadge type={p.targetType} />
                   {p.subscriptionPlanType && <PlanBadge planType={p.subscriptionPlanType} />}
-                  <Text style={styles.cardMeta}>Desde: {formatDate(p.startDate)}</Text>
+                  <Text style={styles.cardMeta}>{t('business.myPromotions.dateFrom')} {formatDate(p.startDate)}</Text>
                 </View>
 
-                {/* Fecha de expiración / vencimiento */}
                 <View style={styles.cardMetaRow}>
                   {p.subscriptionEndDate ? (
-                    <Text style={styles.cardMeta}>Vence: {formatDate(p.subscriptionEndDate)}</Text>
+                    <Text style={styles.cardMeta}>{t('business.myPromotions.dateExpiry')} {formatDate(p.subscriptionEndDate)}</Text>
                   ) : p.expiryDate ? (
-                    <Text style={styles.cardMeta}>Trial expira: {formatDate(p.expiryDate)}</Text>
+                    <Text style={styles.cardMeta}>{t('business.myPromotions.dateTrial')} {formatDate(p.expiryDate)}</Text>
                   ) : null}
                 </View>
 
-                {/* Renovación automática (solo slots con suscripción activa) */}
                 {canRenew && (
                   <View style={styles.renewalRow}>
-                    <Text style={styles.renewalLabel}>Renovación automática</Text>
+                    <Text style={styles.renewalLabel}>{t('business.myPromotions.autoRenewal')}</Text>
                     {renewBusy ? (
                       <ActivityIndicator size="small" color={GREEN} />
                     ) : (
@@ -355,7 +366,7 @@ export function MyPromotionsTab({ userId, businessId }: MyPromotionsTabProps) {
                     activeOpacity={0.8}
                   >
                     <Ionicons name="close-circle-outline" size={16} color="#DC2626" />
-                    <Text style={styles.cancelBtnFullText}>Cancelar promoción</Text>
+                    <Text style={styles.cancelBtnFullText}>{t('business.myPromotions.cancelPromotion')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -396,7 +407,6 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 16, fontWeight: '700', color: '#374151' },
   emptySubtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', maxWidth: 280 },
 
-  // Tabla desktop
   table: {
     borderRadius: 12, borderWidth: 1, borderColor: '#E5E7EB',
     overflow: 'hidden', backgroundColor: '#fff',
@@ -418,7 +428,6 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: { fontSize: 12, fontWeight: '600', color: '#DC2626' },
 
-  // Tarjetas mobile
   card: {
     backgroundColor: '#fff', borderRadius: 12,
     borderWidth: 1, borderColor: '#E5E7EB', padding: 14, gap: 8,
@@ -440,7 +449,6 @@ const styles = StyleSheet.create({
   },
   cancelBtnFullText: { fontSize: 13, fontWeight: '600', color: '#DC2626' },
 
-  // Modal de cancelación
   backdrop: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center', alignItems: 'center', padding: 20,
