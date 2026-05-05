@@ -155,7 +155,7 @@ export async function register(data: {
   publicName?: string;
   email: string;
   password: string;
-  role?: 'professional';
+  role?: 'guide' | 'business';
   langcode?: string;
   rememberMe?: boolean;
 }): Promise<AuthSession> {
@@ -166,7 +166,7 @@ export async function register(data: {
       pass: data.password,
     };
     if (data.publicName) payload.field_public_name = data.publicName;
-    if (data.role === 'professional') payload.role = 'professional';
+    if (data.role === 'guide' || data.role === 'business') payload.role = data.role;
 
     await axios.post(
       `${BASE_URL}/api/user/register`,
@@ -202,7 +202,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
 // ── Google Auth ───────────────────────────────────────────────────────────────
 
-export async function loginWithGoogle(googleAccessToken: string, role?: 'professional', rememberMe = false): Promise<AuthSession> {
+export async function loginWithGoogle(googleAccessToken: string, role?: 'guide' | 'business', rememberMe = false): Promise<AuthSession> {
   let response: any;
   try {
     response = await axios.post(

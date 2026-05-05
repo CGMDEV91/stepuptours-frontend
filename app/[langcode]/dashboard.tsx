@@ -1,5 +1,5 @@
 // app/[langcode]/dashboard.tsx
-// Professional Dashboard — tab navigation for professional role only
+// Guide Dashboard — tab navigation for guide (and legacy professional) role only
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
 import { MyToursTab } from '../../components/dashboard/MyToursTab';
-import { BusinessTab } from '../../components/dashboard/BusinessTab';
 import { SubscriptionTab } from '../../components/dashboard/SubscriptionTab';
 import { PaymentDataTab } from '../../components/dashboard/PaymentDataTab';
 import { DonationsTab } from '../../components/dashboard/DonationsTab';
@@ -29,7 +28,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'tours' | 'businesses' | 'subscription' | 'payment' | 'donations';
+type TabId = 'tours' | 'subscription' | 'payment' | 'donations';
 
 interface Tab {
   id: TabId;
@@ -40,12 +39,11 @@ interface Tab {
 const TABS: Tab[] = [
   { id: 'subscription', labelKey: 'dashboard.tabs.subscription', icon: 'card-outline' },
   { id: 'tours', labelKey: 'dashboard.tabs.tours', icon: 'map-outline' },
-  { id: 'businesses', labelKey: 'dashboard.tabs.businesses', icon: 'business-outline' },
   { id: 'payment', labelKey: 'dashboard.tabs.payment', icon: 'wallet-outline' },
   { id: 'donations', labelKey: 'dashboard.tabs.donations', icon: 'heart-outline' },
 ];
 
-const VALID_TABS: TabId[] = ['tours', 'businesses', 'subscription', 'payment', 'donations'];
+const VALID_TABS: TabId[] = ['tours', 'subscription', 'payment', 'donations'];
 
 function isValidTab(value: string): value is TabId {
   return VALID_TABS.includes(value as TabId);
@@ -122,18 +120,20 @@ export default function DashboardScreen() {
     };
   }, [toastParam]);
 
-  const isProfessional = user?.roles?.includes('professional');
+  // Compatibilidad temporal: 'professional' → 'guide' durante la transición de roles
+  const isGuide =
+    user?.roles?.includes('guide') || user?.roles?.includes('professional');
 
   useEffect(() => {
-    if (!isAuthLoading && (!user || !isProfessional)) {
+    if (!isAuthLoading && (!user || !isGuide)) {
       const timer = setTimeout(() => {
         router.replace(`/${langcode}` as any);
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [user, isAuthLoading, isProfessional, langcode]);
+  }, [user, isAuthLoading, isGuide, langcode]);
 
-  if (isAuthLoading || !user || !isProfessional) {
+  if (isAuthLoading || !user || !isGuide) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={AMBER} />
@@ -213,7 +213,6 @@ export default function DashboardScreen() {
           <View style={{ paddingHorizontal: 16, paddingTop: 20 }}>
             {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
             {activeTab === 'tours' && <MyToursTab userId={user.id} />}
-            {activeTab === 'businesses' && <BusinessTab userId={user.id} />}
             {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
             {activeTab === 'donations' && <DonationsTab userId={user.id} />}
           </View>
@@ -232,7 +231,6 @@ export default function DashboardScreen() {
             <View style={{ maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20 }}>
               {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
               {activeTab === 'tours' && <MyToursTab userId={user.id} />}
-              {activeTab === 'businesses' && <BusinessTab userId={user.id} />}
               {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
               {activeTab === 'donations' && <DonationsTab userId={user.id} />}
             </View>

@@ -15,8 +15,8 @@ interface AuthState {
   pendingAuthModal: 'login' | 'register' | null;
   // Actions
   signIn: (credentials: AuthCredentials) => Promise<void>;
-  signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'professional'; langcode?: string; preferredLanguage?: string }) => Promise<void>;
-  signInWithGoogle: (googleAccessToken: string, role?: 'professional') => Promise<void>;
+  signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'guide' | 'business'; langcode?: string; preferredLanguage?: string }) => Promise<void>;
+  signInWithGoogle: (googleAccessToken: string, role?: 'guide' | 'business') => Promise<void>;
   signOut: () => Promise<void>;
   restore: () => Promise<void>;
   clearError: () => void;

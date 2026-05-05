@@ -500,6 +500,19 @@ export function StepContent({
     setConfirmed(true);
   };
 
+  const isMobileBrowser = () =>
+    Platform.OS === 'web' &&
+    typeof navigator !== 'undefined' &&
+    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const openMapsUrl = (url: string) => {
+    if (isMobileBrowser()) {
+      window.location.href = url;
+    } else {
+      Linking.openURL(url);
+    }
+  };
+
   const openNearbyMaps = async (query: string) => {
     if (!step.location) return;
     const { lat, lon } = step.location;
@@ -512,7 +525,7 @@ export function StepContent({
     } else if (Platform.OS === 'android') {
       Linking.openURL(`geo:${lat},${lon}?q=${encodedQuery}`);
     } else {
-      Linking.openURL(`https://www.google.com/maps/search/${encodedQuery}/@${lat},${lon},16z`);
+      openMapsUrl(`https://www.google.com/maps/search/${encodedQuery}/@${lat},${lon},16z`);
     }
   };
 
@@ -530,7 +543,7 @@ export function StepContent({
       const canGm = await Linking.canOpenURL(gmUrl).catch(() => false);
       Linking.openURL(canGm ? gmUrl : webUrl);
     } else {
-      Linking.openURL(webUrl);
+      openMapsUrl(webUrl);
     }
   };
 

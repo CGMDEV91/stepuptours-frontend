@@ -1,7 +1,7 @@
 // types/index.ts
 // Tipos del dominio — agnósticos del backend
 
-export type UserRole = 'authenticated' | 'professional' | 'administrator';
+export type UserRole = 'authenticated' | 'professional' | 'guide' | 'business' | 'administrator';
 
 export interface User {
   id: string;
@@ -93,7 +93,7 @@ export interface TourActivity {
 export interface SubscriptionPlan {
   id: string;
   title: string;
-  planType: 'free' | 'premium';
+  planType: 'free' | 'premium' | 'business_monthly' | 'business_annual';
   billingCycle: 'monthly' | 'annual' | 'minute' | 'none';
   price: number;
   maxFeaturedDetail: number;
@@ -194,6 +194,40 @@ export interface AuthSession {
   user: User;
   expiresAt: string | null;
   rememberMe?: boolean;
+}
+
+// Ranking
+// ── Business Promotions ────────────────────────────────────────────────────────
+
+export type PromotionTargetType = 'tour_detail' | 'tour_step';
+export type PromotionStatus = 'trial' | 'active' | 'expired';
+
+export interface BusinessPromotion {
+  id: string;
+  businessId: string;
+  businessName: string;
+  targetType: PromotionTargetType;
+  targetId: string;
+  targetName: string;
+  status: PromotionStatus;
+  startDate: string;              // node.created
+  expiryDate: string | null;      // trial expiry; null = subscription-backed
+  // Suscripción del slot (null durante trial)
+  subscriptionId: string | null;
+  subscriptionStatus: 'active' | 'cancelled' | 'expired' | null;
+  subscriptionPlanTitle: string | null;
+  subscriptionPlanType: string | null;  // 'business_monthly' | 'business_annual'
+  subscriptionEndDate: string | null;
+  subscriptionAutoRenewal: boolean | null;
+}
+
+export interface TourWithSlots {
+  tourId: string;
+  tourTitle: string;
+  city: string | null;
+  image: string | null;
+  hasDetailSlot: boolean;
+  availableStepSlots: Array<{ stepId: string; stepTitle: string; order: number }>;
 }
 
 // Ranking

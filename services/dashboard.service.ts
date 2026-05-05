@@ -440,12 +440,23 @@ export async function updateProfessionalProfile(
 
 // ── Subscription ──────────────────────────────────────────────────────────────
 
-export async function getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
-  const params = [
-    'filter[status]=1',
-    'filter[field_plan_type]=premium',
-    'sort=field_price',
-  ].join('&');
+export async function getSubscriptionPlans(
+  planTypes: string[] = ['premium'],
+): Promise<SubscriptionPlan[]> {
+  const filterParts: string[] = ['filter[status]=1', 'sort=field_price'];
+
+  if (planTypes.length === 1) {
+    filterParts.push(`filter[field_plan_type]=${planTypes[0]}`);
+  } else {
+    // JSON:API IN filter for multiple values
+    filterParts.push('filter[pt_filter][condition][path]=field_plan_type');
+    filterParts.push('filter[pt_filter][condition][operator]=IN');
+    planTypes.forEach((type, i) => {
+      filterParts.push(`filter[pt_filter][condition][value][${i}]=${encodeURIComponent(type)}`);
+    });
+  }
+
+  const params = filterParts.join('&');
   const raw = await drupalGet<any[]>('/node/subscription_plan', params);
   const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
   return list.map(mapDrupalSubscriptionPlan);

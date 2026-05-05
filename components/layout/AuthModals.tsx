@@ -13,6 +13,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   TextInput as RNTextInput,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -279,12 +280,15 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [role, setRole] = useState<'traveller' | 'professional'>('traveller');
+  const [role, setRole] = useState<'traveller' | 'guide' | 'business'>('traveller');
+  const [consent, setConsent] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [selectedLangCode, setSelectedLangCode] = useState(currentLangcode);
   const [selectedLangLabel, setSelectedLangLabel] = useState('');
   const [langPickerVisible, setLangPickerVisible] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     username?: string; publicName?: string; email?: string; password?: string; confirm?: string;
+    consent?: string; privacy?: string;
   }>({});
   const [allowProfessional, setAllowProfessional] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -307,6 +311,21 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const passwordRef = useRef<RNTextInput>(null);
   const confirmRef = useRef<RNTextInput>(null);
 
+  const handleRoleSelect = (selected: 'traveller' | 'guide' | 'business') => {
+    setRole(selected);
+    setConsent(false);
+    setFieldErrors((e) => ({ ...e, consent: undefined }));
+  };
+
+  const openPrivacyPolicy = () => {
+    const url = `/${currentLangcode}/privacy-policy`;
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    } else {
+      Linking.openURL(url);
+    }
+  };
+
   const validate = () => {
     const errors: typeof fieldErrors = {};
     const trimmedUsername = username.trim();
@@ -319,6 +338,8 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     if (!password) errors.password = t('auth.passwordRequired');
     else if (password.length < 8) errors.password = t('auth.passwordMinLength');
     if (password !== confirm) errors.confirm = t('auth.passwordMismatch');
+    if ((role === 'guide' || role === 'business') && !consent) errors.consent = t('auth.consentRequired');
+    if (!privacyAccepted) errors.privacy = t('auth.privacyRequired');
     setFieldErrors(errors);
     return !Object.keys(errors).length;
   };
@@ -333,7 +354,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
       publicName: publicName.trim() || undefined,
       email: email.trim(),
       password,
-      role: role === 'professional' ? 'professional' : undefined,
+      role: (role === 'guide' || role === 'business') ? role : undefined,
       langcode: currentLangcode,
       preferredLanguage: selectedLangCode,
     });
@@ -345,7 +366,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     setGoogleLoading(true);
     try {
       const token = await getGoogleAccessToken();
-      await signInWithGoogle(token, role === 'professional' ? 'professional' : undefined);
+      await signInWithGoogle(token, (role === 'guide' || role === 'business') ? role : undefined);
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
       const type = e?.message ?? '';
@@ -377,45 +398,6 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
           <Text style={modalStyles.errorBannerText}>{error}</Text>
         </View>
       ) : null}
-
-      {/* Selector de rol — visible solo si allowProfessional está activo */}
-      {allowProfessional && (
-        <View style={roleStyles.container}>
-          <Text style={roleStyles.label}>{t('auth.roleLabel')}</Text>
-          <View style={roleStyles.row}>
-            <TouchableOpacity
-              style={[roleStyles.card, role === 'traveller' && roleStyles.cardSelected]}
-              onPress={() => setRole('traveller')}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name="person-outline"
-                size={22}
-                color={role === 'traveller' ? '#F59E0B' : '#9CA3AF'}
-              />
-              <Text style={[roleStyles.cardTitle, role === 'traveller' && roleStyles.cardTitleSelected]}>
-                {t('auth.roleTraveller')}
-              </Text>
-              <Text style={roleStyles.cardHint}>{t('auth.roleTravellerHint')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[roleStyles.card, role === 'professional' && roleStyles.cardSelected]}
-              onPress={() => setRole('professional')}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name="briefcase-outline"
-                size={22}
-                color={role === 'professional' ? '#F59E0B' : '#9CA3AF'}
-              />
-              <Text style={[roleStyles.cardTitle, role === 'professional' && roleStyles.cardTitleSelected]}>
-                {t('auth.roleProfessional')}
-              </Text>
-              <Text style={roleStyles.cardHint}>{t('auth.roleProfessionalHint')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
 
       {/* Botón Google */}
       <TouchableOpacity
@@ -512,6 +494,95 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
         </Text>
         <Ionicons name="chevron-down" size={16} color="#6B7280" />
       </TouchableOpacity>
+
+      {/* Sección profesional — visible solo si allowProfessional */}
+      {allowProfessional && (
+        <View style={proStyles.section}>
+          <Text style={proStyles.question}>{t('auth.roleProfessionalQuestion')}</Text>
+
+          {(
+            [
+              { value: 'traveller', icon: 'person-outline',     titleKey: 'auth.roleTraveller',  hintKey: 'auth.roleTravellerHint'  },
+              { value: 'guide',     icon: 'map-outline',        titleKey: 'auth.roleGuide',      hintKey: 'auth.roleGuideHint'      },
+              { value: 'business',  icon: 'storefront-outline', titleKey: 'auth.roleBusiness',   hintKey: 'auth.roleBusinessHint'   },
+            ] as const
+          ).map(({ value, icon, titleKey, hintKey }) => {
+            const selected = role === value;
+            const isBusiness = value === 'business';
+            return (
+              <TouchableOpacity
+                key={value}
+                style={[proStyles.card, selected && (isBusiness ? proStyles.cardBusiness : proStyles.cardGuide)]}
+                onPress={() => handleRoleSelect(value)}
+                activeOpacity={0.8}
+              >
+                <View style={[proStyles.radio, selected && (isBusiness ? proStyles.radioBusiness : proStyles.radioGuide)]}>
+                  {selected && <Ionicons name="checkmark" size={10} color="#fff" />}
+                </View>
+                <Ionicons
+                  name={icon}
+                  size={16}
+                  color={selected ? (isBusiness ? '#059669' : '#D97706') : '#9CA3AF'}
+                />
+                <View style={proStyles.cardText}>
+                  <Text style={[proStyles.cardTitle, selected && (isBusiness ? proStyles.cardTitleBusiness : proStyles.cardTitleGuide)]}>
+                    {t(titleKey)}
+                  </Text>
+                  <Text style={proStyles.cardHint}>{t(hintKey)}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+
+          {(role === 'guide' || role === 'business') && (
+            <>
+              <TouchableOpacity
+                style={proStyles.consentRow}
+                onPress={() => {
+                  setConsent((v) => !v);
+                  setFieldErrors((e) => ({ ...e, consent: undefined }));
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={[proStyles.checkbox, consent && proStyles.checkboxChecked]}>
+                  {consent && <Ionicons name="checkmark" size={12} color="#fff" />}
+                </View>
+                <Text style={proStyles.consentText}>
+                  {t(role === 'guide' ? 'auth.consentGuide' : 'auth.consentBusiness')}
+                </Text>
+              </TouchableOpacity>
+              {fieldErrors.consent && (
+                <Text style={proStyles.fieldError}>{fieldErrors.consent}</Text>
+              )}
+            </>
+          )}
+        </View>
+      )}
+
+      {/* Aceptación política de privacidad */}
+      <View style={{ marginBottom: 12 }}>
+        <TouchableOpacity
+          style={proStyles.consentRow}
+          onPress={() => {
+            setPrivacyAccepted((v) => !v);
+            setFieldErrors((e) => ({ ...e, privacy: undefined }));
+          }}
+          activeOpacity={0.7}
+        >
+          <View style={[proStyles.checkbox, privacyAccepted && proStyles.checkboxChecked]}>
+            {privacyAccepted && <Ionicons name="checkmark" size={12} color="#fff" />}
+          </View>
+          <Text style={proStyles.consentText}>
+            {t('auth.privacyPolicyConsent')}{' '}
+            <Text style={proStyles.privacyLink} onPress={openPrivacyPolicy}>
+              {t('auth.privacyPolicyLink')}
+            </Text>
+          </Text>
+        </TouchableOpacity>
+        {fieldErrors.privacy && (
+          <Text style={proStyles.fieldError}>{fieldErrors.privacy}</Text>
+        )}
+      </View>
 
       {/* Botón principal */}
       <TouchableOpacity
@@ -767,49 +838,131 @@ const modalStyles = {
   switchLink: { fontSize: 14, color: '#F59E0B', fontWeight: '600' as const },
 };
 
-// ── Estilos del selector de rol ───────────────────────────────────────────────
-const roleStyles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
+// ── Estilos del selector profesional ─────────────────────────────────────────
+const proStyles = StyleSheet.create({
+  section: {
+    marginBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    paddingTop: 16,
   },
-  label: {
+  question: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
+    color: '#6B7280',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   card: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    borderRadius: 14,
     borderWidth: 2,
     borderColor: '#E5E7EB',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F9FAFB',
+    position: 'relative',
   },
-  cardSelected: {
+  cardGuide: {
     borderColor: '#F59E0B',
     backgroundColor: '#FFFBEB',
   },
+  cardBusiness: {
+    borderColor: '#10B981',
+    backgroundColor: '#ECFDF5',
+  },
+  checkBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#F59E0B',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   cardTitle: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#374151',
     marginTop: 6,
     textAlign: 'center',
   },
-  cardTitleSelected: {
+  cardTitleGuide: {
     color: '#D97706',
+  },
+  cardTitleBusiness: {
+    color: '#059669',
   },
   cardHint: {
     fontSize: 11,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginTop: 3,
     textAlign: 'center',
+    lineHeight: 15,
+  },
+  consentRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginTop: 12,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    marginTop: 1,
+  },
+  checkboxChecked: {
+    borderColor: '#F59E0B',
+    backgroundColor: '#F59E0B',
+  },
+  consentText: {
+    fontSize: 12,
+    color: '#374151',
+    flex: 1,
+    lineHeight: 18,
+  },
+  privacyLink: {
+    fontSize: 12,
+    color: '#F59E0B',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  fieldError: {
+    fontSize: 11,
+    color: '#EF4444',
+    marginTop: 4,
+    marginLeft: 30,
+  },
+  deselectChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
+  },
+  deselectChipText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
   },
 });

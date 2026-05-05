@@ -467,8 +467,9 @@ export function CompletionPopup({
   }, [visible]);
 
   // Whether to show the guide mini-card
+  // Compatibilidad temporal: acepta tanto 'guide' como 'professional' durante la transición
   const showGuideCard =
-    guideRoles?.includes('professional') &&
+    (guideRoles?.includes('guide') || guideRoles?.includes('professional')) &&
     !guideRoles?.includes('administrator') &&
     !!guideName;
 

@@ -194,14 +194,24 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           <Text style={styles.dropdownItemText}>{t('nav.administration')}</Text>
         </TouchableOpacity>
       )}
-      {roles.includes('professional') && (
+      {(roles.includes('guide') || roles.includes('professional')) && (
         <TouchableOpacity
           onPress={() => handleNavigate(`/${lang}/dashboard`)}
           activeOpacity={0.7}
           style={styles.dropdownItem}
         >
-          <Ionicons name="briefcase-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
+          <Ionicons name="map-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
           <Text style={styles.dropdownItemText}>{t('nav.dashboard')}</Text>
+        </TouchableOpacity>
+      )}
+      {roles.includes('business') && (
+        <TouchableOpacity
+          onPress={() => handleNavigate(`/${lang}/business-dashboard`)}
+          activeOpacity={0.7}
+          style={styles.dropdownItem}
+        >
+          <Ionicons name="storefront-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
+          <Text style={styles.dropdownItemText}>{t('nav.businessDashboard')}</Text>
         </TouchableOpacity>
       )}
       <View style={styles.dropdownDivider} />

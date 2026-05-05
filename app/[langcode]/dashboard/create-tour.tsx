@@ -1,5 +1,5 @@
 // app/[langcode]/dashboard/create-tour.tsx
-// Create Tour page — professional role only
+// Create Tour page — guide (and legacy professional) role only
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -69,7 +69,9 @@ export default function CreateTourScreen() {
 
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
-  const isProfessional = user?.roles?.includes('professional');
+  // Compatibilidad temporal: 'professional' → 'guide' durante la transición de roles
+  const isGuide =
+    user?.roles?.includes('guide') || user?.roles?.includes('professional');
 
   // Guard: avoid navigating before Root Layout mounts (Expo Router requirement)
   const [ready, setReady] = useState(false);
@@ -77,10 +79,10 @@ export default function CreateTourScreen() {
 
   useEffect(() => {
     if (!ready) return;
-    if (!isAuthLoading && (!user || !isProfessional)) {
+    if (!isAuthLoading && (!user || !isGuide)) {
       router.replace(`/${langcode}` as any);
     }
-  }, [ready, user, isAuthLoading, isProfessional, langcode]);
+  }, [ready, user, isAuthLoading, isGuide, langcode]);
 
   // ── Edit mode: loading state ──────────────────────────────────────────────
   const [isLoadingTour, setIsLoadingTour] = useState(isEditMode);
@@ -462,7 +464,7 @@ export default function CreateTourScreen() {
     imageUri, imageFilename, uploadedImageId, languageCode, entityLangcode,
   ]);
 
-  if (isAuthLoading || !user || !isProfessional || isLoadingTour) {
+  if (isAuthLoading || !user || isLoadingTour) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={AMBER} />

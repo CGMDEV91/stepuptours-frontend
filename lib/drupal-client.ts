@@ -17,6 +17,8 @@ import type {
   SubscriptionPayment,
   Donation,
   ProfessionalProfile,
+  BusinessPromotion,
+  TourWithSlots,
 } from '../types';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
@@ -732,4 +734,55 @@ export function mapDrupalProfessionalProfile(raw: any): ProfessionalProfile {
     bic: raw.field_bank_bic ?? '',
     revenuePercentage: parseFloat(raw.field_revenue_percentage ?? '75'),
   };
+}
+
+// ── Business Promotions ────────────────────────────────────────────────────────
+
+export function mapDrupalBusinessPromotion(raw: any): BusinessPromotion {
+  // El backend /api/business/promotions/* devuelve datos ya normalizados en camelCase
+  // (no son campos Drupal crudos sino la respuesta de buildPromotionData() en PHP).
+  return {
+    id: raw.id ?? '',
+    businessId: raw.businessId ?? '',
+    businessName: raw.businessName ?? '',
+    targetType: raw.targetType ?? 'tour_detail',
+    targetId: raw.targetId ?? '',
+    targetName: raw.targetName ?? '',
+    status: raw.status ?? 'trial',
+    startDate: raw.startDate ?? '',
+    expiryDate: raw.expiryDate ?? null,
+    // Suscripción por slot (null durante trial)
+    subscriptionId: raw.subscriptionId ?? null,
+    subscriptionStatus: raw.subscriptionStatus ?? null,
+    subscriptionPlanTitle: raw.subscriptionPlanTitle ?? null,
+    subscriptionPlanType: raw.subscriptionPlanType ?? null,
+    subscriptionEndDate: raw.subscriptionEndDate ?? null,
+    subscriptionAutoRenewal: raw.subscriptionAutoRenewal ?? null,
+  };
+}
+
+export function mapDrupalTourWithSlots(raw: any): TourWithSlots {
+  // El backend /api/tours/available-slots devuelve camelCase directamente.
+  // raw.image ya es una URL absoluta — no pasar por resolveImageUrl().
+  return {
+    tourId: raw.tourId ?? '',
+    tourTitle: raw.tourTitle ?? '',
+    city: raw.city ?? null,
+    image: raw.image ?? null,
+    hasDetailSlot: raw.hasDetailSlot ?? false,
+    availableStepSlots: (raw.availableStepSlots ?? []).map((s: any) => ({
+      stepId: s.stepId ?? '',
+      stepTitle: s.stepTitle ?? '',
+      order: s.order ?? 0,
+    })),
+  };
+}
+
+/**
+ * Devuelve el drupalClientBase con auth inyectada, listo para llamadas
+ * a endpoints custom (/api/...) que no son JSON:API puro.
+ * Lo usan services/business-promotion.service.ts y otros servicios custom.
+ */
+export function drupalClientAuth() {
+  return drupalClientBase;
 }
