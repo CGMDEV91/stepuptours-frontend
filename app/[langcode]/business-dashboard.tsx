@@ -180,22 +180,8 @@ export default function BusinessDashboardScreen() {
   return (
     <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
-        <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 0 }}>
-          <PageBanner
-            icon="storefront-outline"
-            iconBgColor={GREEN}
-            title={t('businessDashboard.title')}
-            subtitle={t('businessDashboard.subtitle')}
-            showBack={false}
-          />
-          {mobileTabBar}
-          {content}
-          <Footer />
-        </PageScrollView>
-      ) : (
-        <>
-          {desktopTabBar}
-          <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 0 }}>
+        <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={{ flex: 1 }}>
             <PageBanner
               icon="storefront-outline"
               iconBgColor={GREEN}
@@ -203,7 +189,25 @@ export default function BusinessDashboardScreen() {
               subtitle={t('businessDashboard.subtitle')}
               showBack={false}
             />
+            {mobileTabBar}
             {content}
+          </View>
+          <Footer />
+        </PageScrollView>
+      ) : (
+        <>
+          {desktopTabBar}
+          <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+            <View style={{ flex: 1 }}>
+              <PageBanner
+                icon="storefront-outline"
+                iconBgColor={GREEN}
+                title={t('businessDashboard.title')}
+                subtitle={t('businessDashboard.subtitle')}
+                showBack={false}
+              />
+              {content}
+            </View>
             <Footer />
           </PageScrollView>
         </>

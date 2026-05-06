@@ -226,8 +226,13 @@ export interface TourWithSlots {
   tourTitle: string;
   city: string | null;
   image: string | null;
+  /** Tour-detail slot is available (not occupied by any business) */
   hasDetailSlot: boolean;
+  /** Tour-detail slot is occupied by another business */
+  detailOccupied: boolean;
   availableStepSlots: Array<{ stepId: string; stepTitle: string; order: number }>;
+  /** Step slots occupied by another business (shown as disabled) */
+  occupiedStepSlots: Array<{ stepId: string; stepTitle: string; order: number }>;
 }
 
 // Ranking

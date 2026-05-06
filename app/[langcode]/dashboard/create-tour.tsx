@@ -30,15 +30,12 @@ import {
   createTourStep,
   updateTourStep,
   deleteTourStep,
-  getActiveSubscription,
   getTourById,
   getTourStepsForEdit,
 } from '../../../services/dashboard.service';
-import { BusinessPicker } from '../../../components/dashboard/BusinessPicker';
 import { ImagePickerField } from '../../../components/shared/ImagePickerField';
 import PageBanner from '../../../components/layout/PageBanner';
 import { uploadDrupalFile, getApiLanguage } from '../../../lib/drupal-client';
-import type { Business, Subscription } from '../../../types';
 
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
@@ -218,17 +215,6 @@ export default function CreateTourScreen() {
     });
   }, []);
 
-  // ── Subscription / featured businesses ──────────────────────────────────
-  const [subscription, setSubscription] = useState<Subscription | null | undefined>(undefined);
-
-  useEffect(() => {
-    if (user?.id) {
-      getActiveSubscription(user.id)
-        .then((sub) => setSubscription(sub))
-        .catch(() => setSubscription(null));
-    }
-  }, [user?.id]);
-
   // ── Edit mode: load existing tour data ────────────────────────────────────
   useEffect(() => {
     if (!isEditMode || !tourId) return;
@@ -260,14 +246,6 @@ export default function CreateTourScreen() {
           // Label will be resolved once languages are loaded — see effect below
         }
 
-        // Pre-fill tour-level featured businesses (slots 1-3)
-        const businesses: (Business | null)[] = [
-          tour.featuredBusinesses[0] ?? null,
-          tour.featuredBusinesses[1] ?? null,
-          tour.featuredBusinesses[2] ?? null,
-        ];
-        setTourBusinesses(businesses);
-
         // Pre-fill steps
         const loadedSteps: StepEntry[] = tourSteps.map((s) => ({
           key: makeKey(),
@@ -281,12 +259,6 @@ export default function CreateTourScreen() {
         setSteps(loadedSteps);
         originalStepIds.current = tourSteps.map((s) => s.id);
 
-        // Pre-fill step-level featured businesses
-        const stepBusinessMap: Record<string, Business | null> = {};
-        tourSteps.forEach((s, idx) => {
-          stepBusinessMap[loadedSteps[idx].key] = s.featuredBusiness ?? null;
-        });
-        setStepFeaturedBusiness(stepBusinessMap);
       })
       .catch(() => {
         // Non-fatal: show empty form if fetch fails
@@ -297,35 +269,6 @@ export default function CreateTourScreen() {
 
     return () => { cancelled = true; };
   }, [isEditMode, tourId]);
-
-  // tourBusinessSlots: from subscription plan field_max_featured_detail
-  // stepBusinessSlots: each step has one featured_business slot (field_featured_business)
-  const tourBusinessSlots = subscription
-    ? subscription.plan.maxFeaturedDetail
-    : 1;
-
-  // tourBusinesses: array of selected Business objects per tour-level slot
-  const [tourBusinesses, setTourBusinesses] = useState<(Business | null)[]>([null, null, null]);
-
-  // stepFeaturedBusiness: one Business per step (field_featured_business)
-  const [stepFeaturedBusiness, setStepFeaturedBusiness] = useState<Record<string, Business | null>>({});
-
-  const getStepBusiness = useCallback(
-    (key: string): Business | null => stepFeaturedBusiness[key] ?? null,
-    [stepFeaturedBusiness]
-  );
-
-  const updateStepBusiness = useCallback(
-    (stepKey: string, business: Business | null) => {
-      setStepFeaturedBusiness((prev) => ({ ...prev, [stepKey]: business }));
-    },
-    []
-  );
-
-  // Warn when the same business is used in multiple tour slots
-  const tourBusinessIds = tourBusinesses.map((b) => b?.id).filter(Boolean) as string[];
-  const hasDuplicateTourBusinesses =
-    new Set(tourBusinessIds).size < tourBusinessIds.length;
 
   // ── Save ─────────────────────────────────────────────────────────────────
   const [saving, setSaving] = useState(false);
@@ -348,13 +291,6 @@ export default function CreateTourScreen() {
       return;
     }
 
-    // Extract business UUIDs for the 3 tour-level slots (null = empty slot)
-    const featuredBusinessIds: (string | null)[] = [
-      tourBusinesses[0]?.id ?? null,
-      tourBusinesses[1]?.id ?? null,
-      tourBusinesses[2]?.id ?? null,
-    ];
-
     setSaving(true);
     try {
       // Upload image if a new file was picked but not yet uploaded
@@ -372,7 +308,6 @@ export default function CreateTourScreen() {
           description: description.trim(),
           duration: parseInt(duration, 10) || 0,
           cityId: cityId || undefined,
-          featuredBusinessIds,
           // Pass imageId only when a new image was uploaded or image was explicitly cleared
           ...(imageId !== undefined ? { imageId } : {}),
         }, entityLangcode || undefined);
@@ -392,7 +327,6 @@ export default function CreateTourScreen() {
           const lat = parseFloat(step.lat);
           const lon = parseFloat(step.lon);
           const hasLocation = !isNaN(lat) && !isNaN(lon);
-          const stepBusinessId = stepFeaturedBusiness[step.key]?.id ?? null;
 
           if (step.drupalId) {
             await updateTourStep(step.drupalId, {
@@ -402,7 +336,6 @@ export default function CreateTourScreen() {
               lat: hasLocation ? lat : undefined,
               lon: hasLocation ? lon : undefined,
               duration: step.duration ? parseInt(step.duration, 10) : undefined,
-              featuredBusinessId: stepBusinessId,
             });
           } else {
             await createTourStep(tourId, {
@@ -412,7 +345,6 @@ export default function CreateTourScreen() {
               lat: hasLocation ? lat : undefined,
               lon: hasLocation ? lon : undefined,
               duration: step.duration ? parseInt(step.duration, 10) : undefined,
-              featuredBusinessId: stepBusinessId,
             });
           }
         }
@@ -423,7 +355,6 @@ export default function CreateTourScreen() {
           description: description.trim(),
           duration: parseInt(duration, 10) || 0,
           cityId: cityId || undefined,
-          featuredBusinessIds,
           imageId: imageId ?? undefined,
           langcode: languageCode,
         });
@@ -433,7 +364,6 @@ export default function CreateTourScreen() {
           const lat = parseFloat(step.lat);
           const lon = parseFloat(step.lon);
           const hasLocation = !isNaN(lat) && !isNaN(lon);
-          const stepBusinessId = stepFeaturedBusiness[step.key]?.id ?? null;
 
           await createTourStep(tour.id, {
             title: step.title.trim(),
@@ -442,7 +372,6 @@ export default function CreateTourScreen() {
             lat: hasLocation ? lat : undefined,
             lon: hasLocation ? lon : undefined,
             duration: step.duration ? parseInt(step.duration, 10) : undefined,
-            featuredBusinessId: stepBusinessId,
           });
         }
       }
@@ -460,7 +389,7 @@ export default function CreateTourScreen() {
     }
   }, [
     title, description, duration, cityId, steps, langcode, router, t,
-    tourBusinesses, stepFeaturedBusiness, isEditMode, tourId,
+    isEditMode, tourId,
     imageUri, imageFilename, uploadedImageId, languageCode, entityLangcode,
   ]);
 
@@ -687,75 +616,8 @@ export default function CreateTourScreen() {
                     </View>
                   </View>
 
-                  {user && (
-                    <View>
-                      <Text style={styles.label}>
-                        {t('createTour.field.stepBusiness', { slot: 1 })}
-                      </Text>
-                      <BusinessPicker
-                        selectedBusinessId={getStepBusiness(step.key)?.id ?? null}
-                        selectedBusiness={getStepBusiness(step.key)}
-                        onSelect={(b) => updateStepBusiness(step.key, b)}
-                        placeholder={t('createTour.placeholder.businessId')}
-                      />
-                    </View>
-                  )}
                 </View>
               ))
-            )}
-          </View>
-
-          {/* Section 3: Tour-level Featured Businesses */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('createTour.section.businesses')}</Text>
-            {subscription === undefined ? (
-              <ActivityIndicator size="small" color={AMBER} style={{ marginVertical: 12 }} />
-            ) : (
-              <>
-                {/* Subscription plan info */}
-                <View style={styles.planBadge}>
-                  <Ionicons name="star-outline" size={14} color={AMBER} />
-                  <Text style={styles.planBadgeText}>
-                    {subscription
-                      ? `${subscription.plan.title} — ${tourBusinessSlots} featured slot${tourBusinessSlots !== 1 ? 's' : ''}`
-                      : `Free plan — 1 featured slot`}
-                  </Text>
-                  {!subscription && (
-                    <Text style={styles.upgradeHint}> · Upgrade for more</Text>
-                  )}
-                </View>
-
-                {hasDuplicateTourBusinesses && (
-                  <View style={styles.warnBanner}>
-                    <Ionicons name="warning-outline" size={15} color="#D97706" />
-                    <Text style={styles.warnText}>
-                      The same business is selected in multiple slots.
-                    </Text>
-                  </View>
-                )}
-
-                {Array.from({ length: tourBusinessSlots }).map((_, idx) => (
-                  <View key={idx}>
-                    <Text style={styles.label}>
-                      {t('createTour.field.tourBusiness', { slot: idx + 1 })}
-                    </Text>
-                    {user && (
-                      <BusinessPicker
-                        selectedBusinessId={tourBusinesses[idx]?.id ?? null}
-                        selectedBusiness={tourBusinesses[idx]}
-                        onSelect={(b) =>
-                          setTourBusinesses((prev) => {
-                            const next = [...prev];
-                            next[idx] = b;
-                            return next;
-                          })
-                        }
-                        placeholder={t('createTour.placeholder.businessId')}
-                      />
-                    )}
-                  </View>
-                ))}
-              </>
             )}
           </View>
 
@@ -1191,45 +1053,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Plan badge
-  planBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#FFFBEB',
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    marginBottom: 14,
-  },
-  planBadgeText: {
-    fontSize: 13,
-    color: '#92400E',
-    fontWeight: '600',
-  },
-  upgradeHint: {
-    fontSize: 12,
-    color: '#B45309',
-  },
-
-  // Duplicate business warning
-  warnBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#FFFBEB',
-    borderWidth: 1,
-    borderColor: '#FCD34D',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
-  },
-  warnText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#92400E',
-    lineHeight: 18,
-  },
 });

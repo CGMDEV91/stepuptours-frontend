@@ -764,17 +764,20 @@ export function mapDrupalBusinessPromotion(raw: any): BusinessPromotion {
 export function mapDrupalTourWithSlots(raw: any): TourWithSlots {
   // El backend /api/tours/available-slots devuelve camelCase directamente.
   // raw.image ya es una URL absoluta — no pasar por resolveImageUrl().
+  const mapSlot = (s: any) => ({
+    stepId: s.stepId ?? '',
+    stepTitle: s.stepTitle ?? '',
+    order: s.order ?? 0,
+  });
   return {
     tourId: raw.tourId ?? '',
     tourTitle: raw.tourTitle ?? '',
     city: raw.city ?? null,
     image: raw.image ?? null,
     hasDetailSlot: raw.hasDetailSlot ?? false,
-    availableStepSlots: (raw.availableStepSlots ?? []).map((s: any) => ({
-      stepId: s.stepId ?? '',
-      stepTitle: s.stepTitle ?? '',
-      order: s.order ?? 0,
-    })),
+    detailOccupied: raw.detailOccupied ?? false,
+    availableStepSlots: (raw.availableStepSlots ?? []).map(mapSlot),
+    occupiedStepSlots: (raw.occupiedStepSlots ?? []).map(mapSlot),
   };
 }
 

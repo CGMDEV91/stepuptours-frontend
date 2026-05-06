@@ -211,7 +211,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           style={styles.dropdownItem}
         >
           <Ionicons name="storefront-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
-          <Text style={styles.dropdownItemText}>{t('nav.businessDashboard')}</Text>
+          <Text style={styles.dropdownItemText}>{t('nav.dashboard')}</Text>
         </TouchableOpacity>
       )}
       <View style={styles.dropdownDivider} />

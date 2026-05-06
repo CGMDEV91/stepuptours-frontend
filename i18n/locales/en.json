@@ -730,6 +730,15 @@
   "business.findTours.backToPlans": "← Back to plans",
   "business.findTours.retryBtn": "Try again",
   "business.findTours.cancel": "Cancel",
+  "business.findTours.trialOptionTitle": "7-Day Free Trial",
+  "business.findTours.trialOptionSub": "No credit card required · 7 days free",
+  "business.findTours.trialOptionFree": "Free",
+  "business.findTours.trialOptionDays": "7 days",
+  "business.findTours.confirmPlan": "Confirm",
+  "business.findTours.slotOccupied": "Occupied",
+  "business.findTours.slotOccupiedHint": "This slot is already taken",
+  "business.findTours.slotAlreadyMine": "Already promoted",
+  "business.findTours.addingTrial": "Activating free trial…",
   "business.findTours.perMonth": "/ month",
   "business.findTours.perYear": "/ year",
 
@@ -772,5 +781,12 @@
   "business.billing.cancelSlotTitle": "Cancel slot",
   "business.billing.cancelSlotBody": "Cancel the subscription for the slot in {{name}}?\n\nThe Stripe subscription will be cancelled and the slot will expire at the end of the current period.",
   "business.billing.cancelSlotKeep": "Keep",
-  "business.billing.cancelSlotConfirm": "Confirm"
+  "business.billing.cancelSlotConfirm": "Confirm",
+
+  "businessDashboard.title": "Business Dashboard",
+  "businessDashboard.subtitle": "Manage your businesses and promote them on tours",
+  "businessDashboard.tabs.myBusinesses": "My Businesses",
+  "businessDashboard.tabs.findTours": "Find Tours",
+  "businessDashboard.tabs.myPromotions": "My Promotions",
+  "businessDashboard.tabs.billing": "Billing"
 }

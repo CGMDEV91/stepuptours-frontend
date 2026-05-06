@@ -722,6 +722,15 @@
   "business.findTours.backToPlans": "← Επιστροφή στα πλάνα",
   "business.findTours.retryBtn": "Δοκιμάστε ξανά",
   "business.findTours.cancel": "Ακύρωση",
+  "business.findTours.trialOptionTitle": "Δωρεάν δοκιμή 7 ημερών",
+  "business.findTours.trialOptionSub": "Χωρίς κάρτα · 7 ημέρες δωρεάν",
+  "business.findTours.trialOptionFree": "Δωρεάν",
+  "business.findTours.trialOptionDays": "7 ημέρες",
+  "business.findTours.confirmPlan": "Επιβεβαίωση",
+  "business.findTours.slotOccupied": "Κατειλημμένο",
+  "business.findTours.slotOccupiedHint": "Αυτή η θέση είναι ήδη κατειλημμένη",
+  "business.findTours.slotAlreadyMine": "Ήδη προωθείται",
+  "business.findTours.addingTrial": "Ενεργοποίηση δωρεάν δοκιμής...",
   "business.findTours.perMonth": "/ μήνα",
   "business.findTours.perYear": "/ χρόνο",
 
@@ -764,5 +773,12 @@
   "business.billing.cancelSlotTitle": "Ακύρωση slot",
   "business.billing.cancelSlotBody": "Ακύρωση συνδρομής για το slot στο {{name}};\n\nΗ συνδρομή Stripe θα ακυρωθεί και το slot θα λήξει στο τέλος της τρέχουσας περιόδου.",
   "business.billing.cancelSlotKeep": "Διατήρηση",
-  "business.billing.cancelSlotConfirm": "Επιβεβαίωση"
+  "business.billing.cancelSlotConfirm": "Επιβεβαίωση",
+
+  "businessDashboard.title": "Πίνακας Επιχείρησης",
+  "businessDashboard.subtitle": "Διαχειριστείτε τις επιχειρήσεις σας και προβάλετε τον εαυτό σας σε tours",
+  "businessDashboard.tabs.myBusinesses": "Οι Επιχειρήσεις Μου",
+  "businessDashboard.tabs.findTours": "Εύρεση Tours",
+  "businessDashboard.tabs.myPromotions": "Οι Προωθήσεις Μου",
+  "businessDashboard.tabs.billing": "Τιμολόγηση"
 }
