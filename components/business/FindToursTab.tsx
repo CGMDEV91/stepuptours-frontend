@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useRouter, usePathname } from 'expo-router';
 import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout,
@@ -38,7 +39,10 @@ import type { Business, TourWithSlots, BusinessPromotion, SubscriptionPlan, Prom
 
 const GREEN      = '#10B981';
 const GREEN_DARK = '#059669';
+const AMBER      = '#F59E0B';
 const MAX_FREE_SLOTS = 2;
+const SLOTS_PER_LOCATION = 3;
+const PAGE_SIZE = 10;
 
 interface FindToursTabProps {
   userId: string;
@@ -58,126 +62,144 @@ function cyclePriceUnit(billingCycle: string, t: (k: string) => string): string 
   return billingCycle;
 }
 
-// ── Slot picker modal ─────────────────────────────────────────────────────────
+// ── Slot box ─────────────────────────────────────────────────────────────────
 
-interface SlotModalProps {
-  visible: boolean;
-  tour: TourWithSlots | null;
-  currentPromos: BusinessPromotion[];
-  businessId: string | null;
-  onSelectSlot: (targetType: PromotionTargetType, targetId: string) => void;
-  onClose: () => void;
+type SlotBoxState = 'free' | 'mine' | 'occupied';
+
+interface SlotBoxProps {
+  state: SlotBoxState;
+  onPress?: () => void;
+  disabled?: boolean;
 }
 
-function SlotModal({ visible, tour, currentPromos, businessId, onSelectSlot, onClose }: SlotModalProps) {
-  const { t } = useTranslation();
-  if (!tour) return null;
-
-  const isAlreadyMineDetail = currentPromos.some(
-    (p) => p.targetType === 'tour_detail' && p.targetId === tour.tourId && p.businessId === businessId && p.status !== 'expired'
+function SlotBox({ state, onPress, disabled }: SlotBoxProps) {
+  if (state === 'occupied') {
+    return (
+      <View style={slotBoxStyles.boxOccupied}>
+        <Ionicons name="storefront-outline" size={14} color="#9CA3AF" />
+      </View>
+    );
+  }
+  if (state === 'mine') {
+    return (
+      <View style={slotBoxStyles.boxMine}>
+        <Ionicons name="storefront" size={14} color="#fff" />
+      </View>
+    );
+  }
+  return (
+    <TouchableOpacity
+      style={[slotBoxStyles.boxFree, disabled && slotBoxStyles.boxFreeDisabled]}
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={0.7}
+    >
+      <Ionicons name="add" size={16} color={disabled ? '#9CA3AF' : GREEN_DARK} />
+    </TouchableOpacity>
   );
+}
+
+const slotBoxStyles = StyleSheet.create({
+  boxFree: {
+    width: 40, height: 40, borderRadius: 10,
+    borderWidth: 1.5, borderColor: GREEN, borderStyle: 'dashed',
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#F0FDF4',
+  },
+  boxFreeDisabled: {
+    borderColor: '#D1D5DB',
+    backgroundColor: '#F9FAFB',
+  },
+  boxMine: {
+    width: 40, height: 40, borderRadius: 10,
+    backgroundColor: GREEN,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  boxOccupied: {
+    width: 40, height: 40, borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1, borderColor: '#E5E7EB',
+    alignItems: 'center', justifyContent: 'center',
+  },
+});
+
+// ── Slot row (one location: tour page OR a step) ──────────────────────────────
+
+interface SlotRowProps {
+  icon: 'map-outline' | 'location-outline';
+  label: string;
+  hint: string;
+  state: SlotBoxState;  // state of the first slot (from backend data)
+  onAddSlot: () => void;
+  disabled: boolean;
+}
+
+function SlotRow({ icon, label, hint, state, onAddSlot, disabled }: SlotRowProps) {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 600;
+
+  const freeCount = state === 'occupied' ? 0 : state === 'mine' ? SLOTS_PER_LOCATION - 1 : SLOTS_PER_LOCATION;
+
+  const boxes: SlotBoxState[] = [state];
+  for (let i = 1; i < SLOTS_PER_LOCATION; i++) {
+    boxes.push(state === 'occupied' ? 'occupied' : 'free');
+  }
 
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
-      <Pressable style={styles.modalBackdrop} onPress={onClose}>
-        <Pressable style={styles.modalBox} onPress={() => {}}>
-          <Text style={styles.modalTitle}>{t('business.findTours.slotModalTitle')}</Text>
-          <Text style={styles.modalSubtitle} numberOfLines={2}>{tour.tourTitle}</Text>
+    <View style={[slotRowStyles.row, isMobile && slotRowStyles.rowMobile]}>
+      <View style={slotRowStyles.labelCol}>
+        <View style={slotRowStyles.labelRow}>
+          <Ionicons name={icon} size={14} color={state === 'occupied' ? '#9CA3AF' : GREEN_DARK} />
+          <Text style={[slotRowStyles.label, state === 'occupied' && slotRowStyles.labelDisabled]} numberOfLines={1}>
+            {label}
+          </Text>
+        </View>
+        <Text style={slotRowStyles.hint} numberOfLines={1}>{hint}</Text>
+      </View>
 
-          {/* Tour-detail slot */}
-          {isAlreadyMineDetail ? (
-            <View style={[styles.slotBtn, styles.slotBtnDisabled]}>
-              <Ionicons name="map-outline" size={20} color="#9CA3AF" />
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.slotBtnTitle, styles.slotBtnTitleDisabled]}>{t('business.findTours.slotTourPage')}</Text>
-                <Text style={styles.slotBtnHint}>{t('business.findTours.slotTourPageHint')}</Text>
-              </View>
-              <View style={styles.mineBadge}><Text style={styles.mineBadgeText}>{t('business.findTours.slotAlreadyMine')}</Text></View>
-            </View>
-          ) : tour.detailOccupied ? (
-            <View style={[styles.slotBtn, styles.slotBtnDisabled]}>
-              <Ionicons name="map-outline" size={20} color="#9CA3AF" />
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.slotBtnTitle, styles.slotBtnTitleDisabled]}>{t('business.findTours.slotTourPage')}</Text>
-                <Text style={styles.slotBtnHint}>{t('business.findTours.slotOccupiedHint')}</Text>
-              </View>
-              <View style={styles.occupiedBadge}><Text style={styles.occupiedBadgeText}>{t('business.findTours.slotOccupied')}</Text></View>
-            </View>
-          ) : tour.hasDetailSlot ? (
-            <TouchableOpacity
-              style={styles.slotBtn}
-              onPress={() => onSelectSlot('tour_detail', tour.tourId)}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="map-outline" size={20} color={GREEN_DARK} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.slotBtnTitle}>{t('business.findTours.slotTourPage')}</Text>
-                <Text style={styles.slotBtnHint}>{t('business.findTours.slotTourPageHint')}</Text>
-              </View>
-              <Ionicons name="add-circle-outline" size={22} color={GREEN} />
-            </TouchableOpacity>
-          ) : null}
-
-          {/* Step slots — available */}
-          {tour.availableStepSlots.map((step) => {
-            const isAlreadyMineStep = currentPromos.some(
-              (p) => p.targetType === 'tour_step' && p.targetId === step.stepId && p.businessId === businessId && p.status !== 'expired'
-            );
-            if (isAlreadyMineStep) {
-              return (
-                <View key={step.stepId} style={[styles.slotBtn, styles.slotBtnDisabled]}>
-                  <Ionicons name="location-outline" size={20} color="#9CA3AF" />
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.slotBtnTitle, styles.slotBtnTitleDisabled]}>
-                      {t('business.findTours.stepLabel', { order: step.order, title: step.stepTitle })}
-                    </Text>
-                    <Text style={styles.slotBtnHint}>{t('business.findTours.slotStepHint')}</Text>
-                  </View>
-                  <View style={styles.mineBadge}><Text style={styles.mineBadgeText}>{t('business.findTours.slotAlreadyMine')}</Text></View>
-                </View>
-              );
-            }
-            return (
-              <TouchableOpacity
-                key={step.stepId}
-                style={styles.slotBtn}
-                onPress={() => onSelectSlot('tour_step', step.stepId)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="location-outline" size={20} color={GREEN_DARK} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.slotBtnTitle}>
-                    {t('business.findTours.stepLabel', { order: step.order, title: step.stepTitle })}
-                  </Text>
-                  <Text style={styles.slotBtnHint}>{t('business.findTours.slotStepHint')}</Text>
-                </View>
-                <Ionicons name="add-circle-outline" size={22} color={GREEN} />
-              </TouchableOpacity>
-            );
-          })}
-
-          {/* Step slots — occupied by another business */}
-          {tour.occupiedStepSlots.map((step) => (
-            <View key={step.stepId} style={[styles.slotBtn, styles.slotBtnDisabled]}>
-              <Ionicons name="location-outline" size={20} color="#9CA3AF" />
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.slotBtnTitle, styles.slotBtnTitleDisabled]}>
-                  {t('business.findTours.stepLabel', { order: step.order, title: step.stepTitle })}
-                </Text>
-                <Text style={styles.slotBtnHint}>{t('business.findTours.slotOccupiedHint')}</Text>
-              </View>
-              <View style={styles.occupiedBadge}><Text style={styles.occupiedBadgeText}>{t('business.findTours.slotOccupied')}</Text></View>
-            </View>
-          ))}
-
-          <TouchableOpacity style={styles.modalCancelBtn} onPress={onClose} activeOpacity={0.8}>
-            <Text style={styles.modalCancelText}>{t('business.findTours.cancel')}</Text>
-          </TouchableOpacity>
-        </Pressable>
-      </Pressable>
-    </Modal>
+      <View style={[slotRowStyles.boxesCol, isMobile && slotRowStyles.boxesColMobile]}>
+        {boxes.map((boxState, i) => (
+          <SlotBox
+            key={i}
+            state={boxState}
+            onPress={boxState === 'free' ? onAddSlot : undefined}
+            disabled={disabled || boxState !== 'free'}
+          />
+        ))}
+        <View style={[slotRowStyles.freeBadge, freeCount === 0 && slotRowStyles.freeBadgeFull]}>
+          <Text style={[slotRowStyles.freeBadgeText, freeCount === 0 && slotRowStyles.freeBadgeTextFull]}>
+            {freeCount}/{SLOTS_PER_LOCATION}
+          </Text>
+        </View>
+      </View>
+    </View>
   );
 }
+
+const slotRowStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row', alignItems: 'center',
+    gap: 10, paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6',
+  },
+  rowMobile: {
+    flexDirection: 'column', alignItems: 'flex-start',
+  },
+  labelCol: { flex: 1, minWidth: 0, gap: 2 },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  label: { fontSize: 13, fontWeight: '600', color: '#111827', flexShrink: 1 },
+  labelDisabled: { color: '#9CA3AF' },
+  hint: { fontSize: 11, color: '#9CA3AF' },
+  boxesCol: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  boxesColMobile: { paddingLeft: 20, paddingTop: 6 },
+  freeBadge: {
+    backgroundColor: '#D1FAE5', borderRadius: 20,
+    paddingHorizontal: 7, paddingVertical: 2, marginLeft: 2,
+  },
+  freeBadgeFull: { backgroundColor: '#F3F4F6' },
+  freeBadgeText: { fontSize: 11, fontWeight: '700', color: GREEN_DARK },
+  freeBadgeTextFull: { color: '#9CA3AF' },
+});
 
 // ── Plan + checkout modal ─────────────────────────────────────────────────────
 
@@ -318,7 +340,7 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
                   </TouchableOpacity>
                 )}
 
-                {/* Paid plan cards */}
+                {/* Paid plan cards — skip if already shown as selected via trial above */}
                 {plans.map((plan) => {
                   const isSelected = selectedOption === plan.id;
                   const isAnnual   = plan.billingCycle === 'annual';
@@ -355,25 +377,6 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
                   );
                 })}
               </View>
-
-              {/* Selected plan summary */}
-              {selectedOption && (
-                <View style={checkoutStyles.summaryBox}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={checkoutStyles.summaryTitle}>
-                      {selectedOption === 'trial' ? t('business.findTours.trialOptionTitle') : (selectedPlan?.title ?? '')}
-                    </Text>
-                    <Text style={checkoutStyles.summaryPrice}>
-                      {selectedOption === 'trial'
-                        ? t('business.findTours.trialOptionFree')
-                        : `${selectedPlan?.price.toFixed(2) ?? ''} €`}
-                      {selectedOption !== 'trial' && selectedPlan && (
-                        <Text style={checkoutStyles.summaryCycle}> / {cyclePriceUnit(selectedPlan.billingCycle, t)}</Text>
-                      )}
-                    </Text>
-                  </View>
-                </View>
-              )}
 
               <TouchableOpacity
                 style={[checkoutStyles.payBtn, !selectedOption && checkoutStyles.payBtnDisabled]}
@@ -414,10 +417,20 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
           )}
 
           {step === 'checkout' && clientSecret && Platform.OS === 'web' && (
-            <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center', marginBottom: 8 }}>
-                <Ionicons name="lock-closed-outline" size={13} color="#6B7280" />
-                <Text style={{ fontSize: 12, color: '#6B7280' }}>{t('business.findTours.securePayment')}</Text>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%' }}>
+              {/* Checkout header with close button */}
+              <View style={checkoutStyles.checkoutHeader}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Ionicons name="lock-closed-outline" size={13} color="#6B7280" />
+                  <Text style={{ fontSize: 12, color: '#6B7280' }}>{t('business.findTours.securePayment')}</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => setStep('plan-picker')}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="close" size={20} color="#6B7280" />
+                </TouchableOpacity>
               </View>
               <View style={{ minHeight: 400, width: '100%' }}>
                 <EmbeddedCheckoutProvider
@@ -427,10 +440,7 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
                   <EmbeddedCheckout />
                 </EmbeddedCheckoutProvider>
               </View>
-              <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setStep('plan-picker')} activeOpacity={0.8}>
-                <Text style={styles.modalCancelText}>{t('business.findTours.backToPlans')}</Text>
-              </TouchableOpacity>
-            </>
+            </ScrollView>
           )}
 
           {step === 'checkout' && Platform.OS !== 'web' && (
@@ -477,6 +487,9 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
 export function FindToursTab({ userId }: FindToursTabProps) {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const router = useRouter();
+  const pathname = usePathname();
+  const langcode = pathname.split('/').filter(Boolean)[0] ?? 'es';
 
   const [search, setSearch]     = useState('');
   const [tours, setTours]       = useState<TourWithSlots[]>([]);
@@ -490,9 +503,8 @@ export function FindToursTab({ userId }: FindToursTabProps) {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [currentPromos, setCurrentPromos] = useState<BusinessPromotion[]>([]);
 
-  const [slotTour, setSlotTour]           = useState<TourWithSlots | null>(null);
-  const [slotModalVisible, setSlotModalVisible] = useState(false);
-  const [addError, setAddError]           = useState<string | null>(null);
+  const [expandedTourId, setExpandedTourId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount]     = useState(PAGE_SIZE);
 
   const [pendingSlot, setPendingSlot] = useState<{
     tourTitle: string;
@@ -521,6 +533,7 @@ export function FindToursTab({ userId }: FindToursTabProps) {
   const searchTours = useCallback(async (query: string) => {
     setLoading(true);
     setError(null);
+    setVisibleCount(PAGE_SIZE);
     try {
       const results = await getAvailableTourSlots({ search: query });
       setTours(results);
@@ -537,18 +550,10 @@ export function FindToursTab({ userId }: FindToursTabProps) {
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [search, searchTours]);
 
-  const handleOpenSlotModal = (tour: TourWithSlots) => {
+  const handleSelectSlot = (tour: TourWithSlots, targetType: PromotionTargetType, targetId: string) => {
     if (!selectedBusiness) return;
-    setSlotTour(tour);
-    setAddError(null);
-    setSlotModalVisible(true);
-  };
-
-  const handleSelectSlot = (targetType: PromotionTargetType, targetId: string) => {
-    if (!selectedBusiness || !slotTour) return;
-    setSlotModalVisible(false);
     setPendingSlot({
-      tourTitle: slotTour.tourTitle,
+      tourTitle: tour.tourTitle,
       targetType,
       targetId,
       businessId: selectedBusiness.id,
@@ -561,11 +566,15 @@ export function FindToursTab({ userId }: FindToursTabProps) {
     setCheckoutModalVisible(false);
     setPendingSlot(null);
     await searchTours(search);
+    router.push(`/${langcode}/business-dashboard?tab=my-promotions` as any);
   };
 
-  // Trial exhausted = user has ever created >= MAX_FREE_SLOTS promos (including expired)
   const trialEverExhausted = currentPromos.length >= MAX_FREE_SLOTS;
   const activePromoCount   = currentPromos.filter((p) => p.status !== 'expired').length;
+
+  const toggleExpand = (tourId: string) => {
+    setExpandedTourId((prev) => (prev === tourId ? null : tourId));
+  };
 
   return (
     <View>
@@ -635,12 +644,33 @@ export function FindToursTab({ userId }: FindToursTabProps) {
         </View>
       )}
 
-      <View style={{ gap: 12, marginTop: 8 }}>
-        {tours.map((tour) => {
-          const totalSlots = (tour.hasDetailSlot ? 1 : 0) + tour.availableStepSlots.length;
+      <View style={{ gap: 16, marginTop: 8 }}>
+        {tours.slice(0, visibleCount).map((tour) => {
+          const isExpanded = expandedTourId === tour.tourId;
+
+          const isAlreadyMineDetail = currentPromos.some(
+            (p) => p.targetType === 'tour_detail' && p.targetId === tour.tourId
+              && p.businessId === selectedBusiness?.id && p.status !== 'expired'
+          );
+
+          const totalFreeSlots =
+            (tour.hasDetailSlot && !tour.detailOccupied ? SLOTS_PER_LOCATION : 0) +
+            tour.availableStepSlots.length * SLOTS_PER_LOCATION;
+
+          // All step data merged for the expanded view
+          const allSteps: Array<{ stepId: string; stepTitle: string; order: number; inAvailable: boolean; inOccupied: boolean }> = [
+            ...tour.availableStepSlots.map((s) => ({ ...s, inAvailable: true, inOccupied: false })),
+            ...tour.occupiedStepSlots.map((s) => ({ ...s, inAvailable: false, inOccupied: true })),
+          ].sort((a, b) => a.order - b.order);
+
           return (
             <View key={tour.tourId} style={styles.tourCard}>
-              <View style={styles.tourCardHeader}>
+              {/* Card header row */}
+              <TouchableOpacity
+                style={styles.tourCardHeader}
+                onPress={() => toggleExpand(tour.tourId)}
+                activeOpacity={0.8}
+              >
                 <View style={{ flex: 1 }}>
                   <Text style={styles.tourTitle} numberOfLines={1}>{tour.tourTitle}</Text>
                   {tour.city && (
@@ -650,67 +680,78 @@ export function FindToursTab({ userId }: FindToursTabProps) {
                     </View>
                   )}
                 </View>
-                <View style={styles.slotCountBadge}>
-                  <Text style={styles.slotCountText}>{t('business.findTours.slots', { count: totalSlots })}</Text>
+                <View style={styles.slotSummaryBadge}>
+                  <Text style={styles.slotSummaryText}>
+                    {totalFreeSlots} {t('business.findTours.slotsAvailable')}
+                  </Text>
                 </View>
-              </View>
-
-              <View style={styles.slotPillRow}>
-                {tour.hasDetailSlot && (
-                  <View style={styles.slotPill}>
-                    <Ionicons name="map-outline" size={12} color={GREEN_DARK} />
-                    <Text style={styles.slotPillText}>{t('business.findTours.typeTour')}</Text>
-                  </View>
-                )}
-                {tour.availableStepSlots.slice(0, 3).map((s) => (
-                  <View key={s.stepId} style={styles.slotPill}>
-                    <Ionicons name="location-outline" size={12} color={GREEN_DARK} />
-                    <Text style={styles.slotPillText}>{t('business.findTours.typeStep')} {s.order}</Text>
-                  </View>
-                ))}
-                {tour.availableStepSlots.length > 3 && (
-                  <View style={styles.slotPill}>
-                    <Text style={styles.slotPillText}>+{tour.availableStepSlots.length - 3}</Text>
-                  </View>
-                )}
-              </View>
-
-              <TouchableOpacity
-                style={[styles.addToTourBtn, !selectedBusiness && styles.addToTourBtnDisabled]}
-                onPress={() => handleOpenSlotModal(tour)}
-                disabled={!selectedBusiness}
-                activeOpacity={0.8}
-              >
                 <Ionicons
-                  name={trialEverExhausted ? 'card-outline' : 'add-circle-outline'}
-                  size={16}
-                  color={selectedBusiness ? '#fff' : '#9CA3AF'}
+                  name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color="#9CA3AF"
                 />
-                <Text style={[styles.addToTourBtnText, !selectedBusiness && { color: '#9CA3AF' }]}>
-                  {trialEverExhausted
-                    ? t('business.findTours.advertiseWithSub')
-                    : t('business.findTours.advertiseHere')}
-                </Text>
               </TouchableOpacity>
+
+              {/* Expanded slot grid */}
+              {isExpanded && (
+                <View style={styles.slotGrid}>
+                  {/* Tour page slot */}
+                  {(tour.hasDetailSlot || tour.detailOccupied) && (
+                    <SlotRow
+                      icon="map-outline"
+                      label={t('business.findTours.slotTourPage')}
+                      hint={t('business.findTours.slotTourPageHint')}
+                      state={
+                        isAlreadyMineDetail ? 'mine'
+                        : tour.detailOccupied ? 'occupied'
+                        : 'free'
+                      }
+                      onAddSlot={() => handleSelectSlot(tour, 'tour_detail', tour.tourId)}
+                      disabled={!selectedBusiness}
+                    />
+                  )}
+
+                  {/* Step slots */}
+                  {allSteps.map((step) => {
+                    const isAlreadyMineStep = currentPromos.some(
+                      (p) => p.targetType === 'tour_step' && p.targetId === step.stepId
+                        && p.businessId === selectedBusiness?.id && p.status !== 'expired'
+                    );
+                    const stepState: SlotBoxState =
+                      isAlreadyMineStep ? 'mine'
+                      : step.inOccupied ? 'occupied'
+                      : 'free';
+
+                    return (
+                      <SlotRow
+                        key={step.stepId}
+                        icon="location-outline"
+                        label={t('business.findTours.stepLabel', { order: step.order, title: step.stepTitle })}
+                        hint={t('business.findTours.slotStepHint')}
+                        state={stepState}
+                        onAddSlot={() => handleSelectSlot(tour, 'tour_step', step.stepId)}
+                        disabled={!selectedBusiness}
+                      />
+                    );
+                  })}
+                </View>
+              )}
             </View>
           );
         })}
       </View>
 
-      {addError && (
-        <View style={[styles.errorBox, { marginTop: 8 }]}>
-          <Text style={styles.errorText}>{addError}</Text>
+      {tours.length > visibleCount && (
+        <View style={styles.loadMoreContainer}>
+          <TouchableOpacity
+            style={styles.loadMoreBtn}
+            onPress={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.loadMoreText}>{t('home.loadMore')}</Text>
+          </TouchableOpacity>
         </View>
       )}
-
-      <SlotModal
-        visible={slotModalVisible}
-        tour={slotTour}
-        currentPromos={currentPromos}
-        businessId={selectedBusiness?.id ?? null}
-        onSelectSlot={handleSelectSlot}
-        onClose={() => { setSlotModalVisible(false); setAddError(null); }}
-      />
 
       <SlotCheckoutModal
         visible={checkoutModalVisible}
@@ -753,6 +794,13 @@ export function FindToursTab({ userId }: FindToursTabProps) {
 const checkoutStyles = StyleSheet.create({
   header: { alignItems: 'center', paddingVertical: 4, marginBottom: 4 },
 
+  checkoutHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingBottom: 12, marginBottom: 4,
+    borderBottomWidth: 1, borderBottomColor: '#F3F4F6',
+    width: '100%',
+  },
+
   planList: { gap: 10, marginBottom: 14, width: '100%' },
 
   planCard: {
@@ -793,19 +841,6 @@ const checkoutStyles = StyleSheet.create({
   },
   radioSelected: { borderColor: GREEN },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: GREEN },
-
-  summaryBox: {
-    backgroundColor: '#ECFDF5',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#A7F3D0',
-    padding: 12,
-    marginBottom: 12,
-    width: '100%',
-  },
-  summaryTitle: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  summaryPrice: { fontSize: 16, fontWeight: '700', color: GREEN_DARK },
-  summaryCycle: { fontSize: 12, fontWeight: '400', color: '#6B7280' },
 
   payBtn: {
     backgroundColor: GREEN, borderRadius: 12, paddingVertical: 14,
@@ -864,31 +899,39 @@ const styles = StyleSheet.create({
   emptySubtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', maxWidth: 280 },
 
   tourCard: {
-    backgroundColor: '#fff', borderRadius: 12,
-    borderWidth: 1, borderColor: '#E5E7EB', padding: 14, gap: 10,
+    backgroundColor: '#fff', borderRadius: 16,
+    borderWidth: 1, borderColor: '#E5E7EB', overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
   },
-  tourCardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  tourTitle: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  cityRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
+  tourCardHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingHorizontal: 16, paddingVertical: 16,
+  },
+  tourTitle: { fontSize: 15, fontWeight: '700', color: '#111827', lineHeight: 20 },
+  cityRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 5 },
   cityText: { fontSize: 12, color: '#6B7280' },
-  slotCountBadge: {
-    backgroundColor: '#ECFDF5', paddingHorizontal: 8, paddingVertical: 3,
+
+  slotSummaryBadge: {
+    backgroundColor: '#ECFDF5', paddingHorizontal: 10, paddingVertical: 4,
     borderRadius: 20, borderWidth: 1, borderColor: '#A7F3D0',
   },
-  slotCountText: { fontSize: 12, fontWeight: '600', color: GREEN_DARK },
-  slotPillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  slotPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#F0FDF4', borderRadius: 20,
-    paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#BBF7D0',
+  slotSummaryText: { fontSize: 12, fontWeight: '700', color: GREEN_DARK },
+
+  slotGrid: {
+    paddingHorizontal: 16, paddingBottom: 16, paddingTop: 4,
+    borderTopWidth: 1, borderTopColor: '#F3F4F6',
+    backgroundColor: '#FAFAFA',
   },
-  slotPillText: { fontSize: 11, fontWeight: '600', color: GREEN_DARK },
-  addToTourBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 6, backgroundColor: GREEN, borderRadius: 10, paddingVertical: 10,
+
+  loadMoreContainer: {
+    paddingTop: 16, paddingBottom: 8, alignItems: 'center',
   },
-  addToTourBtnDisabled: { backgroundColor: '#F3F4F6' },
-  addToTourBtnText: { fontSize: 14, fontWeight: '600', color: '#fff' },
+  loadMoreBtn: {
+    backgroundColor: AMBER, paddingHorizontal: 32, paddingVertical: 12,
+    borderRadius: 24, minWidth: 160, alignItems: 'center',
+  },
+  loadMoreText: { color: '#fff', fontSize: 14, fontWeight: '700' },
 
   modalBackdrop: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
@@ -910,19 +953,7 @@ const styles = StyleSheet.create({
     borderRadius: 12, backgroundColor: '#F0FDF4', borderWidth: 1, borderColor: '#A7F3D0',
   },
   slotBtnSelected: { borderColor: GREEN, backgroundColor: '#ECFDF5' },
-  slotBtnDisabled: { backgroundColor: '#F9FAFB', borderColor: '#E5E7EB' },
-  slotBtnTitle: { fontSize: 14, fontWeight: '600', color: '#111827' },
-  slotBtnTitleDisabled: { color: '#9CA3AF' },
-  slotBtnHint: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-
-  occupiedBadge: {
-    backgroundColor: '#FEE2E2', borderRadius: 20, paddingHorizontal: 6, paddingVertical: 2,
-  },
-  occupiedBadgeText: { fontSize: 11, fontWeight: '600', color: '#DC2626' },
-  mineBadge: {
-    backgroundColor: '#ECFDF5', borderRadius: 20, paddingHorizontal: 6, paddingVertical: 2,
-  },
-  mineBadgeText: { fontSize: 11, fontWeight: '600', color: GREEN_DARK },
+  slotBtnTitle: { fontSize: 14, fontWeight: '600', color: '#111827', flex: 1 },
 
   modalCancelBtn: {
     alignItems: 'center', paddingVertical: 12, borderRadius: 10,

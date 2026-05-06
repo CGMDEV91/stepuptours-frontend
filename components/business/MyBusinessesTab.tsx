@@ -264,6 +264,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   statusText: { fontSize: 12, fontWeight: '600', color: '#065F46' },
   adminBtn: {

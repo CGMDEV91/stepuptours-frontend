@@ -741,6 +741,7 @@
   "business.findTours.addingTrial": "Activating free trial…",
   "business.findTours.perMonth": "/ month",
   "business.findTours.perYear": "/ year",
+  "business.findTours.slotsAvailable": "free slots",
 
   "business.billing.title": "Billing",
   "business.billing.infoTitle": "Per-slot advertising model",

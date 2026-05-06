@@ -47,8 +47,8 @@ function StatusBadge({ status }: { status: PromotionStatus }) {
   };
   const c = config[status] ?? config.expired;
   return (
-    <View style={{ backgroundColor: c.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>
-      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }}>{t(c.labelKey)}</Text>
+    <View style={{ backgroundColor: c.bg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, alignSelf: 'flex-start' }}>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: c.text }} numberOfLines={1}>{t(c.labelKey)}</Text>
     </View>
   );
 }
@@ -61,13 +61,14 @@ function TypeBadge({ type }: { type: PromotionTargetType }) {
       flexDirection: 'row', alignItems: 'center', gap: 4,
       backgroundColor: isTour ? '#EFF6FF' : '#F0FDF4',
       paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
+      alignSelf: 'flex-start', flexShrink: 0,
     }}>
       <Ionicons
         name={isTour ? 'map-outline' : 'location-outline'}
         size={11}
         color={isTour ? '#1D4ED8' : GREEN_DARK}
       />
-      <Text style={{ fontSize: 11, fontWeight: '600', color: isTour ? '#1D4ED8' : GREEN_DARK }}>
+      <Text style={{ fontSize: 11, fontWeight: '600', color: isTour ? '#1D4ED8' : GREEN_DARK }} numberOfLines={1}>
         {isTour ? t('business.myPromotions.typeTour') : t('business.myPromotions.typeStep')}
       </Text>
     </View>
@@ -82,8 +83,9 @@ function PlanBadge({ planType }: { planType: string | null }) {
     <View style={{
       backgroundColor: isAnnual ? '#EDE9FE' : '#E0F2FE',
       paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
+      alignSelf: 'flex-start', flexShrink: 0,
     }}>
-      <Text style={{ fontSize: 11, fontWeight: '700', color: isAnnual ? '#5B21B6' : '#0369A1' }}>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: isAnnual ? '#5B21B6' : '#0369A1' }} numberOfLines={1}>
         {isAnnual ? t('business.myPromotions.planAnnual') : t('business.myPromotions.planMonthly')}
       </Text>
     </View>
@@ -421,7 +423,7 @@ const styles = StyleSheet.create({
     flex: 1, fontSize: 11, fontWeight: '600', color: '#6B7280',
     textTransform: 'uppercase', letterSpacing: 0.4,
   },
-  tableCell: { flex: 1, fontSize: 13, color: '#111827' },
+  tableCell: { flex: 1, fontSize: 13, color: '#111827', overflow: 'hidden' },
   cancelBtn: {
     backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FCA5A5',
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, alignSelf: 'flex-start',
@@ -435,7 +437,7 @@ const styles = StyleSheet.create({
   cardTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   cardName: { fontSize: 14, fontWeight: '700', color: '#111827', flex: 1 },
   cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  cardMeta: { fontSize: 12, color: '#6B7280' },
+  cardMeta: { fontSize: 12, color: '#6B7280', flexShrink: 1 },
   renewalRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: '#F9FAFB', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8,

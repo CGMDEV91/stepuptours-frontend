@@ -733,6 +733,7 @@
   "business.findTours.addingTrial": "Attivazione della prova gratuita...",
   "business.findTours.perMonth": "/ mese",
   "business.findTours.perYear": "/ anno",
+  "business.findTours.slotsAvailable": "slot liberi",
 
   "business.billing.title": "Fatturazione",
   "business.billing.infoTitle": "Modello pubblicitario per slot",

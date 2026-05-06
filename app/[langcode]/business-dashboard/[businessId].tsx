@@ -309,6 +309,7 @@ export default function BusinessDetailScreen() {
       alignSelf: 'center',
       paddingHorizontal: 16,
       paddingTop: 20,
+      paddingBottom: 32,
     }}>
       {activeTab === 'overview' && (
         <OverviewTab business={business} onSaved={setBusiness} />
@@ -322,22 +323,8 @@ export default function BusinessDetailScreen() {
   return (
     <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
-        <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 0 }}>
-          <PageBanner
-            icon="storefront-outline"
-            iconBgColor={GREEN}
-            title={business.name}
-            subtitle="Gestiona tu negocio"
-            showBack
-          />
-          {tabBar}
-          {contentInner}
-          <Footer />
-        </PageScrollView>
-      ) : (
-        <>
-          {tabBar}
-          <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 0 }}>
+        <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={{ flex: 1 }}>
             <PageBanner
               icon="storefront-outline"
               iconBgColor={GREEN}
@@ -345,7 +332,25 @@ export default function BusinessDetailScreen() {
               subtitle="Gestiona tu negocio"
               showBack
             />
+            {tabBar}
             {contentInner}
+          </View>
+          <Footer />
+        </PageScrollView>
+      ) : (
+        <>
+          {tabBar}
+          <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+            <View style={{ flex: 1 }}>
+              <PageBanner
+                icon="storefront-outline"
+                iconBgColor={GREEN}
+                title={business.name}
+                subtitle="Gestiona tu negocio"
+                showBack
+              />
+              {contentInner}
+            </View>
             <Footer />
           </PageScrollView>
         </>

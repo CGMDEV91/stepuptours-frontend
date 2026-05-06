@@ -298,14 +298,17 @@ export default function CreateBusinessScreen() {
 
       if (isEditMode && businessId) {
         await updateBusiness(businessId, data, entityLangcode || undefined);
+        const returnPath = isAdmin
+          ? `/${langcode}/admin?tab=businesses&toast=business_saved`
+          : `/${langcode}/business-dashboard/${businessId}`;
+        router.replace(returnPath as any);
       } else {
-        await createBusiness(data);
+        const newBusiness = await createBusiness(data);
+        const returnPath = isAdmin
+          ? `/${langcode}/admin?tab=businesses&toast=business_saved`
+          : `/${langcode}/business-dashboard/${newBusiness.id}`;
+        router.replace(returnPath as any);
       }
-
-      const returnPath = isAdmin
-        ? `/${langcode}/admin?tab=businesses&toast=business_saved`
-        : `/${langcode}/dashboard?tab=businesses&toast=business_saved`;
-      router.replace(returnPath as any);
     } catch (err: any) {
       setValidationError(err.message ?? 'Error saving business');
     } finally {
@@ -323,7 +326,7 @@ export default function CreateBusinessScreen() {
 
   const contentStyle = {
     paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingTop: 40,
     ...(isDesktop
       ? { maxWidth: CONTENT_MAX_WIDTH, width: '100%' as const, alignSelf: 'center' as const }
       : {}),

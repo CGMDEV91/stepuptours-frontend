@@ -733,6 +733,7 @@
   "business.findTours.addingTrial": "Ενεργοποίηση δωρεάν δοκιμής...",
   "business.findTours.perMonth": "/ μήνα",
   "business.findTours.perYear": "/ χρόνο",
+  "business.findTours.slotsAvailable": "ελεύθερες θέσεις",
 
   "business.billing.title": "Χρεώσεις",
   "business.billing.infoTitle": "Μοντέλο διαφήμισης ανά slot",
