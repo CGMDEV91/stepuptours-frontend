@@ -63,9 +63,9 @@ function dropColor(rate: number): string {
 // Widths sized to fit the longest translated header text (Spanish) at fontSize 11
 // Rule of thumb: ~7.5px per character + 8px padding + 16px if tooltip icon present
 
-// Tour performance table
+// Tour performance table — "steps" column removed; tour col is now the drill-down trigger
 const TC = {
-  tour:      { flex: 1, minWidth: 120 } as const,
+  tour:      { flex: 1, minWidth: 140 } as const,
   views:     { width: 72 }  as const,
   starts:    { width: 76 }  as const,
   done:      { width: 114 } as const,
@@ -73,14 +73,13 @@ const TC = {
   avgTime:   { width: 124 } as const,
   abandoned: { width: 108 } as const,
   shared:    { width: 120 } as const,
-  steps:     { width: 80 }  as const,
 };
-const TOUR_TABLE_MIN_W = 120 + 72 + 76 + 114 + 84 + 124 + 108 + 120 + 80 + 32;
+const TOUR_TABLE_MIN_W = 140 + 72 + 76 + 114 + 84 + 124 + 108 + 120 + 32;
 
 // Step drilldown table — first col flex, fixed cols sized to header text
 const SC = {
   order:   { width: 32 }  as const,
-  step:    { flex: 1, minWidth: 80 } as const,   // flex, texto wrappea si es largo
+  step:    { flex: 1, minWidth: 80 } as const,
   views:   { width: 88 }  as const,
   done:    { width: 126 } as const,
   avgTime: { width: 136 } as const,
@@ -139,8 +138,8 @@ export function InfoTooltip({ text }: { text: string }) {
 // ── Summary card ──────────────────────────────────────────────────────────────
 
 export function SummaryCard({
-                       icon, iconColor, label, value, sub, loading, tooltip,
-                     }: {
+                              icon, iconColor, label, value, sub, loading, tooltip,
+                            }: {
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
   label: string;
@@ -309,6 +308,45 @@ function ColHeader<T extends string>({
 
 type TourSortKey = 'views' | 'starts' | 'completions' | 'completion_rate' | 'abandonments' | 'avg_step_duration_s' | 'shares';
 
+function TourTitleCell({
+                         tour, onOpenTour, tourDetailLoading,
+                       }: {
+  tour: TourSummary;
+  onOpenTour: (tour: TourSummary) => void;
+  tourDetailLoading: boolean;
+}) {
+  const { t } = useTranslation();
+  const [hovered, setHovered] = useState(false);
+
+  return (
+      <TouchableOpacity
+          style={[styles.tourTitleBtn, TC.tour, hovered && styles.tourTitleBtnHovered]}
+          onPress={() => onOpenTour(tour)}
+          activeOpacity={0.7}
+          disabled={tourDetailLoading}
+          // @ts-ignore — onMouseEnter/Leave are valid on RN Web
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+      >
+        <View style={styles.tourTitleInner}>
+          <Text style={[styles.tourTitleText, hovered && styles.tourTitleTextHovered]} numberOfLines={2}>
+            {tour.title || '–'}
+          </Text>
+          <View style={styles.tourTitleMeta}>
+            <Ionicons name="layers-outline" size={11} color={hovered ? '#D97706' : AMBER} />
+            <Text style={[styles.tourTitleStepsHint, hovered && styles.tourTitleStepsHintHovered]}>
+              {t('admin.analytics.tourTable.colSteps')}
+            </Text>
+            <Ionicons name="chevron-forward" size={11} color={hovered ? '#D97706' : AMBER} />
+          </View>
+        </View>
+        {tourDetailLoading && (
+            <ActivityIndicator size="small" color={AMBER} style={{ marginLeft: 6 }} />
+        )}
+      </TouchableOpacity>
+  );
+}
+
 function ToursTable({
                       tours, onOpenTour, tourDetailLoading, containerWidth,
                     }: {
@@ -352,11 +390,13 @@ function ToursTable({
           style={{ width: '100%' }}
           contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View style={{ minWidth: TOUR_TABLE_MIN_W }}>
-          {/* Header row */}
+        <View style={{ minWidth: TOUR_TABLE_MIN_W, flex: 1 }}>
+          {/* Header row — Tour col has a subtle "drill-down" hint icon */}
           <View style={[styles.tableRow, styles.tableHeader]}>
             <View style={[styles.thCell, TC.tour]}>
               <Text style={styles.thText}>{t('admin.analytics.tourTable.colTour')}</Text>
+              {/* Small icon hinting every row is tappable */}
+              <Ionicons name="chevron-forward-circle-outline" size={11} color="#D1D5DB" style={{ marginLeft: 2 }} />
             </View>
             <ColHeader k="views"               label={t('admin.analytics.tourTable.colViews')}     colStyle={TC.views}     {...hProps} />
             <ColHeader k="starts"              label={t('admin.analytics.tourTable.colStarts')}    colStyle={TC.starts}    {...hProps} />
@@ -365,14 +405,13 @@ function ToursTable({
             <ColHeader k="avg_step_duration_s" label={t('admin.analytics.tourTable.colAvgTime')}   colStyle={TC.avgTime}   tooltip={t('admin.analytics.tourTable.colAvgTimeTooltip')}   {...hProps} />
             <ColHeader k="abandonments"        label={t('admin.analytics.tourTable.colAbandoned')} colStyle={TC.abandoned} tooltip={t('admin.analytics.tourTable.colAbandonedTooltip')} {...hProps} />
             <ColHeader k="shares"              label={t('admin.analytics.tourTable.colShared')}    colStyle={TC.shared}    tooltip={t('admin.analytics.tourTable.colSharedTooltip')}    {...hProps} />
-            <View style={[styles.thCell, TC.steps]}>
-              <Text style={styles.thText}>{t('admin.analytics.tourTable.colSteps')}</Text>
-            </View>
           </View>
 
           {sorted.map((tour, i) => (
               <View key={tour.tour_id} style={[styles.tableRow, styles.tableRowTop, i % 2 === 0 && styles.tableRowEven]}>
-                <Text style={[styles.tdCell, styles.tdTourTitle, TC.tour]}>{tour.title || '–'}</Text>
+                {/* Tour title is now the drill-down trigger */}
+                <TourTitleCell tour={tour} onOpenTour={onOpenTour} tourDetailLoading={tourDetailLoading} />
+
                 <Text style={[styles.tdCell, TC.views]}>{tour.views.toLocaleString()}</Text>
                 <Text style={[styles.tdCell, TC.starts]}>{tour.starts.toLocaleString()}</Text>
                 <Text style={[styles.tdCell, TC.done]}>{tour.completions.toLocaleString()}</Text>
@@ -382,21 +421,6 @@ function ToursTable({
                 <Text style={[styles.tdCell, TC.avgTime, { color: '#6B7280' }]}>{fmtSecs(tour.avg_step_duration_s ?? 0)}</Text>
                 <Text style={[styles.tdCell, TC.abandoned]}>{tour.abandonments.toLocaleString()}</Text>
                 <Text style={[styles.tdCell, TC.shared]}>{tour.shares.toLocaleString()}</Text>
-                <TouchableOpacity
-                    style={[styles.stepsBtn, TC.steps]}
-                    onPress={() => onOpenTour(tour)}
-                    activeOpacity={0.7}
-                    disabled={tourDetailLoading}
-                >
-                  {tourDetailLoading ? (
-                      <ActivityIndicator size="small" color={AMBER} />
-                  ) : (
-                      <>
-                        <Text style={styles.stepsBtnText}>{t('admin.analytics.tourTable.colSteps')}</Text>
-                        <Ionicons name="chevron-forward" size={13} color={AMBER} />
-                      </>
-                  )}
-                </TouchableOpacity>
               </View>
           ))}
         </View>
@@ -950,15 +974,34 @@ const styles = StyleSheet.create({
   },
   thTextActive: { color: AMBER },
   tdCell: { fontSize: 13, color: '#374151', paddingRight: 4 },
-  tdTourTitle: { fontWeight: '500' },
 
-  // Steps button
-  stepsBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 3,
-    paddingHorizontal: 8, paddingVertical: 5,
-    borderRadius: 8, borderWidth: 1, borderColor: '#FDE68A', backgroundColor: '#FFFBEB',
+  // Tour title drill-down button (replaces plain tdCell + separate steps button)
+  tourTitleBtn: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    paddingRight: 4,
   },
-  stepsBtnText: { fontSize: 12, fontWeight: '600', color: AMBER },
+  tourTitleInner: { flex: 1 },
+  tourTitleText: {
+    fontSize: 13, fontWeight: '500', color: '#111827',
+    marginBottom: 3,
+  },
+  tourTitleMeta: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+  },
+  tourTitleStepsHint: {
+    fontSize: 11, fontWeight: '600', color: AMBER,
+  },
+  tourTitleBtnHovered: {
+    backgroundColor: '#FFFBEB',
+    borderRadius: 6,
+  },
+  tourTitleTextHovered: {
+    color: '#D97706',
+    textDecorationLine: 'underline' as const,
+  },
+  tourTitleStepsHintHovered: {
+    color: '#D97706',
+  },
 
   // Drilldown
   drillHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginBottom: 16 },
