@@ -69,6 +69,11 @@ export default function AdminScreen() {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const scrollRef = useRef<ScrollView>(null);
 
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    router.setParams({ tab });
+  };
+
   // ── Scroll to top on tab change ────────────────────────────────────────────
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
@@ -121,7 +126,7 @@ export default function AdminScreen() {
               <TouchableOpacity
                   key={tab.id}
                   style={[styles.mobileTabItem, isActive && styles.mobileTabItemActive]}
-                  onPress={() => setActiveTab(tab.id)}
+                  onPress={() => handleTabChange(tab.id)}
                   activeOpacity={0.8}
               >
                 <Ionicons
@@ -152,7 +157,7 @@ export default function AdminScreen() {
                 <TouchableOpacity
                     key={tab.id}
                     style={[styles.tabPill, isActive && styles.tabPillActive]}
-                    onPress={() => setActiveTab(tab.id)}
+                    onPress={() => handleTabChange(tab.id)}
                     activeOpacity={0.8}
                 >
                   <Ionicons

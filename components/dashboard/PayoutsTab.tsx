@@ -9,10 +9,12 @@ import {
   ActivityIndicator,
   StyleSheet,
   Linking,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
+import * as ExpoLinking from 'expo-linking';
 import {
   startOnboarding,
   getOnboardStatus,
@@ -23,8 +25,6 @@ import {
 import type { StripeOnboardStatus } from '../../types';
 
 const AMBER = '#F59E0B';
-
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
 
 interface PayoutsTabProps {
   onGoToPayment: () => void;
@@ -57,15 +57,16 @@ export function PayoutsTab({ onGoToPayment }: PayoutsTabProps) {
     }
   }, []);
 
-  useFocusEffect(loadStatus);
+  useFocusEffect(useCallback(() => { loadStatus(); }, [loadStatus]));
 
   const handleStartOnboarding = async () => {
     setWorking(true);
     setError(null);
     try {
-      const returnUrl  = `${BASE_URL}/stripe-return`;
-      const refreshUrl = `${BASE_URL}/stripe-refresh`;
-      const result = await startOnboarding(returnUrl, refreshUrl);
+      const returnUrl = Platform.OS === 'web'
+        ? window.location.href
+        : ExpoLinking.createURL('/dashboard');
+      const result = await startOnboarding(returnUrl, returnUrl);
       await Linking.openURL(result.onboardingUrl);
     } catch (err) {
       if (err instanceof StripeNotConfiguredError) {

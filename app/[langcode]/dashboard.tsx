@@ -69,6 +69,11 @@ export default function DashboardScreen() {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const scrollRef = useRef<ScrollView>(null);
 
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    router.setParams({ tab });
+  };
+
   // ── Scroll to top on mount + tab change ───────────────────────────────────
   useEffect(() => {
     // Prevent browser from restoring scroll position on page refresh (web only)
@@ -152,7 +157,7 @@ export default function DashboardScreen() {
           <TouchableOpacity
             key={tab.id}
             style={[styles.mobileTabItem, isActive && styles.mobileTabItemActive]}
-            onPress={() => setActiveTab(tab.id)}
+            onPress={() => handleTabChange(tab.id)}
             activeOpacity={0.8}
           >
             <Ionicons
@@ -183,7 +188,7 @@ export default function DashboardScreen() {
             <TouchableOpacity
               key={tab.id}
               style={[styles.tabPill, isActive && styles.tabPillActive]}
-              onPress={() => setActiveTab(tab.id)}
+              onPress={() => handleTabChange(tab.id)}
               activeOpacity={0.8}
             >
               <Ionicons
@@ -210,7 +215,7 @@ export default function DashboardScreen() {
       {activeTab === 'tours' && <MyToursTab userId={user.id} />}
       {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
       {activeTab === 'donations' && <DonationsTab userId={user.id} />}
-      {activeTab === 'payouts' && <PayoutsTab onGoToPayment={() => setActiveTab('payment')} />}
+      {activeTab === 'payouts' && <PayoutsTab onGoToPayment={() => handleTabChange('payment')} />}
     </View>
   );
 
