@@ -343,7 +343,11 @@ export function StepTimeline({
               </TouchableOpacity>
             </View>
             {/* Scrollable content */}
-            <ScrollView style={styles.modalScroll} contentContainerStyle={styles.modalScrollContent}>
+            <ScrollView
+              style={styles.modalScroll}
+              contentContainerStyle={styles.modalScrollContent}
+              {...(Platform.OS === 'web' ? { className: 'modal-scroll' } as any : {})}
+            >
               <StepContent
                 step={steps[modalStepIndex]}
                 isCompleted={stepsCompleted.includes(steps[modalStepIndex].id)}

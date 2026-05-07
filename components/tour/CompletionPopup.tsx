@@ -703,6 +703,7 @@ export function CompletionPopup({
               }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
+              {...(Platform.OS === 'web' ? { className: 'modal-scroll' } as any : {})}
             >
               {cardContent}
             </ScrollView>
@@ -716,6 +717,7 @@ export function CompletionPopup({
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ padding: 28 }}
               style={Platform.OS === 'web' ? { maxHeight: '85vh' } as any : undefined}
+              {...(Platform.OS === 'web' ? { className: 'modal-scroll' } as any : {})}
             >
               {cardContent}
             </ScrollView>

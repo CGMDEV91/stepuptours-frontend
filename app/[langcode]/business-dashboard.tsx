@@ -169,7 +169,7 @@ export default function BusinessDashboardScreen() {
   );
 
   const content = (
-    <View style={isMobile ? { paddingHorizontal: 16, paddingTop: 20 } : { maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20 }}>
+    <View style={isMobile ? { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32 } : { maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32 }}>
       {activeTab === 'my-businesses'  && <MyBusinessesTab userId={user.id} />}
       {activeTab === 'find-tours'     && <FindToursTab userId={user.id} />}
       {activeTab === 'my-promotions'  && <MyPromotionsTab userId={user.id} />}

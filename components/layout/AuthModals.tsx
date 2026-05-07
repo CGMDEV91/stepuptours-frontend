@@ -293,6 +293,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const [allowProfessional, setAllowProfessional] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const [googlePreStep, setGooglePreStep] = useState(false);
 
   useEffect(() => {
     getRegistrationSettings().then((s) =>
@@ -311,7 +312,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const passwordRef = useRef<RNTextInput>(null);
   const confirmRef = useRef<RNTextInput>(null);
 
-  const needsConsent = (role === 'guide' || role === 'business') && allowProfessional;
+  const needsConsent = (role === 'guide' || role === 'business') && (allowProfessional || googlePreStep);
   const isSubmitDisabled = isLoading || !privacyAccepted || (needsConsent && !consent);
 
   const handleRoleSelect = (selected: 'traveller' | 'guide' | 'business') => {
@@ -383,44 +384,155 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
 
   return (
     <View style={[modalStyles.sheet, fullscreen && modalStyles.sheetFullscreen, desktopWeb && modalStyles.sheetDesktopWeb as any]}>
-      {/* Cabecera */}
-      <View style={modalStyles.header}>
-        <View>
-          <Text style={modalStyles.title}>{t('auth.createAccount')}</Text>
-          <Text style={modalStyles.subtitle}>{t('auth.joinSubtitle')}</Text>
-        </View>
-        <TouchableOpacity onPress={onClose} style={modalStyles.closeBtn}>
-          <Ionicons name="close" size={16} color="#6B7280" />
-        </TouchableOpacity>
-      </View>
 
-      {/* Error global */}
-      {error ? (
-        <View style={modalStyles.errorBanner}>
-          <Ionicons name="alert-circle" size={14} color="#B91C1C" style={{ marginRight: 6 }} />
-          <Text style={modalStyles.errorBannerText}>{error}</Text>
-        </View>
-      ) : null}
+      {googlePreStep ? (
+        /* ── Google pre-step: choose profile + language before OAuth ─────── */
+        <>
+          {/* Header with back */}
+          <View style={modalStyles.header}>
+            <TouchableOpacity
+              onPress={() => setGooglePreStep(false)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="arrow-back" size={18} color="#374151" />
+              <Text style={{ fontSize: 14, color: '#374151', fontWeight: '600' }}>{t('common.back')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onClose} style={modalStyles.closeBtn}>
+              <Ionicons name="close" size={16} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
 
-      {/* Botón Google */}
-      <TouchableOpacity
-        style={modalStyles.googleBtn}
-        onPress={handleGoogleAuth}
-        disabled={googleLoading || isLoading}
-        activeOpacity={0.8}
-      >
-        {googleLoading ? (
-          <ActivityIndicator size="small" color="#374151" />
-        ) : (
-          <>
-            {Platform.OS === 'web' && <GoogleLogo />}
-            <Text style={modalStyles.googleBtnText}>{t('auth.continueWithGoogle')}</Text>
-          </>
-        )}
-      </TouchableOpacity>
-      {googleError ? (
-        <Text style={modalStyles.googleErrorText}>{googleError}</Text>
-      ) : null}
+          <Text style={[modalStyles.title, { marginBottom: 4 }]}>{t('auth.chooseYourProfile')}</Text>
+          <Text style={[modalStyles.subtitle, { marginBottom: 16 }]}>{t('auth.chooseYourProfileHint')}</Text>
+
+          {/* Role cards — always shown regardless of allowProfessional */}
+          <View style={proStyles.section}>
+            {(
+              [
+                { value: 'traveller', icon: 'person-outline',     titleKey: 'auth.roleTraveller',  hintKey: 'auth.roleTravellerHint'  },
+                { value: 'guide',     icon: 'map-outline',        titleKey: 'auth.roleGuide',      hintKey: 'auth.roleGuideHint'      },
+                { value: 'business',  icon: 'storefront-outline', titleKey: 'auth.roleBusiness',   hintKey: 'auth.roleBusinessHint'   },
+              ] as const
+            ).map(({ value, icon, titleKey, hintKey }) => {
+              const selected = role === value;
+              const isBusiness = value === 'business';
+              return (
+                <TouchableOpacity
+                  key={value}
+                  style={[proStyles.card, selected && (isBusiness ? proStyles.cardBusiness : proStyles.cardGuide)]}
+                  onPress={() => handleRoleSelect(value)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[proStyles.radio, selected && (isBusiness ? proStyles.radioBusiness : proStyles.radioGuide)]}>
+                    {selected && <Ionicons name="checkmark" size={10} color="#fff" />}
+                  </View>
+                  <Ionicons
+                    name={icon}
+                    size={16}
+                    color={selected ? (isBusiness ? '#059669' : '#D97706') : '#9CA3AF'}
+                  />
+                  <View style={proStyles.cardText}>
+                    <Text style={[proStyles.cardTitle, selected && (isBusiness ? proStyles.cardTitleBusiness : proStyles.cardTitleGuide)]}>
+                      {t(titleKey)}
+                    </Text>
+                    <Text style={proStyles.cardHint}>{t(hintKey)}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+
+            {(role === 'guide' || role === 'business') && (
+              <>
+                <TouchableOpacity
+                  style={proStyles.consentRow}
+                  onPress={() => {
+                    setConsent((v) => !v);
+                    setFieldErrors((e) => ({ ...e, consent: undefined }));
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={[proStyles.checkbox, consent && proStyles.checkboxChecked]}>
+                    {consent && <Ionicons name="checkmark" size={12} color="#fff" />}
+                  </View>
+                  <Text style={proStyles.consentText}>
+                    {t(role === 'guide' ? 'auth.consentGuide' : 'auth.consentBusiness')}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+
+          {/* Preferred language */}
+          <Text style={modalStyles.fieldLabel}>{t('auth.preferredLanguage')}</Text>
+          <TouchableOpacity
+            ref={langButtonRef}
+            style={modalStyles.pickerButton}
+            onPress={() => setLangPickerVisible(true)}
+            activeOpacity={0.8}
+          >
+            <Text style={modalStyles.pickerButtonText}>
+              {selectedLangLabel || t('auth.selectLanguage')}
+            </Text>
+            <Ionicons name="chevron-down" size={16} color="#6B7280" />
+          </TouchableOpacity>
+
+          {googleError ? <Text style={[modalStyles.googleErrorText, { marginTop: 8 }]}>{googleError}</Text> : null}
+
+          {/* Final Google OAuth button */}
+          <TouchableOpacity
+            style={[modalStyles.googleBtn, { marginTop: 16 }, (needsConsent && !consent) && { opacity: 0.45 }]}
+            onPress={handleGoogleAuth}
+            disabled={googleLoading || isLoading || (needsConsent && !consent)}
+            activeOpacity={0.8}
+          >
+            {googleLoading ? (
+              <ActivityIndicator size="small" color="#374151" />
+            ) : (
+              <>
+                {Platform.OS === 'web' && <GoogleLogo />}
+                <Text style={modalStyles.googleBtnText}>{t('auth.registerWithGoogle')}</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </>
+      ) : (
+        /* ── Normal registration form ─────────────────────────────────────── */
+        <>
+          {/* Cabecera */}
+          <View style={modalStyles.header}>
+            <View>
+              <Text style={modalStyles.title}>{t('auth.createAccount')}</Text>
+              <Text style={modalStyles.subtitle}>{t('auth.joinSubtitle')}</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} style={modalStyles.closeBtn}>
+              <Ionicons name="close" size={16} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Error global */}
+          {error ? (
+            <View style={modalStyles.errorBanner}>
+              <Ionicons name="alert-circle" size={14} color="#B91C1C" style={{ marginRight: 6 }} />
+              <Text style={modalStyles.errorBannerText}>{error}</Text>
+            </View>
+          ) : null}
+
+          {/* Botón Google — enters pre-step instead of immediate OAuth */}
+          <TouchableOpacity
+            style={modalStyles.googleBtn}
+            onPress={() => setGooglePreStep(true)}
+            disabled={isLoading}
+            activeOpacity={0.8}
+          >
+            <>
+              {Platform.OS === 'web' && <GoogleLogo />}
+              <Text style={modalStyles.googleBtnText}>{t('auth.continueWithGoogle')}</Text>
+            </>
+          </TouchableOpacity>
+          {googleError ? (
+            <Text style={modalStyles.googleErrorText}>{googleError}</Text>
+          ) : null}
 
       {/* Divider */}
       <View style={modalStyles.dividerRow}>
@@ -607,7 +719,10 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
           <Text style={modalStyles.switchLink}>{t('auth.switchToLogin')}</Text>
         </TouchableOpacity>
       </View>
+        </>
+      )}
 
+      {/* Language picker — shared between both steps */}
       <Picker
         visible={langPickerVisible}
         title={t('auth.preferredLanguage')}
@@ -628,6 +743,8 @@ export function AuthModals({ visible, onClose, onSwitch }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const scrollRef = useRef<ScrollView>(null);
+  // Track where mousedown started to prevent drag-to-select from closing the modal
+  const mouseDownTarget = useRef<EventTarget | null>(null);
 
   // Reset scroll to top whenever the modal switches between login ↔ register
   useEffect(() => {
@@ -667,7 +784,11 @@ export function AuthModals({ visible, onClose, onSwitch }: Props) {
     return (
       // @ts-ignore
       <div
-        onClick={handleClose}
+        onMouseDown={(e: any) => { mouseDownTarget.current = e.target; }}
+        onClick={(e: any) => {
+          if (mouseDownTarget.current === e.currentTarget) handleClose();
+          mouseDownTarget.current = null;
+        }}
         style={{
           position: 'fixed',
           inset: 0,

@@ -24,3 +24,64 @@
 - Drupal backend uses two tables: `su_analytics_events` (raw append-only, high volume) and `su_analytics_daily` (pre-aggregated by cron). Dashboard always reads from the aggregated table.
 - Cron aggregation is idempotent (`INSERT ... ON DUPLICATE KEY UPDATE`). `retention_days = 0` means no time limit (configurable by admin via `drush cset`).
 
+---
+
+## Sesión 2026-05-07
+
+**Resumen**: Multi-session sprint covering UX improvements across the business dashboard, auth modals, and modal scrollbars.
+
+**Trabajo realizado**:
+
+### create-business.tsx — Colors & category edit bug
+- Replaced `const AMBER` with `const GREEN = '#10B981'` / `const GREEN_DARK = '#059669'`
+- Replaced all `AMBER` color references (spinner, banner icon, checkmarks, save button background)
+- Updated dropdown active state: `'#FEF3C7'` → `'#ECFDF5'`, `'#92400E'` → `GREEN_DARK`
+
+### business-dashboard.tsx — Mobile bottom spacing
+- Added `paddingBottom: 32` to the content wrapper `<View>` on both mobile and desktop branches
+- Fixes last card sitting flush against the footer on mobile (My Businesses, Find Tours, My Promotions tabs)
+
+### global.css — Modal + auth scrollbars
+- Added `.modal-scroll` CSS class: 4px thin native webkit scrollbar for React Native Web modal ScrollViews
+- Expanded `.auth-scroll` from plain `overflow-y: auto` to include matching thin scrollbar styling
+- Pure CSS, no JS/DOM manipulation — avoids the old BUG-003 (absolute-position thumb inflating scrollHeight)
+
+### Modal ScrollViews — applied `.modal-scroll` class
+- `components/business/FindToursTab.tsx` (plan-picker modal + checkout modal ScrollViews)
+- `components/tour/TourOnboardingModal.tsx` (onboarding modal ScrollView)
+- `components/tour/CompletionPopup.tsx` (mobile + desktop completion card ScrollViews)
+- `components/tour/StepTimeline.tsx` (step details modal ScrollView)
+
+### FindToursTab.tsx — UX improvements
+- Improved tour card design: `borderRadius: 16`, softer shadow, padding 16, gap 16
+- Added `PAGE_SIZE = 10` + `visibleCount` state + "Load more" amber button (same style as homepage)
+- SlotBox icon changes: `mine` → `storefront`, `occupied` → `storefront-outline` (more intuitive for users)
+- Mobile slot layout: boxes appear below location label when `width < 600` using `useWindowDimensions`
+- Added `alignSelf: 'flex-start'` to `statusBadge` in `MyBusinessesTab.tsx`
+
+### AuthModals.tsx — Three UX fixes
+1. **Scrollbar**: `.auth-scroll` CSS already applied; now has thin 4px webkit scrollbar styling
+2. **Google pre-step**: Added `googlePreStep` boolean state to `RegisterModal`; clicking "Continue with Google" now switches to a pre-step view showing role cards (always all 3, no `allowProfessional` guard) + language picker + "Register with Google" button before triggering OAuth. Back button returns to normal form.
+3. **Drag-close fix**: Added `mouseDownTarget = useRef<EventTarget | null>(null)` to `AuthModals` wrapper. Backdrop `onClick` only calls `handleClose()` if `mousedown` also originated on the backdrop itself — prevents text drag-select from closing the modal.
+
+### i18n — 6 locale files (en, es, fr, de, it, el)
+- Added `auth.registerWithGoogle`, `auth.chooseYourProfile`, `auth.chooseYourProfileHint`
+- Added `common.back`
+
+**Archivos modificados**:
+- `components/layout/AuthModals.tsx`
+- `components/business/FindToursTab.tsx`
+- `components/business/MyBusinessesTab.tsx`
+- `components/tour/TourOnboardingModal.tsx`
+- `components/tour/CompletionPopup.tsx`
+- `components/tour/StepTimeline.tsx`
+- `app/[langcode]/business-dashboard.tsx`
+- `app/[langcode]/dashboard/create-business.tsx`
+- `global.css`
+- `i18n/locales/en.json`, `es.json`, `fr.json`, `de.json`, `it.json`, `el.json`
+
+**Pendiente / Próximos pasos**:
+- Runtime-test the Google pre-step flow (no automated test yet)
+- Run `ddev drush php:script web/scripts/create_business_categories.php` to create the 13 taxonomy terms and export them with `drush dcer`
+- Verify Stripe webhook is wired for local testing (was failing in local because webhook couldn't reach DDEV)
+

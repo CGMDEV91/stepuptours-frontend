@@ -303,7 +303,12 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
         <Pressable style={[styles.modalBox, step === 'checkout' && styles.modalBoxWide]} onPress={() => {}}>
 
           {step === 'plan-picker' && (
-            <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%' }} contentContainerStyle={{ gap: 0 }}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={{ width: '100%' }}
+              contentContainerStyle={{ gap: 0 }}
+              {...(Platform.OS === 'web' ? { className: 'modal-scroll' } as any : {})}
+            >
               {/* Header */}
               <View style={checkoutStyles.header}>
                 <Ionicons name="megaphone-outline" size={28} color={GREEN} />
@@ -417,7 +422,11 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
           )}
 
           {step === 'checkout' && clientSecret && Platform.OS === 'web' && (
-            <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%' }}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={{ width: '100%' }}
+              {...(Platform.OS === 'web' ? { className: 'modal-scroll' } as any : {})}
+            >
               {/* Checkout header with close button */}
               <View style={checkoutStyles.checkoutHeader}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>

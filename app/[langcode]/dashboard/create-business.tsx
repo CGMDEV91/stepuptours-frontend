@@ -33,7 +33,8 @@ import { ImagePickerField } from '../../../components/shared/ImagePickerField';
 import { uploadDrupalFile, getApiLanguage } from '../../../lib/drupal-client';
 import PageBanner from '../../../components/layout/PageBanner';
 
-const AMBER = '#F59E0B';
+const GREEN      = '#10B981';
+const GREEN_DARK = '#059669';
 const CONTENT_MAX_WIDTH = 720;
 
 interface FormState {
@@ -319,7 +320,7 @@ export default function CreateBusinessScreen() {
   if (isAuthLoading || !user || isLoadingBusiness) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={AMBER} />
+        <ActivityIndicator size="large" color={GREEN} />
       </View>
     );
   }
@@ -341,7 +342,7 @@ export default function CreateBusinessScreen() {
       >
         <PageBanner
           icon="business-outline"
-          iconBgColor={AMBER}
+          iconBgColor={GREEN}
           title={isEditMode ? 'Edit Business' : 'New Business'}
           subtitle={
             isEditMode
@@ -571,7 +572,7 @@ export default function CreateBusinessScreen() {
                     {item.name}
                   </Text>
                   {form.categoryId === item.id && item.id !== '' && (
-                    <Ionicons name="checkmark" size={18} color={AMBER} />
+                    <Ionicons name="checkmark" size={18} color={GREEN} />
                   )}
                 </TouchableOpacity>
               )}
@@ -621,7 +622,7 @@ export default function CreateBusinessScreen() {
                 >
                   <Text style={styles.pickerItemText}>{item.name}</Text>
                   {languageCode === item.id && (
-                    <Ionicons name="checkmark" size={18} color={AMBER} />
+                    <Ionicons name="checkmark" size={18} color={GREEN} />
                   )}
                 </TouchableOpacity>
               )}
@@ -679,7 +680,7 @@ export default function CreateBusinessScreen() {
                         {item.name}
                       </Text>
                       {form.categoryId === item.id && item.id !== '' && (
-                        <Ionicons name="checkmark" size={16} color={AMBER} />
+                        <Ionicons name="checkmark" size={16} color={GREEN} />
                       )}
                     </TouchableOpacity>
                   ))
@@ -702,7 +703,7 @@ export default function CreateBusinessScreen() {
                         {item.name}
                       </Text>
                       {languageCode === item.id && (
-                        <Ionicons name="checkmark" size={16} color={AMBER} />
+                        <Ionicons name="checkmark" size={16} color={GREEN} />
                       )}
                     </TouchableOpacity>
                   ))}
@@ -785,7 +786,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: AMBER,
+    backgroundColor: GREEN,
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: 8,
@@ -870,7 +871,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#F3F4F6',
   },
-  ddOptionActive: { backgroundColor: '#FEF3C7' },
+  ddOptionActive: { backgroundColor: '#ECFDF5' },
   ddOptionText: { fontSize: 14, color: '#111827' },
-  ddOptionTextActive: { fontWeight: '600', color: '#92400E' },
+  ddOptionTextActive: { fontWeight: '600', color: GREEN_DARK },
 });

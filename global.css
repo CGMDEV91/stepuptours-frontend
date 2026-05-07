@@ -58,8 +58,39 @@ body {
   border-radius: 10px !important;
 }
 
+/* Modal scrollable areas — thin native scrollbar, does not affect layout */
+.modal-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 4px !important;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.18) !important;
+  border-radius: 4px !important;
+}
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.modal-scroll {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent !important;
+}
+
+/* Desktop auth modal — show thin scrollbar when content overflows */
 .auth-scroll {
   overflow-y: auto;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent !important;
+}
+.auth-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 4px !important;
+}
+.auth-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.18) !important;
+  border-radius: 4px !important;
+}
+.auth-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
 @layer base {

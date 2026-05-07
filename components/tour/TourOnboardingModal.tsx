@@ -124,6 +124,7 @@ export function TourOnboardingModal({ visible, onClose }: TourOnboardingModalPro
             style={native.scroll}
             contentContainerStyle={native.scrollContent}
             showsVerticalScrollIndicator={false}
+            {...(Platform.OS === 'web' ? { className: 'modal-scroll' } as any : {})}
           >
             <OnboardingContent t={t} dontShow={dontShow} setDontShow={setDontShow} />
           </ScrollView>
