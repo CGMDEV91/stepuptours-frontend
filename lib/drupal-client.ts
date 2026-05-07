@@ -733,6 +733,8 @@ export function mapDrupalProfessionalProfile(raw: any): ProfessionalProfile {
     iban: raw.field_bank_iban ?? '',
     bic: raw.field_bank_bic ?? '',
     revenuePercentage: parseFloat(raw.field_revenue_percentage ?? '75'),
+    stripeAccountId: raw.field_stripe_account_id ?? null,
+    stripeOnboardingComplete: raw.field_stripe_onboarding_complete ?? false,
   };
 }
 

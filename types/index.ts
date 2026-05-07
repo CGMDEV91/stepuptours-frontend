@@ -148,6 +148,16 @@ export interface ProfessionalProfile {
   iban: string;
   bic: string;
   revenuePercentage: number;
+  stripeAccountId: string | null;
+  stripeOnboardingComplete: boolean;
+}
+
+export interface StripeOnboardStatus {
+  onboardingComplete: boolean;
+  stripeAccountId: string | null;
+  payoutsEnabled: boolean;
+  chargesEnabled: boolean;
+  detailsSubmitted: boolean;
 }
 
 export interface Donation {

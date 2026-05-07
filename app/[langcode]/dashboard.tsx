@@ -20,6 +20,7 @@ import { MyToursTab } from '../../components/dashboard/MyToursTab';
 import { SubscriptionTab } from '../../components/dashboard/SubscriptionTab';
 import { PaymentDataTab } from '../../components/dashboard/PaymentDataTab';
 import { DonationsTab } from '../../components/dashboard/DonationsTab';
+import { PayoutsTab } from '../../components/dashboard/PayoutsTab';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
@@ -28,7 +29,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'tours' | 'subscription' | 'payment' | 'donations';
+type TabId = 'tours' | 'subscription' | 'payment' | 'donations' | 'payouts';
 
 interface Tab {
   id: TabId;
@@ -38,12 +39,13 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'subscription', labelKey: 'dashboard.tabs.subscription', icon: 'card-outline' },
-  { id: 'tours', labelKey: 'dashboard.tabs.tours', icon: 'map-outline' },
-  { id: 'payment', labelKey: 'dashboard.tabs.payment', icon: 'wallet-outline' },
-  { id: 'donations', labelKey: 'dashboard.tabs.donations', icon: 'heart-outline' },
+  { id: 'tours',        labelKey: 'dashboard.tabs.tours',        icon: 'map-outline' },
+  { id: 'payment',      labelKey: 'dashboard.tabs.payment',      icon: 'wallet-outline' },
+  { id: 'donations',    labelKey: 'dashboard.tabs.donations',    icon: 'heart-outline' },
+  { id: 'payouts',      labelKey: 'dashboard.tabs.payouts',      icon: 'cash-outline' },
 ];
 
-const VALID_TABS: TabId[] = ['tours', 'subscription', 'payment', 'donations'];
+const VALID_TABS: TabId[] = ['tours', 'subscription', 'payment', 'donations', 'payouts'];
 
 function isValidTab(value: string): value is TabId {
   return VALID_TABS.includes(value as TabId);
@@ -199,22 +201,28 @@ export default function DashboardScreen() {
     </View>
   );
 
+  const content = (
+    <View style={isMobile
+      ? { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32 }
+      : { maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32 }
+    }>
+      {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
+      {activeTab === 'tours' && <MyToursTab userId={user.id} />}
+      {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
+      {activeTab === 'donations' && <DonationsTab userId={user.id} />}
+      {activeTab === 'payouts' && <PayoutsTab onGoToPayment={() => setActiveTab('payment')} />}
+    </View>
+  );
+
   return (
     <View style={{ flex: 1, minHeight: 0, backgroundColor: '#F9FAFB', ...webFullHeight }}>
       {isMobile ? (
         // ── Mobile: banner + tabs + contenido en scroll único ────────────
-        <PageScrollView
-          ref={scrollRef}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 0 }}
-        >
-          <PageBanner icon="grid-outline" iconBgColor="#F59E0B" title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} showBack={false} />
-          {mobileTabBar}
-          <View style={{ paddingHorizontal: 16, paddingTop: 20 }}>
-            {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
-            {activeTab === 'tours' && <MyToursTab userId={user.id} />}
-            {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
-            {activeTab === 'donations' && <DonationsTab userId={user.id} />}
+        <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={{ flex: 1 }}>
+            <PageBanner icon="grid-outline" iconBgColor="#F59E0B" title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} showBack={false} />
+            {mobileTabBar}
+            {content}
           </View>
           <Footer />
         </PageScrollView>
@@ -222,17 +230,10 @@ export default function DashboardScreen() {
         // ── Desktop: pills sticky + contenido en scroll ───────────────────
         <>
           {desktopTabBar}
-          <PageScrollView
-            ref={scrollRef}
-            style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 0 }}
-          >
-            <PageBanner icon="grid-outline" iconBgColor="#F59E0B" title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} showBack={false} />
-            <View style={{ maxWidth: CONTENT_MAX_WIDTH, width: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingTop: 20 }}>
-              {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
-              {activeTab === 'tours' && <MyToursTab userId={user.id} />}
-              {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
-              {activeTab === 'donations' && <DonationsTab userId={user.id} />}
+          <PageScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+            <View style={{ flex: 1 }}>
+              <PageBanner icon="grid-outline" iconBgColor="#F59E0B" title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} showBack={false} />
+              {content}
             </View>
             <Footer />
           </PageScrollView>
