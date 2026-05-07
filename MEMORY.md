@@ -85,3 +85,27 @@
 - Run `ddev drush php:script web/scripts/create_business_categories.php` to create the 13 taxonomy terms and export them with `drush dcer`
 - Verify Stripe webhook is wired for local testing (was failing in local because webhook couldn't reach DDEV)
 
+---
+
+## Sesión 2026-05-07 (continuación) — Business Analytics Tab
+
+**Resumen**: Nuevo tab "Analíticas" en el dashboard individual de negocio (`/business-dashboard/[businessId]`).
+
+**Trabajo realizado**:
+- `services/analytics.service.ts` — añadido parámetro `langcode?` a `fetchBusinessAnalytics`
+- `components/admin/AnalyticsTab.tsx` — exportados `Preset`, `formatDate`, `getPresetRange`, `fmtSecs`, `InfoTooltip`, `SummaryCard`, `StepDrilldown`
+- `components/business/BusinessAnalyticsTab.tsx` — **creado nuevo**: 4 summary cards (step views, link clicks, CTR, avg time), sección de desglose de clicks (web/phone/maps), tabla top tours con acceso a drilldown por pasos; preset 7d/30d/90d/all; accent color verde
+- `app/[langcode]/business-dashboard/[businessId].tsx` — añadido `TabId 'analytics'`, `TABS` movido dentro del componente (para acceder a `t()`), render case del nuevo tab
+- `i18n/locales/{en,es,fr,de,it,el}.json` — añadidas 27 claves nuevas: `business.tabs.analytics`, `business.analytics.*`, `common.details`
+
+**Archivos modificados**:
+- `services/analytics.service.ts`
+- `components/admin/AnalyticsTab.tsx`
+- `components/business/BusinessAnalyticsTab.tsx` (nuevo)
+- `app/[langcode]/business-dashboard/[businessId].tsx`
+- `i18n/locales/en.json`, `es.json`, `fr.json`, `de.json`, `it.json`, `el.json`
+
+**Pendiente / Próximos pasos**:
+- Probar con datos reales (necesita analytics en BD para el negocio)
+- El step drilldown desde BusinessAnalyticsTab usa `fetchTourAnalytics` que requiere `access analytics dashboard` (admin). Si el business owner no es admin, el endpoint devolverá 403. Evaluar si añadir permiso o mostrar solo la vista básica de top_tours sin drilldown para no-admins.
+

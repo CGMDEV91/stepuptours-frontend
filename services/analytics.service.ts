@@ -285,13 +285,18 @@ export async function fetchAnalyticsSummary(
 export async function fetchBusinessAnalytics(
   businessId: string,
   from: string,
-  to: string
+  to: string,
+  langcode?: string
 ): Promise<BusinessAnalytics> {
+  const params = new URLSearchParams({ from, to });
+  if (langcode) params.set('langcode', langcode);
   const session = useAuthStore.getState().session;
   const res = await fetch(
-    `${BASE_URL}/api/analytics/business/${businessId}?from=${from}&to=${to}`,
+    `${BASE_URL}/api/analytics/business/${businessId}?${params}`,
     { headers: { Authorization: `Basic ${session?.token}` } }
   );
+  if (res.status === 403) throw Object.assign(new Error('subscription_required'), { status: 403 });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 

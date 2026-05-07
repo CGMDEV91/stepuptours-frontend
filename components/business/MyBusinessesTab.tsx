@@ -82,6 +82,14 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
         </View>
       )}
 
+      {/* Info banner — shown when there are businesses */}
+      {!loading && businesses.length > 0 && (
+        <View style={styles.infoBanner}>
+          <Ionicons name="information-circle-outline" size={18} color="#0369A1" style={{ marginTop: 1 }} />
+          <Text style={styles.infoBannerText}>{t('business.myBusinesses.manageTip')}</Text>
+        </View>
+      )}
+
       {!loading && businesses.length === 0 && (
         <View style={styles.emptyBox}>
           <Ionicons name="storefront-outline" size={48} color="#D1D5DB" />
@@ -203,6 +211,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  infoBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+  },
+  infoBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#1E40AF',
+    lineHeight: 19,
   },
   errorBox: {
     flexDirection: 'row',

@@ -33,13 +33,13 @@ const PURPLE = '#8B5CF6';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-type Preset = '7d' | '30d' | '90d' | 'all';
+export type Preset = '7d' | '30d' | '90d' | 'all';
 
-function formatDate(d: Date): string {
+export function formatDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-function getPresetRange(preset: Preset): { from: string; to: string } {
+export function getPresetRange(preset: Preset): { from: string; to: string } {
   const to   = new Date();
   const from = new Date();
   if (preset === 'all') return { from: '2020-01-01', to: formatDate(to) };
@@ -47,7 +47,7 @@ function getPresetRange(preset: Preset): { from: string; to: string } {
   return { from: formatDate(from), to: formatDate(to) };
 }
 
-function fmtSecs(s: number): string {
+export function fmtSecs(s: number): string {
   if (!s || s <= 0) return '—';
   if (s < 60) return `${Math.round(s)}s`;
   return `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
@@ -102,7 +102,7 @@ const BIZ_TABLE_MIN_W = 100 + 118 + 60 + 90 + 72 + 72 + 136 + 32;
 
 // ── InfoTooltip — tap/click to open, tap/click outside to close ───────────────
 
-function InfoTooltip({ text }: { text: string }) {
+export function InfoTooltip({ text }: { text: string }) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -138,7 +138,7 @@ function InfoTooltip({ text }: { text: string }) {
 
 // ── Summary card ──────────────────────────────────────────────────────────────
 
-function SummaryCard({
+export function SummaryCard({
                        icon, iconColor, label, value, sub, loading, tooltip,
                      }: {
   icon: keyof typeof Ionicons.glyphMap;
@@ -406,7 +406,7 @@ function ToursTable({
 
 // ── Step drilldown view ───────────────────────────────────────────────────────
 
-function StepDrilldown({ detail, onBack, containerWidth }: { detail: TourAnalyticsDetail; onBack: () => void; containerWidth: number }) {
+export function StepDrilldown({ detail, onBack, containerWidth }: { detail: TourAnalyticsDetail; onBack: () => void; containerWidth: number }) {
   const { t } = useTranslation();
   const steps = [...detail.steps].sort((a, b) => a.order - b.order);
 

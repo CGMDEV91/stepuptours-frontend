@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../stores/auth.store';
 import { getBusinessById, updateBusiness } from '../../../services/business.service';
 import { MyPromotionsTab } from '../../../components/business/MyPromotionsTab';
+import { BusinessAnalyticsTab } from '../../../components/business/BusinessAnalyticsTab';
 import { ImagePickerField } from '../../../components/shared/ImagePickerField';
 import PageBanner from '../../../components/layout/PageBanner';
 import Footer from '../../../components/layout/Footer';
@@ -33,18 +34,13 @@ const GREEN = '#10B981';
 const GREEN_DARK = '#059669';
 const CONTENT_MAX_WIDTH = 860;
 
-type TabId = 'overview' | 'promotions';
+type TabId = 'overview' | 'promotions' | 'analytics';
 
 interface Tab {
   id: TabId;
   label: string;
   icon: string;
 }
-
-const TABS: Tab[] = [
-  { id: 'overview',    label: 'Información',   icon: 'storefront-outline' },
-  { id: 'promotions',  label: 'Promociones',   icon: 'megaphone-outline' },
-];
 
 // ── Tab: Información / edición ────────────────────────────────────────────────
 
@@ -211,6 +207,12 @@ export default function BusinessDetailScreen() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
+  const TABS: Tab[] = [
+    { id: 'overview',   label: 'Información',                    icon: 'storefront-outline' },
+    { id: 'promotions', label: 'Promociones',                    icon: 'megaphone-outline'  },
+    { id: 'analytics',  label: t('business.tabs.analytics'),     icon: 'bar-chart-outline'  },
+  ];
+
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
   const isBusiness = user?.roles?.includes('business');
@@ -316,6 +318,9 @@ export default function BusinessDetailScreen() {
       )}
       {activeTab === 'promotions' && user && (
         <MyPromotionsTab userId={user.id} businessId={business.id} />
+      )}
+      {activeTab === 'analytics' && (
+        <BusinessAnalyticsTab businessId={business.id} />
       )}
     </View>
   );
