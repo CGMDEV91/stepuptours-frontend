@@ -1,9 +1,9 @@
 // components/shared/ImagePickerField.tsx
 // Reusable image pick + preview component for forms.
-// Web:    hidden <input type="file"> triggered by a styled button
+// Web:    hidden <input type="file"> rendered in JSX, triggered by a styled button
 // Native: expo-image-picker launchImageLibraryAsync
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -32,24 +32,22 @@ export function ImagePickerField({
   onImageCleared,
   label = 'Image',
 }: ImagePickerFieldProps) {
-  // Web: reference to the hidden <input type="file"> element
+  // Web: ref to the persistent hidden <input type="file"> element in the DOM.
+  // We do NOT use document.createElement() because detached elements can be
+  // garbage-collected before the async file-picker dialog returns, causing
+  // the onchange closure to lose its callback reference (TypeError in prod builds).
   const fileInputRef = useRef<any>(null);
 
-  const handlePickWeb = useCallback(() => {
-    if (Platform.OS !== 'web') return;
-
-    // Create a temporary file input and trigger it
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e: any) => {
-      const file: File = e.target?.files?.[0];
-      if (!file) return;
-      const uri = URL.createObjectURL(file);
-      onImageSelected(uri, file.name);
-    };
-    input.click();
+  // Always hold the latest callback in a ref so the input's onChange handler
+  // is never stale regardless of parent re-renders.
+  const onImageSelectedRef = useRef(onImageSelected);
+  useEffect(() => {
+    onImageSelectedRef.current = onImageSelected;
   }, [onImageSelected]);
+
+  const handlePickWeb = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   const handlePickNative = useCallback(async () => {
     try {
@@ -77,6 +75,26 @@ export function ImagePickerField({
 
   return (
     <View style={styles.container}>
+      {/* Persistent hidden file input for web — keeps the DOM node alive through
+          the async file-picker dialog so the onChange closure is never GC'd. */}
+      {Platform.OS === 'web' && (
+        // @ts-ignore — raw <input> is valid React Native Web DOM passthrough
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={(e: any) => {
+            const file: File = e.target?.files?.[0];
+            if (!file) return;
+            const uri = URL.createObjectURL(file);
+            onImageSelectedRef.current(uri, file.name);
+            // Reset so the same file can be re-selected next time
+            if (fileInputRef.current) fileInputRef.current.value = '';
+          }}
+        />
+      )}
+
       <Text style={styles.label}>{label}</Text>
 
       {previewUri ? (
