@@ -263,7 +263,7 @@ export default function CreateBusinessScreen() {
     setValidationError(null);
 
     if (!form.name.trim()) {
-      setValidationError(t('createBusiness.validation.nameRequired', 'Business name is required'));
+      setValidationError(t('createBusiness.validation.nameRequired'));
       return;
     }
 
@@ -311,7 +311,7 @@ export default function CreateBusinessScreen() {
         router.replace(returnPath as any);
       }
     } catch (err: any) {
-      setValidationError(err.message ?? 'Error saving business');
+      setValidationError(err.message ?? t('createBusiness.error.save'));
     } finally {
       setSaving(false);
     }
@@ -343,11 +343,11 @@ export default function CreateBusinessScreen() {
         <PageBanner
           icon="business-outline"
           iconBgColor={GREEN}
-          title={isEditMode ? 'Edit Business' : 'New Business'}
+          title={isEditMode ? t('createBusiness.title.edit') : t('createBusiness.title.new')}
           subtitle={
             isEditMode
-              ? 'Update your business details'
-              : 'Add a new business to your portfolio'
+              ? t('createBusiness.subtitle.edit')
+              : t('createBusiness.subtitle.new')
           }
           showBack
         />
@@ -355,28 +355,28 @@ export default function CreateBusinessScreen() {
         <View style={contentStyle}>
           {/* Section: Business Info */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Business Details</Text>
+            <Text style={styles.sectionTitle}>{t('createBusiness.section.details')}</Text>
 
             {/* Name */}
             <Text style={styles.label}>
-              Name <Text style={styles.required}>*</Text>
+              {t('createBusiness.field.name')} <Text style={styles.required}>*</Text>
             </Text>
             <TextInput
               style={styles.input}
               value={form.name}
               onChangeText={(v) => update('name', v)}
-              placeholder="Business name"
+              placeholder={t('createBusiness.placeholder.name')}
               placeholderTextColor="#9CA3AF"
               maxLength={200}
             />
 
             {/* Description */}
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>{t('createBusiness.field.description')}</Text>
             <TextInput
               style={[styles.input, styles.inputMultiline]}
               value={form.description}
               onChangeText={(v) => update('description', v)}
-              placeholder="Short description of the business"
+              placeholder={t('createBusiness.placeholder.description')}
               placeholderTextColor="#9CA3AF"
               multiline
               numberOfLines={4}
@@ -384,7 +384,7 @@ export default function CreateBusinessScreen() {
             />
 
             {/* Category */}
-            <Text style={styles.label}>Category</Text>
+            <Text style={styles.label}>{t('createBusiness.field.category')}</Text>
             <View ref={categoryBtnRef} collapsable={false}>
               <TouchableOpacity
                 style={styles.input}
@@ -397,7 +397,7 @@ export default function CreateBusinessScreen() {
                     fontSize: 15,
                   }}
                 >
-                  {categoryLabel || 'Select category'}
+                  {categoryLabel || t('createBusiness.placeholder.category')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -426,7 +426,7 @@ export default function CreateBusinessScreen() {
             </View>
 
             <ImagePickerField
-              label="Logo"
+              label={t('createBusiness.field.logo')}
               currentImageUrl={imageUri ?? existingLogoUrl}
               onImageSelected={(uri, filename) => {
                 setImageUri(uri);
@@ -444,40 +444,40 @@ export default function CreateBusinessScreen() {
 
           {/* Section: Contact */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Contact & Location</Text>
+            <Text style={styles.sectionTitle}>{t('createBusiness.section.contact')}</Text>
 
             {/* Website */}
-            <Text style={styles.label}>Website</Text>
+            <Text style={styles.label}>{t('createBusiness.field.website')}</Text>
             <TextInput
               style={styles.input}
               value={form.website}
               onChangeText={(v) => update('website', v)}
-              placeholder="https://example.com"
+              placeholder={t('createBusiness.placeholder.website')}
               placeholderTextColor="#9CA3AF"
               autoCapitalize="none"
               keyboardType="url"
             />
 
             {/* Phone */}
-            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.label}>{t('createBusiness.field.phone')}</Text>
             <TextInput
               style={styles.input}
               value={form.phone}
               onChangeText={(v) => update('phone', v)}
-              placeholder="+34 600 000 000"
+              placeholder={t('createBusiness.placeholder.phone')}
               placeholderTextColor="#9CA3AF"
               keyboardType="phone-pad"
             />
 
             {/* Location */}
-            <Text style={styles.label}>Location (optional)</Text>
+            <Text style={styles.label}>{t('createBusiness.field.location')}</Text>
             <View style={styles.row}>
               <View style={styles.rowField}>
                 <TextInput
                   style={styles.input}
                   value={form.lat}
                   onChangeText={(v) => update('lat', v)}
-                  placeholder="Lat: 41.38"
+                  placeholder={t('createBusiness.placeholder.lat')}
                   placeholderTextColor="#9CA3AF"
                   keyboardType="decimal-pad"
                 />
@@ -487,7 +487,7 @@ export default function CreateBusinessScreen() {
                   style={styles.input}
                   value={form.lon}
                   onChangeText={(v) => update('lon', v)}
-                  placeholder="Lon: 2.17"
+                  placeholder={t('createBusiness.placeholder.lon')}
                   placeholderTextColor="#9CA3AF"
                   keyboardType="decimal-pad"
                 />
@@ -516,7 +516,7 @@ export default function CreateBusinessScreen() {
               <>
                 <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />
                 <Text style={styles.saveBtnText}>
-                  {isEditMode ? 'Save Changes' : 'Create Business'}
+                  {isEditMode ? t('createBusiness.action.save') : t('createBusiness.action.create')}
                 </Text>
               </>
             )}
@@ -536,7 +536,7 @@ export default function CreateBusinessScreen() {
         >
           <View style={{ flex: 1, minHeight: 0, backgroundColor: '#FFFFFF' }}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalHeaderTitle}>Category</Text>
+              <Text style={styles.modalHeaderTitle}>{t('createBusiness.field.category')}</Text>
               <TouchableOpacity
                 onPress={() => setCategoryPickerVisible(false)}
                 activeOpacity={0.7}
@@ -548,13 +548,13 @@ export default function CreateBusinessScreen() {
               style={styles.pickerSearch}
               value={categorySearch}
               onChangeText={setCategorySearch}
-              placeholder="Search category..."
+              placeholder={t('createBusiness.picker.searchCategory')}
               placeholderTextColor="#9CA3AF"
               autoFocus
               {...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {})}
             />
             <FlatList
-              data={[{ id: '', name: 'No category' }, ...filteredCategories]}
+              data={[{ id: '', name: t('createBusiness.picker.noCategory') }, ...filteredCategories]}
               keyExtractor={(item) => item.id || '__clear__'}
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
@@ -605,7 +605,7 @@ export default function CreateBusinessScreen() {
               style={styles.pickerSearch}
               value={langSearch}
               onChangeText={setLangSearch}
-              placeholder="Search language..."
+              placeholder={t('createBusiness.picker.searchLanguage')}
               placeholderTextColor="#9CA3AF"
               autoFocus
               {...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {})}
@@ -652,7 +652,7 @@ export default function CreateBusinessScreen() {
                 style={styles.ddSearchInput}
                 value={ddSearch}
                 onChangeText={setDdSearch}
-                placeholder={ddConfig.type === 'category' ? 'Search category...' : 'Search language...'}
+                placeholder={ddConfig.type === 'category' ? t('createBusiness.picker.searchCategory') : t('createBusiness.picker.searchLanguage')}
                 placeholderTextColor="#9CA3AF"
                 autoFocus
                 {...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {})}
@@ -660,7 +660,7 @@ export default function CreateBusinessScreen() {
             </View>
             <ScrollView style={{ maxHeight: 280 }} keyboardShouldPersistTaps="handled">
               {ddConfig.type === 'category'
-                ? [{ id: '', name: 'No category' }, ...filteredCategoriesDd].map((item) => (
+                ? [{ id: '', name: t('createBusiness.picker.noCategory') }, ...filteredCategoriesDd].map((item) => (
                     <TouchableOpacity
                       key={item.id || '__clear__'}
                       style={[

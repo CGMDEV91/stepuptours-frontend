@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export interface ImagePickerFieldProps {
   /** Existing image URL shown in edit mode before a new file is selected */
@@ -21,6 +22,7 @@ export interface ImagePickerFieldProps {
   onImageSelected: (uri: string, filename: string) => void;
   /** Called when the user removes the current/selected image */
   onImageCleared: () => void;
+  /** Optional label — defaults to translated "Image" if omitted */
   label?: string;
 }
 
@@ -30,8 +32,9 @@ export function ImagePickerField({
   currentImageUrl,
   onImageSelected,
   onImageCleared,
-  label = 'Image',
+  label,
 }: ImagePickerFieldProps) {
+  const { t } = useTranslation();
   // Web: ref to the persistent hidden <input type="file"> element in the DOM.
   // We do NOT use document.createElement() because detached elements can be
   // garbage-collected before the async file-picker dialog returns, causing
@@ -95,7 +98,7 @@ export function ImagePickerField({
         />
       )}
 
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>{label ?? t('imagePicker.label', 'Image')}</Text>
 
       {previewUri ? (
         <View style={styles.previewContainer}>
@@ -111,7 +114,7 @@ export function ImagePickerField({
               activeOpacity={0.8}
             >
               <Ionicons name="swap-horizontal-outline" size={14} color={AMBER} />
-              <Text style={styles.changeBtnText}>Change</Text>
+              <Text style={styles.changeBtnText}>{t('imagePicker.change')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.removeBtn}
@@ -119,7 +122,7 @@ export function ImagePickerField({
               activeOpacity={0.8}
             >
               <Ionicons name="trash-outline" size={14} color="#EF4444" />
-              <Text style={styles.removeBtnText}>Remove</Text>
+              <Text style={styles.removeBtnText}>{t('imagePicker.remove')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -130,7 +133,7 @@ export function ImagePickerField({
           activeOpacity={0.8}
         >
           <Ionicons name="image-outline" size={22} color="#9CA3AF" />
-          <Text style={styles.pickBtnText}>Select image</Text>
+          <Text style={styles.pickBtnText}>{t('imagePicker.selectImage')}</Text>
         </TouchableOpacity>
       )}
     </View>
