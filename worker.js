@@ -1,10 +1,10 @@
 function slugify(text) {
   return text
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
 }
 
 function buildSlug(country, city, nid) {
@@ -16,8 +16,13 @@ function buildSlug(country, city, nid) {
   return parts.join('-');
 }
 
-// Matches /{lang}/tour/{uuid} and /{lang}/tour/{uuid}/steps
 const UUID_TOUR_RE = /^\/([a-z]{2})\/tour\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(\/steps)?$/;
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
 
 export default {
   async fetch(request, env) {
@@ -31,12 +36,12 @@ export default {
       const prefix = lang === 'en' ? '' : `/${lang}`;
       try {
         const apiResp = await fetch(
-          `${apiBase}${prefix}/jsonapi/node/tour/${uuid}` +
+            `${apiBase}${prefix}/jsonapi/node/tour/${uuid}` +
             `?fields[node--tour]=drupal_internal__nid` +
             `&include=field_city,field_country` +
             `&fields[taxonomy_term--cities]=name` +
             `&fields[taxonomy_term--countries]=name`,
-          { headers: { Accept: 'application/vnd.api+json' } },
+            { headers: { Accept: 'application/vnd.api+json' } },
         );
         if (apiResp.ok) {
           const data = await apiResp.json();
@@ -49,35 +54,26 @@ export default {
           if (nid) {
             const slug = buildSlug(country, city, nid);
             return Response.redirect(
-              `${url.origin}/${lang}/tour/${slug}${suffix ?? ''}`,
-              301,
+                `${url.origin}/${lang}/tour/${slug}${suffix ?? ''}`,
+                301,
             );
           }
         }
       } catch {
-        // If the Drupal call fails, fall through — the SPA handles UUIDs natively.
+        // fall through — the SPA handles UUIDs natively
       }
     }
 
-    // Proxy TTS MP3s with CORS headers
-    if (url.pathname.startsWith('/sites/default/files/tts/')) {
-      const upstream = 'https://dev-step-up-tours.pantheonsite.io' + url.pathname;
-
+    // Proxy /sites/default/files/* desde Pantheon con headers CORS
+    // Cubre tanto imágenes como TTS MP3s y cualquier otro asset estático
+    if (url.pathname.startsWith('/sites/default/files/')) {
       if (request.method === 'OPTIONS') {
-        return new Response(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          },
-        });
+        return new Response(null, { status: 204, headers: CORS_HEADERS });
       }
-
+      const upstream = 'https://dev-step-up-tours.pantheonsite.io' + url.pathname;
       const response = await fetch(upstream);
       const newResponse = new Response(response.body, response);
-      newResponse.headers.set('Access-Control-Allow-Origin', '*');
-      newResponse.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      Object.entries(CORS_HEADERS).forEach(([k, v]) => newResponse.headers.set(k, v));
       return newResponse;
     }
 

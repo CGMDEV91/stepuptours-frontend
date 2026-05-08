@@ -168,18 +168,15 @@ function resolveImageUrl(raw: any): string | null {
   const url = raw?.uri?.url ?? raw?.url ?? null;
   if (!url) return null;
   if (url.startsWith('http')) {
-    // Always rewrite image URLs to use the current API host so they work
-    // regardless of whether Drupal returns ddev.site, localhost:PORT or any
-    // other internal host (e.g. when accessed via ngrok or a tunnel).
     try {
-      const base = new URL(BASE_URL);
       const parsed = new URL(url);
-      if (parsed.host !== base.host) {
-        parsed.protocol = base.protocol;
-        parsed.host = base.host;
+      // Redirigir assets de Pantheon por el Worker de Cloudflare (que añade CORS)
+      if (parsed.hostname.endsWith('pantheonsite.io')) {
+        parsed.protocol = 'https:';
+        parsed.hostname = 'stepuptours.com';
         return parsed.toString();
       }
-    } catch { /* ignore malformed URLs */ }
+    } catch { /* ignore */ }
     return url;
   }
   return `${BASE_URL}${url}`;
@@ -775,7 +772,7 @@ export function mapDrupalTourWithSlots(raw: any): TourWithSlots {
     tourId: raw.tourId ?? '',
     tourTitle: raw.tourTitle ?? '',
     city: raw.city ?? null,
-    image: raw.image ?? null,
+    image: raw.image ? resolveImageUrl({ url: raw.image }) : null,
     hasDetailSlot: raw.hasDetailSlot ?? false,
     detailOccupied: raw.detailOccupied ?? false,
     availableStepSlots: (raw.availableStepSlots ?? []).map(mapSlot),
