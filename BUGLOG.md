@@ -5,6 +5,19 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 
 ---
 
+## BUG-004 — Imágenes de Drupal bloqueadas por CORS en producción
+
+**Status:** Fixed
+**Date:** 2026-05-08
+**Symptom:** En producción (`stepuptours.com`), las tarjetas de tour y la página de detalle mostraban el área de imagen en blanco. La consola del navegador mostraba errores CORS al intentar cargar archivos estáticos desde `dev-step-up-tours.pantheonsite.io`.
+**Root cause (dos causas combinadas):**
+1. `resolveImageUrl` en `lib/drupal-client.ts` solo aplicaba el rewrite Pantheon→`stepuptours.com` (vía Cloudflare Worker) cuando la URL empezaba con `http`. Drupal devuelve `uri.url` como ruta relativa (`/sites/default/files/...`); el código le anteponía `BASE_URL` directamente, generando la URL absoluta de Pantheon sin pasar por el check de rewrite.
+2. En `TourCard.tsx` y en `app/[langcode]/tour/[id].tsx`, `expo-image` recibía `headers: {}` (vacío en producción). Pasar este prop fuerza a expo-image a usar `fetch()` en lugar del elemento `<img>` nativo en web, lo que activa CORS incluso si la URL fuera correcta.
+**Fix:** Refactorizado `resolveImageUrl` para construir siempre la URL completa primero y luego aplicar el rewrite de Pantheon, independientemente del formato original. En los dos componentes de imagen, el prop `headers` solo se pasa cuando `imageHeaders` no está vacío.
+**Files:** `lib/drupal-client.ts`, `components/tour/TourCard.tsx`, `app/[langcode]/tour/[id].tsx`
+
+---
+
 ## BUG-003 — All pages allow scroll past Footer into empty white space on iOS Safari and Chrome Android
 
 **Status:** Fixed
