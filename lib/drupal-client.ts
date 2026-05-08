@@ -167,19 +167,20 @@ export function buildPage(page: number, limit: number): string {
 function resolveImageUrl(raw: any): string | null {
   const url = raw?.uri?.url ?? raw?.url ?? null;
   if (!url) return null;
-  if (url.startsWith('http')) {
-    try {
-      const parsed = new URL(url);
-      // Redirigir assets de Pantheon por el Worker de Cloudflare (que añade CORS)
-      if (parsed.hostname.endsWith('pantheonsite.io')) {
-        parsed.protocol = 'https:';
-        parsed.hostname = 'stepuptours.com';
-        return parsed.toString();
-      }
-    } catch { /* ignore */ }
-    return url;
-  }
-  return `${BASE_URL}${url}`;
+
+  const fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
+
+  try {
+    const parsed = new URL(fullUrl);
+    // Redirigir assets de Pantheon por el Worker de Cloudflare (que añade CORS)
+    if (parsed.hostname.endsWith('pantheonsite.io')) {
+      parsed.protocol = 'https:';
+      parsed.hostname = 'stepuptours.com';
+      return parsed.toString();
+    }
+  } catch { /* ignore */ }
+
+  return fullUrl;
 }
 
 // ── Geofield helper ───────────────────────────────────────────────────────────

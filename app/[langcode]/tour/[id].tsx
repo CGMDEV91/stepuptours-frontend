@@ -221,7 +221,14 @@ export default function TourDetailScreen() {
         {/* Banner */}
         <View style={styles.bannerContainer}>
           <Image
-            source={tour.image ? { uri: tour.image, headers: imageHeaders } : stableDefault}
+            source={
+              tour.image
+                ? {
+                    uri: tour.image,
+                    ...(Object.keys(imageHeaders).length > 0 ? { headers: imageHeaders } : {}),
+                  }
+                : stableDefault
+            }
             style={styles.bannerImage}
             contentFit="cover"
             transition={300}

@@ -83,7 +83,14 @@ export function TourCard({
       {/* Image with overlays */}
       <View style={[styles.imageContainer, { height: imageHeight }]}>
         <Image
-          source={tour.image ? { uri: tour.image, headers: imageHeaders } : stableDefault}
+          source={
+            tour.image
+              ? {
+                  uri: tour.image,
+                  ...(Object.keys(imageHeaders).length > 0 ? { headers: imageHeaders } : {}),
+                }
+              : stableDefault
+          }
           style={styles.image}
           contentFit="cover"
           transition={200}
