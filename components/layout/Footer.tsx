@@ -56,9 +56,7 @@ export default function Footer() {
 
   useEffect(() => {
     const base = process.env.EXPO_PUBLIC_API_URL ?? '';
-    fetch(`${base}/api/site-settings`, {
-      headers: { 'ngrok-skip-browser-warning': 'true' },
-    })
+    fetch(`${base}/api/site-settings`)
         .then(r => r.json())
         .then((data) => {
           setSettings(prev => ({

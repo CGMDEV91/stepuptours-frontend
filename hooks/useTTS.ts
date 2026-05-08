@@ -58,9 +58,7 @@ async function fetchPlayableUri(text: string, langcode: string, meta?: TtsMeta):
     if (Platform.OS !== 'web') return audioUrl;
 
     // ✅ Fix: usar audioUrl completo en lugar de solo el pathname
-    const audioRes = await fetch(audioUrl, {
-      headers: { 'ngrok-skip-browser-warning': '1' },
-    });
+    const audioRes = await fetch(audioUrl);
 
     if (!audioRes.ok) throw new Error(`Audio fetch ${audioRes.status}`);
     const audioBuf = await audioRes.arrayBuffer();
