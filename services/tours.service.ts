@@ -142,13 +142,13 @@ async function batchGetStepCounts(tourIds: string[]): Promise<Record<string, num
   // tours even when steps existed, likely due to how the IN condition is parsed
   // server-side. Parallel individual calls are guaranteed correct.
   const results = await Promise.allSettled(
-    missing.map(async (id) => {
-      const steps = await drupalGetJsonApi(
-        '/node/tour_step',
-        `filter[field_tour.id]=${id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
-      );
-      return { id, count: Array.isArray(steps) ? steps.length : 0 };
-    })
+      missing.map(async (id) => {
+        const steps = await drupalGetJsonApi(
+            '/node/tour_step',
+            `filter[field_tour.id]=${id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
+        );
+        return { id, count: Array.isArray(steps) ? steps.length : 0 };
+      })
   );
 
   const fetched: Record<string, number> = {};
@@ -185,9 +185,9 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
   const drupalFilters: Record<string, any> = { status: 1 };
   if (city) drupalFilters['field_city.name'] = city;
 
-  let sortParam = 'sort=-field_average_rate';
-  if (sort === 'alphabetical') sortParam = 'sort=title';
-  else if (sort === 'popular') sortParam = 'sort=-field_donation_count';
+  let sortParam = 'sort=-field_average_rate,drupal_internal__nid';
+  if (sort === 'alphabetical') sortParam = 'sort=title,drupal_internal__nid';
+  else if (sort === 'popular') sortParam = 'sort=-field_donation_count,drupal_internal__nid';
 
   const filterStr = [
     buildFilters(drupalFilters),
@@ -244,8 +244,8 @@ export async function getTourById(id: string): Promise<Tour> {
     // Use base URL (no language prefix) so the count includes all published steps
     // regardless of whether they have a translation in the current language.
     const steps = await drupalGetJsonApiBase(
-      '/node/tour_step',
-      `filter[field_tour.id]=${raw.id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
+        '/node/tour_step',
+        `filter[field_tour.id]=${raw.id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
     );
     tour.stopsCount = steps.length;
   } catch {
@@ -272,8 +272,8 @@ export async function getTourByNid(nid: number): Promise<Tour> {
   const tour = mapDrupalTour(list[0]);
   try {
     const steps = await drupalGetJsonApiBase(
-      '/node/tour_step',
-      `filter[field_tour.id]=${list[0].id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`,
+        '/node/tour_step',
+        `filter[field_tour.id]=${list[0].id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`,
     );
     tour.stopsCount = steps.length;
   } catch {
@@ -315,8 +315,8 @@ export async function getTourSteps(tourId: string): Promise<TourStep[]> {
 // ── Obtener actividad de un usuario en un tour ────────────────────────────────
 
 export async function getTourActivity(
-  userId: string,
-  tourId: string
+    userId: string,
+    tourId: string
 ): Promise<TourActivity | null> {
   const params = [
     `filter[field_user.id]=${userId}`,
@@ -332,29 +332,29 @@ export async function getTourActivity(
 // ── Crear o actualizar actividad de usuario en un tour ────────────────────────
 
 export async function upsertTourActivity(
-  userId: string,
-  tourId: string,
-  updates: Partial<Pick<TourActivity, 'isFavorite' | 'isSaved' | 'isCompleted' | 'userRating' | 'stepsCompleted'>>,
-  currentTourRatingCount?: number
+    userId: string,
+    tourId: string,
+    updates: Partial<Pick<TourActivity, 'isFavorite' | 'isSaved' | 'isCompleted' | 'userRating' | 'stepsCompleted'>>,
+    currentTourRatingCount?: number
 ): Promise<TourActivity> {
   const existing = await getTourActivity(userId, tourId);
   const isNewRating = updates.userRating !== undefined && !existing?.userRating;
 
-const attributes: Record<string, any> = {};
-if (updates.isFavorite !== undefined) attributes.field_is_favorite = updates.isFavorite;
-if (updates.isSaved !== undefined) attributes.field_is_saved = updates.isSaved;
-if (updates.isCompleted !== undefined) {
-  attributes.field_is_completed = updates.isCompleted;
-  if (updates.isCompleted) {
-    attributes.field_completed_at = Math.floor(Date.now() / 1000);
+  const attributes: Record<string, any> = {};
+  if (updates.isFavorite !== undefined) attributes.field_is_favorite = updates.isFavorite;
+  if (updates.isSaved !== undefined) attributes.field_is_saved = updates.isSaved;
+  if (updates.isCompleted !== undefined) {
+    attributes.field_is_completed = updates.isCompleted;
+    if (updates.isCompleted) {
+      attributes.field_completed_at = Math.floor(Date.now() / 1000);
+    }
   }
-}
-if (updates.userRating !== undefined) {
-  attributes.field_user_rating = updates.userRating;
-  if (isNewRating) {
-    attributes.field_rated_at = Math.floor(Date.now() / 1000);
+  if (updates.userRating !== undefined) {
+    attributes.field_user_rating = updates.userRating;
+    if (isNewRating) {
+      attributes.field_rated_at = Math.floor(Date.now() / 1000);
+    }
   }
-}
 
   const relationships: Record<string, any> = {
     field_user: { data: { type: 'user--user', id: userId } },
@@ -515,8 +515,8 @@ export async function getToursByIds(ids: string[]): Promise<Tour[]> {
   if (ids.length === 0) return [];
 
   const filterParts = ids.map(
-    (id, i) =>
-      `filter[id-group][group][conjunction]=OR&filter[id-${i}][condition][path]=id&filter[id-${i}][condition][value]=${id}&filter[id-${i}][condition][memberOf]=id-group`
+      (id, i) =>
+          `filter[id-group][group][conjunction]=OR&filter[id-${i}][condition][path]=id&filter[id-${i}][condition][value]=${id}&filter[id-${i}][condition][memberOf]=id-group`
   );
 
   const params = [

@@ -48,9 +48,9 @@ interface ToursState {
   fetchTours: (filters?: TourFilters, append?: boolean) => Promise<void>;
   fetchTourDetail: (id: string, userId?: string) => Promise<void>;
   updateActivity: (
-    userId: string,
-    tourId: string,
-    updates: Partial<Pick<TourActivity, 'isFavorite' | 'isSaved' | 'isCompleted' | 'userRating' | 'stepsCompleted'>>
+      userId: string,
+      tourId: string,
+      updates: Partial<Pick<TourActivity, 'isFavorite' | 'isSaved' | 'isCompleted' | 'userRating' | 'stepsCompleted'>>
   ) => Promise<void>;
   fetchUserActivities: (userId: string) => Promise<void>;
   toggleFavorite: (userId: string, tourId: string) => Promise<void>;
@@ -91,7 +91,9 @@ export const useToursStore = create<ToursState>((set, get) => ({
       const result: PaginatedResult<Tour> = await getTours(mergedFilters);
 
       set((state) => ({
-        tours: append ? [...state.tours, ...result.data] : result.data,
+        tours: append
+            ? [...state.tours, ...result.data.filter((t) => !state.tours.some((e) => e.id === t.id))]
+            : result.data,
         total: result.total,
         hasMore: result.hasMore,
         filters: mergedFilters,
@@ -129,33 +131,33 @@ export const useToursStore = create<ToursState>((set, get) => ({
     }
   },
 
-updateActivity: async (userId, tourId, updates) => {
-  const prev = get().currentActivity;
-  if (prev) {
-    set({ currentActivity: { ...prev, ...updates } });
-  }
-  try {
-    const activity = await upsertTourActivity(
-      userId,
-      tourId,
-      updates,
-      get().currentTour?.ratingCount
-    );
-
-    set({ currentActivity: activity });
-
-    if (updates.userRating !== undefined && !prev?.userRating) {
-      set((state) => ({
-        currentTour: state.currentTour
-          ? { ...state.currentTour, ratingCount: (state.currentTour.ratingCount ?? 0) + 1 }
-          : null,
-      }));
+  updateActivity: async (userId, tourId, updates) => {
+    const prev = get().currentActivity;
+    if (prev) {
+      set({ currentActivity: { ...prev, ...updates } });
     }
-  } catch (err: any) {
-    console.error('→ updateActivity error:', err);
-    set({ currentActivity: prev, error: err.message ?? 'Error updating Tour activity' });
-  }
-},
+    try {
+      const activity = await upsertTourActivity(
+          userId,
+          tourId,
+          updates,
+          get().currentTour?.ratingCount
+      );
+
+      set({ currentActivity: activity });
+
+      if (updates.userRating !== undefined && !prev?.userRating) {
+        set((state) => ({
+          currentTour: state.currentTour
+              ? { ...state.currentTour, ratingCount: (state.currentTour.ratingCount ?? 0) + 1 }
+              : null,
+        }));
+      }
+    } catch (err: any) {
+      console.error('→ updateActivity error:', err);
+      set({ currentActivity: prev, error: err.message ?? 'Error updating Tour activity' });
+    }
+  },
 
   fetchUserActivities: async (userId) => {
     try {
@@ -174,8 +176,8 @@ updateActivity: async (userId, tourId, updates) => {
     const previous = get().userActivities[tourId] ?? null;
     const currentIsFavorite = previous?.isFavorite ?? false;
     const optimistic: TourActivity = previous
-      ? { ...previous, isFavorite: !currentIsFavorite }
-      : {
+        ? { ...previous, isFavorite: !currentIsFavorite }
+        : {
           id: '',
           tourId,
           userId,
