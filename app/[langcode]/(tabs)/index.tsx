@@ -797,6 +797,7 @@ export default function HomePage() {
                 </TouchableOpacity>
               </View>
             )}
+            {!hasMore && <View style={styles.listEndSpacer} />}
             <Footer />
           </>
         }
@@ -1219,6 +1220,9 @@ const styles = StyleSheet.create({
   },
   emptyTitle: { fontSize: 16, color: '#6B7280', fontWeight: '500' },
   loadingState: { flex: 1, paddingVertical: 60, alignItems: 'center', justifyContent: 'center' },
+  listEndSpacer: {
+    height: 40,
+  },
   loadMoreContainer: {
     paddingBottom: 25,
     paddingTop: 10,

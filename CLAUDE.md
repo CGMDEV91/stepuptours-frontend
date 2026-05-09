@@ -192,6 +192,7 @@ Project-local skills live in `.claude/skills/`. Claude should invoke them when t
 | `react-state-architecture` | When designing or refactoring Zustand stores or global state |
 | `responsive-design` | When implementing responsive or adaptive layouts across web, iOS, and Android |
 | `payments-apple-pay` | When implementing or debugging Apple Pay / in-app payment flows |
+| `stepuptours-analytics` | When working on the analytics system: event tracking, session deduplication, admin dashboard, or the Drupal `stepuptours_analytics` module |
 
 ## Agents reference
 

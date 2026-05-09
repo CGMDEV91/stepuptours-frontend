@@ -129,6 +129,17 @@ let _queue: AnalyticsEvent[] = [];
 let _flushTimer: ReturnType<typeof setInterval> | null = null;
 let _consentGranted: boolean | null = null;
 let _sessionId: string | null = null;
+const _sessionSeen = new Set<string>();
+
+const DEDUPE_EVENTS: AnalyticsEventType[] = ['site_view', 'tour_view', 'step_view'];
+
+function isDuplicate(eventType: AnalyticsEventType, entityId?: string): boolean {
+  if (!DEDUPE_EVENTS.includes(eventType)) return false;
+  const key = entityId ? `${eventType}:${entityId}` : eventType;
+  if (_sessionSeen.has(key)) return true;
+  _sessionSeen.add(key);
+  return false;
+}
 
 async function sha256(text: string): Promise<string> {
   if (typeof crypto !== 'undefined' && crypto.subtle) {
@@ -241,6 +252,9 @@ export async function track(
 ): Promise<void> {
   const granted = await isConsentGranted();
   if (!granted) return;
+
+  const entityId = params.tourId ?? params.stepId ?? undefined;
+  if (isDuplicate(eventType, entityId)) return;
 
   const sessionId = await getOrCreateSessionId();
   const user = useAuthStore.getState().user;

@@ -225,7 +225,7 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
   return {
     data: mapped,
     total: allTours.length,
-    hasMore: rawList.length === limit,
+    hasMore: page * limit < allTours.length,
   };
 }
 

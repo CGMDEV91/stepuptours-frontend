@@ -5,6 +5,17 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 
 ---
 
+## BUG-005 — Duplicate React keys on tour pagination (Load More)
+
+**Status:** Fixed
+**Date:** 2026-05-09
+**Symptom:** On the home page, clicking "Load More" caused React warnings "Encountered two children with the same key `.$<uuid>`" and the same tour cards appeared multiple times. The first page (9 tours) loaded correctly; duplicates appeared from page 2 onwards. Total count was correct (27 tours detected) but many cards were repeats of the same tour.
+**Root cause:** All 27 tours were freshly created with a script, so every tour had `field_average_rate = 0` and `field_donation_count = 0`. The three sort options in `getTours()` were single-field sorts (`sort=-field_average_rate`, `sort=-field_donation_count`, `sort=title`). When all values are equal, Drupal's JSON:API returns results in non-deterministic SQL order — the order changes between the page 1 and page 2 requests, causing the same tour UUID to appear in both pages. The store appended pages naively (`[...state.tours, ...result.data]`) with no deduplication, so duplicate UUIDs flowed into the FlatList `keyExtractor`.
+**Fix:** Added `drupal_internal__nid` as a stable secondary tiebreaker to all three sort strings (NID is unique and sequential, guaranteeing deterministic pagination). Added UUID deduplication in the store's append logic as a safety net.
+**Files:** `services/tours.service.ts` (sort params), `stores/tours.store.ts` (append deduplication)
+
+---
+
 ## BUG-004 — Imágenes de Drupal bloqueadas por CORS en producción
 
 **Status:** Fixed
