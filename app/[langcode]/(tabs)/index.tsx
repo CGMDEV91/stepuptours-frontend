@@ -617,6 +617,7 @@ export default function HomePage() {
   const handleClear = () => {
     clearFilters();
     setSearch('');
+    fetchCities();
     fetchTours({});
   };
 
