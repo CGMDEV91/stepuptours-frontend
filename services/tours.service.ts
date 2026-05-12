@@ -115,9 +115,15 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
   if (sort === 'alphabetical') sortParam = 'sort=title,drupal_internal__nid';
   else if (sort === 'popular') sortParam = 'sort=-field_donation_count,drupal_internal__nid';
 
+  // Skip the country relationship filter when a city is selected:
+  // a city already implies its country unambiguously, and combining
+  // filter[field_city.name] + filter[field_country.name] in JSON:API forces
+  // Drupal to JOIN both taxonomy relationships, which is ~140x slower on
+  // Pantheon (~21s vs ~0.15s in measured tests). The country chip stays
+  // visible in the UI for UX; only the request is optimised.
   const filterStr = [
     buildFilters(drupalFilters),
-    buildCountriesFilter(countries ?? []),
+    city ? '' : buildCountriesFilter(countries ?? []),
     minRating ? `filter[rate][condition][path]=field_average_rate&filter[rate][condition][operator]=>=&filter[rate][condition][value]=${minRating}` : '',
     search ? `filter[title][condition][path]=title&filter[title][condition][operator]=CONTAINS&filter[title][condition][value]=${encodeURIComponent(search)}` : '',
   ].filter(Boolean).join('&');
