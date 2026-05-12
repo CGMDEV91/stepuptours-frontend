@@ -243,6 +243,7 @@ interface MobileFilterBarProps {
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
   onFetchCities: (countries?: string[]) => void;
+  onClear: () => void;
   cardPadding: number;
 }
 
@@ -255,6 +256,7 @@ function MobileFilterBar({
   onCitySelect,
   onSortSelect,
   onFetchCities,
+  onClear,
   cardPadding,
 }: MobileFilterBarProps) {
   const { t } = useTranslation();
@@ -301,6 +303,12 @@ function MobileFilterBar({
           )}
           <Ionicons name="chevron-down" size={13} color="#9CA3AF" />
         </TouchableOpacity>
+        {hasActive && (
+          <TouchableOpacity style={styles.mobileClearChip} onPress={onClear} activeOpacity={0.7}>
+            <Ionicons name="close-circle" size={13} color="#EF4444" />
+            <Text style={styles.mobileClearChipText}>{t('filter.clear')}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={close}>
@@ -378,7 +386,7 @@ function MobileFilterBar({
                         <TouchableOpacity
                           key={c.id}
                           style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
-                          onPress={() => onCountryToggle(c.name)}
+                          onPress={() => { onCountryToggle(c.name); close(); }}
                           activeOpacity={0.7}
                         >
                           <Ionicons name="earth-outline" size={18} color={isActive ? AMBER : '#6B7280'} />
@@ -393,11 +401,11 @@ function MobileFilterBar({
             </View>
 
             {/* City section */}
-            <View style={[styles.filterSection, { marginBottom: 32 }]}>
+            <View style={styles.filterSection}>
               <TouchableOpacity style={styles.filterSectionRow} onPress={() => toggleSection('city')} activeOpacity={0.7}>
                 <Text style={styles.mobileSectionLabel}>{t('filter.city')}</Text>
                 <View style={styles.filterSectionRight}>
-                  <Text style={styles.filterSectionValue} numberOfLines={1}>{t('filter.selectCity')}</Text>
+                  <Text style={styles.filterSectionValue} numberOfLines={1}>{filters.city ?? t('filter.selectCity')}</Text>
                   <Ionicons name={expandedSection === 'city' ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
                 </View>
               </TouchableOpacity>
@@ -719,6 +727,7 @@ export default function HomePage() {
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
                 onFetchCities={fetchCities}
+                onClear={handleClear}
                 cardPadding={PADDING}
               />
             )}
@@ -956,6 +965,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 5,
+  },
+  mobileClearChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#FECACA',
+    backgroundColor: '#FEF2F2',
+  },
+  mobileClearChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#EF4444',
   },
   mobileFilterBadgeText: {
     fontSize: 11,

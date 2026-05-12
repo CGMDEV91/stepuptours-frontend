@@ -66,6 +66,9 @@ const DEFAULT_FILTERS: TourFilters = {
   limit: 9,
 };
 
+// Monotonic counter: ensures stale async fetches never overwrite newer results.
+let _activeFetchId = 0;
+
 export const useToursStore = create<ToursState>((set, get) => ({
   tours: [],
   total: 0,
@@ -85,10 +88,14 @@ export const useToursStore = create<ToursState>((set, get) => ({
   cities: [],
 
   fetchTours: async (filters = {}, append = false) => {
+    const fetchId = ++_activeFetchId;
     set({ isLoading: true, error: null });
     try {
       const mergedFilters = { ...get().filters, ...filters };
       const result: PaginatedResult<Tour> = await getTours(mergedFilters);
+
+      // Discard result if a newer fetch has already been dispatched.
+      if (fetchId !== _activeFetchId) return;
 
       set((state) => ({
         tours: append
@@ -100,6 +107,7 @@ export const useToursStore = create<ToursState>((set, get) => ({
         isLoading: false,
       }));
     } catch (err: any) {
+      if (fetchId !== _activeFetchId) return;
       set({ isLoading: false, error: err.message ?? 'Error al cargar tours' });
     }
   },
