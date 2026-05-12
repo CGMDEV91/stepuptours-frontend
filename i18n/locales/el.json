@@ -434,6 +434,7 @@
   "profile.selectLanguage": "Επιλέξτε γλώσσα",
   "profile.selectCountry": "Επιλέξτε χώρα",
   "favourites.subtitle": "Οι αποθηκευμένες περιηγήσεις σας",
+  "favourites.empty": "Δεν έχετε αποθηκεύσει ακόμα κανέναν γύρο.",
   "completed.subtitle": "Περιηγήσεις που έχετε εξερευνήσει",
   "ranking.subtitle": "Οι πιο ενεργοί εξερευνητές",
   "admin.title": "Διαχείριση",

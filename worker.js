@@ -28,6 +28,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // Redirect www → non-www (canonical domain)
+    if (url.hostname === 'www.stepuptours.com') {
+      url.hostname = 'stepuptours.com';
+      return Response.redirect(url.toString(), 301);
+    }
+
     // Redirect legacy UUID tour URLs to SEO-friendly slug URLs
     const uuidMatch = url.pathname.match(UUID_TOUR_RE);
     if (uuidMatch) {

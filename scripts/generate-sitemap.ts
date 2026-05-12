@@ -7,8 +7,20 @@ import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Load .env.production so EXPO_PUBLIC_* vars are available when running via ts-node
+const envPath = path.join(__dirname, '../.env.production');
+if (fs.existsSync(envPath)) {
+  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
+    const eq = line.indexOf('=');
+    if (eq > 0) {
+      const key = line.slice(0, eq).trim();
+      if (!process.env[key]) process.env[key] = line.slice(eq + 1).trim();
+    }
+  });
+}
+
 const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://stepuptours.com';
-const DRUPAL_URL = process.env.DRUPAL_URL ?? 'https://stepuptours.com';
+const DRUPAL_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://dev-step-up-tours.pantheonsite.io';
 const LANGUAGES = ['es', 'en', 'fr', 'de', 'it', 'el'];
 const PAGE_LIMIT = 100;
 
@@ -88,11 +100,27 @@ async function main() {
     );
     urlEntries.push(
       `  <url>
+    <loc>${SITE_URL}/${lang}/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>`,
+    );
+    urlEntries.push(
+      `  <url>
     <loc>${SITE_URL}/${lang}/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>`,
     );
+    for (const page of ['cookie-policy', 'privacy-policy', 'terms-of-use']) {
+      urlEntries.push(
+        `  <url>
+    <loc>${SITE_URL}/${lang}/${page}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>`,
+      );
+    }
   }
 
   // Tour pages — fetched per language so city/country names are translated

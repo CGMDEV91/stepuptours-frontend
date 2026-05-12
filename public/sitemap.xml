@@ -1,0 +1,2214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
+  <url>
+    <loc>https://stepuptours.com/es</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/terms-of-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/terms-of-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/terms-of-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/terms-of-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/terms-of-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/ranking</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/faq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/cookie-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/terms-of-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-172</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-172"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-173</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-173"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-174</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-174"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-175</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-175"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-176</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-176"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-177</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-177"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-178</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-178"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-179</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-179"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-180</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-180"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-181</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-181"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-182</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-182"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-183</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-183"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-185</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-185"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-189</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-189"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-220</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-220"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-226</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-226"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-255</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-255"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-258</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-258"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-261</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-261"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-262</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-262"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-265</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-265"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-273</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-273"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-287</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-287"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-288</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-288"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-290</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-290"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/es/tour/tour-299</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-299"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-172</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-172"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-173</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-173"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-174</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-174"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-175</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-175"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-176</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-176"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-177</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-177"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-178</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-178"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-179</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-179"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-180</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-180"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-181</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-181"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-182</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-182"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-183</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-183"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-185</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-185"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-189</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-189"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-220</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-220"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-226</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-226"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-255</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-255"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-258</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-258"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-261</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-261"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-262</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-262"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-265</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-265"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-273</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-273"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-287</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-287"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-288</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-288"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-290</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-290"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/en/tour/tour-299</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-299"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-172</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-172"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-173</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-173"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-174</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-174"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-175</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-175"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-176</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-176"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-177</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-177"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-178</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-178"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-179</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-179"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-180</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-180"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-181</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-181"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-182</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-182"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-183</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-183"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-185</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-185"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-189</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-189"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-220</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-220"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-226</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-226"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-255</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-255"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-258</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-258"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-261</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-261"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-262</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-262"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-265</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-265"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-273</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-273"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-287</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-287"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-288</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-288"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-290</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-290"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/fr/tour/tour-299</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-299"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-172</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-172"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-173</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-173"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-174</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-174"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-175</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-175"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-176</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-176"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-177</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-177"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-178</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-178"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-179</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-179"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-180</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-180"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-181</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-181"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-182</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-182"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-183</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-183"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-185</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-185"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-189</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-189"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-220</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-220"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-226</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-226"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-255</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-255"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-258</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-258"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-261</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-261"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-262</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-262"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-265</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-265"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-273</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-273"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-287</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-287"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-288</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-288"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-290</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-290"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/de/tour/tour-299</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-299"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-172</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-172"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-173</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-173"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-174</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-174"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-175</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-175"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-176</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-176"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-177</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-177"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-178</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-178"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-179</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-179"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-180</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-180"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-181</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-181"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-182</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-182"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-183</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-183"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-185</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-185"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-189</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-189"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-220</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-220"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-226</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-226"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-255</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-255"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-258</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-258"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-261</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-261"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-262</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-262"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-265</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-265"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-273</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-273"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-287</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-287"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-288</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-288"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-290</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-290"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/it/tour/tour-299</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-299"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-172</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-172"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-172"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-173</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-173"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-173"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-174</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-174"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-174"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-175</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-175"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-175"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-176</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-176"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-176"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-177</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-177"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-177"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-178</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-178"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-178"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-179</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-179"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-179"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-180</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-180"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-180"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-181</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-181"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-181"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-182</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-182"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-182"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-183</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-183"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-183"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-185</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-185"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-185"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-189</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-189"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-189"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-220</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-220"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-220"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-226</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-226"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-226"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-255</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-255"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-255"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-258</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-258"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-258"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-261</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-261"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-261"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-262</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-262"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-262"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-265</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-265"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-265"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-273</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-273"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-273"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-287</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-287"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-287"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-288</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-288"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-288"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-290</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-290"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-290"/>
+  </url>
+  <url>
+    <loc>https://stepuptours.com/el/tour/tour-299</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stepuptours.com/es/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stepuptours.com/en/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://stepuptours.com/fr/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://stepuptours.com/de/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://stepuptours.com/it/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://stepuptours.com/el/tour/tour-299"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stepuptours.com/en/tour/tour-299"/>
+  </url>
+</urlset>

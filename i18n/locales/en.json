@@ -433,6 +433,7 @@
   "profile.selectLanguage": "Select language",
   "profile.selectCountry": "Select country",
   "favourites.subtitle": "Your saved tours",
+  "favourites.empty": "You haven't saved any tours yet.",
   "completed.subtitle": "Tours you've explored",
   "ranking.subtitle": "The most active explorers",
   "admin.title": "Administration",

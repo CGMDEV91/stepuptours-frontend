@@ -1,11 +1,13 @@
 // app/[langcode]/cookie-policy.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
+import { PageHead } from '../../components/seo/PageHead';
 
 const AMBER = '#F59E0B';
 
@@ -47,9 +49,11 @@ const SECTIONS = [
 ];
 
 export default function CookiePolicyScreen() {
+  const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
   return (
     <View style={styles.root}>
+      <PageHead langcode={langcode ?? 'en'} path="cookie-policy" title={t('legal.cookiePolicy')} />
       <PageScrollView>
         <PageBanner icon="document-text" iconBgColor="#6366F1" title={t('legal.cookiePolicy')} />
         <View style={styles.inner}>

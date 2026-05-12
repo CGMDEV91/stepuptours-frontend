@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   Platform,
 } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -20,6 +21,7 @@ import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import type { RankingEntry } from '../../types';
+import { PageHead } from '../../components/seo/PageHead';
 
 const AMBER = '#F59E0B';
 const SILVER = '#9CA3AF';
@@ -146,6 +148,7 @@ function RankingRow({ entry, isLast }: { entry: RankingEntry; isLast: boolean })
 
 // ── Main screen ───────────────────────────────────────────────────────────────
 export default function RankingScreen() {
+  const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
 
@@ -212,13 +215,15 @@ export default function RankingScreen() {
   };
 
   return (
-    <PageScrollView
-      style={styles.root}
-      contentContainerStyle={styles.scrollContent}
-    >
-      <PageBanner
-        icon="trophy"
-        iconBgColor={AMBER}
+    <>
+      <PageHead langcode={langcode ?? 'en'} path="ranking" title={t('ranking.title', 'Ranking')} />
+      <PageScrollView
+        style={styles.root}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <PageBanner
+          icon="trophy"
+          iconBgColor={AMBER}
         title={t('ranking.title')}
         subtitle={t('ranking.subtitle')}
         showBack={false}
@@ -239,6 +244,7 @@ export default function RankingScreen() {
       </View>
       <Footer />
     </PageScrollView>
+    </>
   );
 }
 

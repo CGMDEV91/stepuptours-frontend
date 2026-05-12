@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
+import { PageHead } from '../../components/seo/PageHead';
 
 const AMBER = '#F59E0B';
 
@@ -62,6 +64,7 @@ const CATEGORIES = [
 ];
 
 export default function FaqScreen() {
+  const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
   const [open, setOpen] = useState<Set<number>>(new Set());
 
@@ -76,6 +79,7 @@ export default function FaqScreen() {
 
   return (
     <View style={styles.root}>
+      <PageHead langcode={langcode ?? 'en'} path="faq" title={t('legal.faq')} />
       <PageScrollView>
         <PageBanner icon="help-circle" iconBgColor="#6366F1" title={t('legal.faq')} />
         <View style={styles.inner}>
