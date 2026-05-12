@@ -19,7 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/auth.store';
 import { useLanguageStore } from '../../stores/language.store';
-import { getGoogleAccessToken } from '../../services/googleAuth.service';
+import { GoogleSignInButton } from '../auth/GoogleSignInButton';
 import { getRegistrationSettings } from '../../services/admin.service';
 import { Picker } from './Picker';
 import type { PickerItem } from './Picker';
@@ -116,12 +116,11 @@ function Field({
 // ── Modal Login ───────────────────────────────────────────────────────────────
 function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: () => void; onSwitch: () => void; fullscreen?: boolean; desktopWeb?: boolean }) {
   const { signIn, signInWithGoogle, isLoading, error, clearError } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const passwordRef = useRef<RNTextInput>(null);
 
@@ -140,20 +139,20 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
     if (!useAuthStore.getState().error) onClose();
   };
 
-  const handleGoogleAuth = async () => {
+  const handleGoogleCredential = async (idToken: string) => {
     setGoogleError(null);
-    setGoogleLoading(true);
     try {
-      const token = await getGoogleAccessToken();
-      await signInWithGoogle(token);
+      await signInWithGoogle(idToken);
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
-      const type = e?.message ?? '';
-      if (!type.includes('popup_closed') && !type.includes('access_denied')) {
-        setGoogleError(t('auth.googleAuthError'));
-      }
-    } finally {
-      setGoogleLoading(false);
+      setGoogleError(t('auth.googleAuthError'));
+    }
+  };
+
+  const handleGoogleError = (e: Error) => {
+    const msg = e?.message ?? '';
+    if (!msg.includes('popup_closed') && !msg.includes('access_denied')) {
+      setGoogleError(t('auth.googleAuthError'));
     }
   };
 
@@ -178,22 +177,15 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
         </View>
       ) : null}
 
-      {/* Botón Google */}
-      <TouchableOpacity
-        style={modalStyles.googleBtn}
-        onPress={handleGoogleAuth}
-        disabled={googleLoading || isLoading}
-        activeOpacity={0.8}
-      >
-        {googleLoading ? (
-          <ActivityIndicator size="small" color="#374151" />
-        ) : (
-          <>
-            {Platform.OS === 'web' && <GoogleLogo />}
-            <Text style={modalStyles.googleBtnText}>{t('auth.continueWithGoogle')}</Text>
-          </>
-        )}
-      </TouchableOpacity>
+      {/* Botón Google — custom-styled, GIS click overlay (web-only) */}
+      <GoogleSignInButton
+        label={t('auth.continueWithGoogle')}
+        text="continue_with"
+        locale={i18n.language}
+        disabled={isLoading}
+        onSuccess={handleGoogleCredential}
+        onError={handleGoogleError}
+      />
       {googleError ? (
         <Text style={modalStyles.googleErrorText}>{googleError}</Text>
       ) : null}
@@ -274,7 +266,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const { signUp, signInWithGoogle, isLoading, error, clearError } = useAuthStore();
   const currentLangcode = useLanguageStore((s) => s.currentLanguage?.id ?? 'en');
   const languages = useLanguageStore((s) => s.languages ?? []);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [username, setUsername] = useState('');
   const [publicName, setPublicName] = useState('');
   const [email, setEmail] = useState('');
@@ -291,7 +283,6 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     consent?: string; privacy?: string;
   }>({});
   const [allowProfessional, setAllowProfessional] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googlePreStep, setGooglePreStep] = useState(false);
 
@@ -374,20 +365,20 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     if (!useAuthStore.getState().error) onClose();
   };
 
-  const handleGoogleAuth = async () => {
+  const handleGoogleCredential = async (idToken: string) => {
     setGoogleError(null);
-    setGoogleLoading(true);
     try {
-      const token = await getGoogleAccessToken();
-      await signInWithGoogle(token, allowProfessional && (role === 'guide' || role === 'business') ? role : undefined);
+      await signInWithGoogle(idToken, allowProfessional && (role === 'guide' || role === 'business') ? role : undefined);
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
-      const type = e?.message ?? '';
-      if (!type.includes('popup_closed') && !type.includes('access_denied')) {
-        setGoogleError(t('auth.googleAuthError'));
-      }
-    } finally {
-      setGoogleLoading(false);
+      setGoogleError(t('auth.googleAuthError'));
+    }
+  };
+
+  const handleGoogleError = (e: Error) => {
+    const msg = e?.message ?? '';
+    if (!msg.includes('popup_closed') && !msg.includes('access_denied')) {
+      setGoogleError(t('auth.googleAuthError'));
     }
   };
 
@@ -493,22 +484,17 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
 
           {googleError ? <Text style={[modalStyles.googleErrorText, { marginTop: 8 }]}>{googleError}</Text> : null}
 
-          {/* Final Google OAuth button */}
-          <TouchableOpacity
-            style={[modalStyles.googleBtn, { marginTop: 16 }, (needsConsent && !consent) && { opacity: 0.45 }]}
-            onPress={handleGoogleAuth}
-            disabled={googleLoading || isLoading || (needsConsent && !consent)}
-            activeOpacity={0.8}
-          >
-            {googleLoading ? (
-              <ActivityIndicator size="small" color="#374151" />
-            ) : (
-              <>
-                {Platform.OS === 'web' && <GoogleLogo />}
-                <Text style={modalStyles.googleBtnText}>{t('auth.registerWithGoogle')}</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          {/* Final Google OAuth button — custom-styled, GIS click overlay */}
+          <View style={{ marginTop: 16 }}>
+            <GoogleSignInButton
+              label={t('auth.registerWithGoogle')}
+              text="signup_with"
+              locale={i18n.language}
+              disabled={isLoading || (needsConsent && !consent)}
+              onSuccess={handleGoogleCredential}
+              onError={handleGoogleError}
+            />
+          </View>
         </>
       ) : (
         /* ── Normal registration form ─────────────────────────────────────── */

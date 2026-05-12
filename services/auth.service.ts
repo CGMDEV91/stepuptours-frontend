@@ -214,12 +214,12 @@ export async function getCurrentUser(): Promise<User | null> {
 
 // ── Google Auth ───────────────────────────────────────────────────────────────
 
-export async function loginWithGoogle(googleAccessToken: string, role?: 'guide' | 'business', rememberMe = false): Promise<AuthSession> {
+export async function loginWithGoogle(googleIdToken: string, role?: 'guide' | 'business', rememberMe = false): Promise<AuthSession> {
   let response: any;
   try {
     response = await axios.post(
       `${BASE_URL}/api/auth/google`,
-      { access_token: googleAccessToken, role: role ?? null },
+      { id_token: googleIdToken, role: role ?? null },
       { headers: { 'Content-Type': 'application/json' } }
     );
   } catch (err: any) {

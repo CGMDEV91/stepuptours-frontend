@@ -16,7 +16,7 @@ interface AuthState {
   // Actions
   signIn: (credentials: AuthCredentials) => Promise<void>;
   signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'guide' | 'business'; langcode?: string; preferredLanguage?: string }) => Promise<void>;
-  signInWithGoogle: (googleAccessToken: string, role?: 'guide' | 'business') => Promise<void>;
+  signInWithGoogle: (googleIdToken: string, role?: 'guide' | 'business') => Promise<void>;
   signOut: () => Promise<void>;
   restore: () => Promise<void>;
   clearError: () => void;
@@ -60,11 +60,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: false });
   },
 
-  signInWithGoogle: async (googleAccessToken, role) => {
+  signInWithGoogle: async (googleIdToken, role) => {
     set({ isLoading: true, error: null });
     try {
       const { loginWithGoogle } = await import('../services/auth.service');
-      const session = await loginWithGoogle(googleAccessToken, role);
+      const session = await loginWithGoogle(googleIdToken, role);
       set({ session, user: session.user, isLoading: false, isNewLogin: true });
       inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
     } catch (err: any) {
