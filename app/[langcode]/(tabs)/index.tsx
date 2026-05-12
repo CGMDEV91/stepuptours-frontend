@@ -602,16 +602,18 @@ export default function HomePage() {
     const updated = current.includes(country)
       ? current.filter((c) => c !== country)
       : [...current, country];
-    setFilters({ countries: updated.length ? updated : undefined, city: undefined });
+    const newFilters = { countries: updated.length ? updated : undefined, city: undefined, page: 1 };
+    setFilters(newFilters);
     fetchCities(updated);
-    fetchTours({ page: 1 });
+    fetchTours(newFilters);
     void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `country:${country}` });
   };
 
   const handleCountryClear = () => {
-    setFilters({ countries: undefined, city: undefined });
+    const newFilters = { countries: undefined, city: undefined, page: 1 };
+    setFilters(newFilters);
     fetchCities([]);
-    fetchTours({ page: 1 });
+    fetchTours(newFilters);
   };
 
   const handleCitySelect = (city: string | null) => {
@@ -626,7 +628,7 @@ export default function HomePage() {
       }
     }
     setFilters(next);
-    fetchTours({ page: 1 });
+    fetchTours({ ...next, page: 1 });
     if (city) {
       void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `city:${city}` });
     }
@@ -634,7 +636,7 @@ export default function HomePage() {
 
   const handleSortSelect = (sort: TourFilters['sort']) => {
     setFilters({ sort });
-    fetchTours({ page: 1 });
+    fetchTours({ sort, page: 1 });
     if (sort) {
       void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `sort:${sort}` });
     }
@@ -645,7 +647,7 @@ export default function HomePage() {
     clearTours();
     setSearch('');
     fetchCities();
-    fetchTours({});
+    fetchTours({ page: 1, limit: 9 });
   };
 
   return (

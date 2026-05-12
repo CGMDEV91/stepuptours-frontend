@@ -204,21 +204,13 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
     buildInclude(TOUR_CARD_INCLUDE),
   ].filter(Boolean).join('&');
 
-  // Count request: same filters as data query but no pagination, base URL so all
-  // published tours matching the filters are counted regardless of translation status.
-  // Promise.allSettled prevents a slow/failing count query from blocking tour display —
-  // combined city+country filters on the base (non-language) URL can be slow on some
-  // environments; falling back to the data-page length keeps the UI responsive.
-  const countParams = [filterStr, 'fields[node--tour]=id', 'page[limit]=500'].filter(Boolean).join('&');
-  const [dataResult, countResult] = await Promise.allSettled([
-    drupalGetRaw('/node/tour', dataParams),
-    drupalGetJsonApiBase('/node/tour', countParams),
-  ]);
-
-  if (dataResult.status === 'rejected') throw dataResult.reason;
-
-  const { data } = dataResult.value;
-  const allTours = countResult.status === 'fulfilled' ? countResult.value : [];
+  // Single request: Drupal 11 JSON:API includes meta.count in every collection
+  // response — no need for a separate count round-trip.
+  // The previous two-request pattern (data + base-URL count) was causing the
+  // filter bug: relationship filters on the non-language-prefixed URL are not
+  // cached on Pantheon and could take 15+ seconds, keeping isLoading=true long
+  // enough for a competing fetch to supersede and discard the filtered result.
+  const { data, meta } = await drupalGetRaw('/node/tour', dataParams);
 
   const rawList = Array.isArray(data) ? data : [data];
   const mapped = rawList.map(mapDrupalTour);
@@ -230,12 +222,8 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
     });
   }
 
-  // If count query failed, fall back to data-page size so hasMore is conservative
-  // (may show "load more" when none exist) rather than cutting off real results.
-  const total = countResult.status === 'fulfilled' ? allTours.length : mapped.length;
-  const hasMore = countResult.status === 'fulfilled'
-    ? page * limit < allTours.length
-    : mapped.length === limit;
+  const total = typeof (meta as any)?.count === 'number' ? (meta as any).count : mapped.length;
+  const hasMore = page * limit < total;
 
   return {
     data: mapped,
