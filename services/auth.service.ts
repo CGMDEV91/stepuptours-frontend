@@ -53,7 +53,7 @@ export async function login(credentials: AuthCredentials, rememberMe = false): P
   let response: any;
   try {
     response = await axios.get(
-      `${BASE_URL}/jsonapi/user/user?filter[name]=${credentials.username}&fields[user--user]=name,mail,field_public_name,field_experience_points,field_country,user_picture,created,preferred_langcode,langcode&include=field_country`,
+      `${BASE_URL}/jsonapi/user/user?filter[name]=${encodeURIComponent(credentials.username)}&fields[user--user]=name,mail,field_public_name,field_experience_points,field_country,user_picture,created,preferred_langcode,langcode&include=field_country`,
       {
         headers: {
           'Accept': 'application/vnd.api+json',
@@ -118,7 +118,7 @@ export async function restoreSession(): Promise<AuthSession | null> {
     const authHeader = `Basic ${session.token}`;
 
     const meRes = await axios.get(
-      `${BASE_URL}/jsonapi/user/user?filter[name]=${session.user.username}&fields[user--user]=name`,
+      `${BASE_URL}/jsonapi/user/user?filter[name]=${encodeURIComponent(session.user.username)}&fields[user--user]=name`,
       {
         headers: {
           'Accept': 'application/vnd.api+json',

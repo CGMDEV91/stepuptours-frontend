@@ -270,6 +270,8 @@
   "auth.privacyRequired": "Sie müssen die Datenschutzrichtlinie akzeptieren, um sich zu registrieren.",
   "auth.usernameNoSpaces": "Benutzername darf keine Leerzeichen enthalten",
   "auth.usernameInvalidChars": "Nur Buchstaben, Zahlen und @ . - _ sind erlaubt",
+  "auth.publicNameTooLong": "Der Anzeigename darf höchstens 60 Zeichen lang sein",
+  "auth.googleAuthError": "Die Google-Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "auth.publicName": "Anzeigename",
   "auth.publicNamePlaceholder": "Wie Sie anderen erscheinen",
   "auth.continueWithGoogle": "Mit Google fortfahren",

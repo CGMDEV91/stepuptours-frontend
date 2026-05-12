@@ -270,6 +270,8 @@
   "auth.privacyRequired": "Debes aceptar la política de privacidad para registrarte.",
   "auth.usernameNoSpaces": "El usuario no puede contener espacios",
   "auth.usernameInvalidChars": "Solo letras, números y @ . - _ están permitidos",
+  "auth.publicNameTooLong": "El nombre público debe tener 60 caracteres o menos",
+  "auth.googleAuthError": "El inicio de sesión con Google falló. Por favor, inténtalo de nuevo.",
   "auth.publicName": "Nombre público",
   "auth.publicNamePlaceholder": "Cómo aparecerás a los demás",
   "auth.continueWithGoogle": "Continuar con Google",

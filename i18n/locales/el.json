@@ -271,6 +271,8 @@
   "auth.privacyRequired": "Πρέπει να αποδεχτείτε την πολιτική απορρήτου για να εγγραφείτε.",
   "auth.usernameNoSpaces": "Το όνομα χρήστη δεν μπορεί να περιέχει κενά",
   "auth.usernameInvalidChars": "Επιτρέπονται μόνο γράμματα, αριθμοί και @ . - _",
+  "auth.publicNameTooLong": "Το εμφανιζόμενο όνομα πρέπει να έχει 60 χαρακτήρες ή λιγότερους",
+  "auth.googleAuthError": "Η σύνδεση με Google απέτυχε. Παρακαλώ δοκιμάστε ξανά.",
   "auth.publicName": "Εμφανιζόμενο όνομα",
   "auth.publicNamePlaceholder": "Πώς θα εμφανίζεστε στους άλλους",
   "auth.continueWithGoogle": "Συνέχεια με Google",

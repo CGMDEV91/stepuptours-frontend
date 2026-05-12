@@ -150,7 +150,7 @@ function LoginModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose: ()
     } catch (e: any) {
       const type = e?.message ?? '';
       if (!type.includes('popup_closed') && !type.includes('access_denied')) {
-        setGoogleError(type);
+        setGoogleError(t('auth.googleAuthError'));
       }
     } finally {
       setGoogleLoading(false);
@@ -337,6 +337,8 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     else if (trimmedUsername.length < 3) errors.username = t('auth.usernameMinLength');
     else if (/\s/.test(trimmedUsername)) errors.username = t('auth.usernameNoSpaces');
     else if (!/^[a-zA-Z0-9@.\-_]+$/.test(trimmedUsername)) errors.username = t('auth.usernameInvalidChars');
+    const trimmedPublicName = publicName.trim();
+    if (trimmedPublicName.length > 60) errors.publicName = t('auth.publicNameTooLong');
     if (!email.trim()) errors.email = t('auth.emailRequired');
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = t('auth.emailInvalid');
     if (!password) errors.password = t('auth.passwordRequired');
@@ -358,7 +360,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
       publicName: publicName.trim() || undefined,
       email: email.trim(),
       password,
-      role: (role === 'guide' || role === 'business') ? role : undefined,
+      role: allowProfessional && (role === 'guide' || role === 'business') ? role : undefined,
       langcode: currentLangcode,
       preferredLanguage: selectedLangCode,
     });
@@ -370,12 +372,12 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     setGoogleLoading(true);
     try {
       const token = await getGoogleAccessToken();
-      await signInWithGoogle(token, (role === 'guide' || role === 'business') ? role : undefined);
+      await signInWithGoogle(token, allowProfessional && (role === 'guide' || role === 'business') ? role : undefined);
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
       const type = e?.message ?? '';
       if (!type.includes('popup_closed') && !type.includes('access_denied')) {
-        setGoogleError(type);
+        setGoogleError(t('auth.googleAuthError'));
       }
     } finally {
       setGoogleLoading(false);

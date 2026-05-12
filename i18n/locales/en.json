@@ -270,6 +270,8 @@
   "auth.privacyRequired": "You must accept the privacy policy to register.",
   "auth.usernameNoSpaces": "Username cannot contain spaces",
   "auth.usernameInvalidChars": "Only letters, numbers and @ . - _ are allowed",
+  "auth.publicNameTooLong": "Display name must be 60 characters or fewer",
+  "auth.googleAuthError": "Google sign-in failed. Please try again.",
   "auth.publicName": "Display Name",
   "auth.publicNamePlaceholder": "How you'll appear to others",
   "auth.continueWithGoogle": "Continue with Google",
