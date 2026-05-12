@@ -83,7 +83,17 @@ export default {
       return newResponse;
     }
 
-    // Everything else → serve the static SPA
-    return env.ASSETS.fetch(request);
+    // Everything else → serve the static SPA.
+    // Override COOP to same-origin-allow-popups on HTML responses so that
+    // Google OAuth popup can communicate back via window.closed without being
+    // blocked by the default same-origin policy.
+    const assetResponse = await env.ASSETS.fetch(request);
+    const contentType = assetResponse.headers.get('Content-Type') ?? '';
+    if (contentType.includes('text/html')) {
+      const headers = new Headers(assetResponse.headers);
+      headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+      return new Response(assetResponse.body, { status: assetResponse.status, headers });
+    }
+    return assetResponse;
   },
 };
