@@ -507,6 +507,10 @@ export default function HomePage() {
   const [focusGeneration, setFocusGeneration] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Tracks the language for which we've already done the initial full reset.
+  // If the language changes → full reset. On mere re-focus → preserve filters.
+  const initialLoadLangRef = useRef<string | null>(null);
+
   // Empty deps → callback never changes → useFocusEffect only fires on actual
   // focus/blur events, NEVER on language or state changes.
   // This is the key to preventing double-fetches.
@@ -522,12 +526,26 @@ export default function HomePage() {
   // Triggers on: (1) tab focus (focusGeneration↑), (2) language synced/changed
   // (currentLanguageId), (3) URL langcode change.
   // Guards: screen must be focused AND language must match the URL langcode.
+  //
+  // Language change / first load → full reset (clear filters).
+  // Re-focus with same language → refresh with current filters preserved.
   useEffect(() => {
     if (!isFocusedRef.current) return;
     if (!currentLanguageId || currentLanguageId !== langcode) return;
-    clearFilters();
-    setSearch('');
-    fetchTours({});
+
+    const isLangChange = initialLoadLangRef.current !== langcode;
+    initialLoadLangRef.current = langcode;
+
+    if (isLangChange) {
+      // New language (or first load): reset everything
+      clearFilters();
+      setSearch('');
+      fetchTours({});
+    } else {
+      // Re-focus: fetch with whatever filters the user has active (page reset to 1)
+      fetchTours({ page: 1 });
+    }
+
     fetchCountries();
     fetchCities();
   }, [currentLanguageId, langcode, focusGeneration]); // eslint-disable-line react-hooks/exhaustive-deps

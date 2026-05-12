@@ -560,6 +560,8 @@
   "step.streetView": "In Street View anzeigen",
   "step.showMap": "Karte anzeigen",
   "step.historyAndAudio": "Geschichte & Audioguide",
+  "step.tooFarTitle": "Sie sind zu weit entfernt",
+  "step.tooFarBody": "Die Routenvorschau ist nur innerhalb von {{km}} km verfügbar. Versuchen Sie es erneut, wenn Sie sich in der Tourstadt befinden.",
   "subscription.complete.sessionNotFound": "Sitzung nicht gefunden",
   "subscription.complete.backToDashboard": "Zurück zum Dashboard",
   "subscription.complete.paymentComplete": "Zahlung abgeschlossen!",

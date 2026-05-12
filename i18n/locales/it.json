@@ -560,6 +560,8 @@
   "step.streetView": "Vedi in Street View",
   "step.showMap": "Mostra mappa",
   "step.historyAndAudio": "Storia e audioguida",
+  "step.tooFarTitle": "Sei troppo lontano",
+  "step.tooFarBody": "L'anteprima del percorso è disponibile entro {{km}} km dalla destinazione. Riprova quando sei nella città del tour.",
   "subscription.complete.sessionNotFound": "Sessione non trovata",
   "subscription.complete.backToDashboard": "Torna alla dashboard",
   "subscription.complete.paymentComplete": "Pagamento completato!",

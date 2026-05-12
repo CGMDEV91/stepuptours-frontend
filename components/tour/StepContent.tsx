@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   StyleSheet,
   Animated,
@@ -149,6 +150,20 @@ function GoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedP
   );
 }
 
+// ─── MapFallback — static bundled image, zero network requests ───────────────
+
+const MAP_PLACEHOLDER = require('../../assets/images/map-generated.png');
+
+function MapFallback({ height }: { height: number }) {
+  return (
+      <Image
+          source={MAP_PLACEHOLDER}
+          style={[styles.mapFallback, { height }]}
+          resizeMode="cover"
+      />
+  );
+}
+
 // ─── AccordionSection ─────────────────────────────────────────────────────────
 
 interface AccordionSectionProps {
@@ -240,7 +255,17 @@ function SkipIcon({ direction, color }: { direction: 'back' | 'forward'; color: 
   );
 }
 
-const MAP_HEIGHT = 290;
+const MAP_HEIGHT              = 290;
+const MAX_ROUTE_DISTANCE_KM   = 2000;
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R      = 6371;
+  const toRad  = (d: number) => (d * Math.PI) / 180;
+  const dLat   = toRad(lat2 - lat1);
+  const dLon   = toRad(lon2 - lon1);
+  const a      = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 // ─── NavBlock ─────────────────────────────────────────────────────────────────
 
@@ -255,11 +280,12 @@ interface NavBlockProps {
   svKey: number;
   svAvailable: boolean;
   isDesktop: boolean;
+  isTooFar: boolean;
   onModeSelect: (mode: NavMode) => void;
   onGoToSite: () => void;
   onToggleStreetView: () => void;
   onSvUnavailable: () => void;
-  t: (key: string) => string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
 }
 
 function NavBlock({
@@ -273,6 +299,7 @@ function NavBlock({
                     svKey,
                     svAvailable,
                     isDesktop,
+                    isTooFar,
                     onModeSelect,
                     onGoToSite,
                     onToggleStreetView,
@@ -310,13 +337,35 @@ function NavBlock({
             <View style={[styles.navContent, isDesktop && styles.navContentDesktop]}>
               {/* Mapa o Street View */}
               <View style={[styles.navMapWrap, isDesktop && styles.navMapWrapDesktop]}>
-                <GoogleEmbed
-                    key={showingSV ? `sv-${svKey}` : `map-${selectedMode}`}
-                    uri={mapUri}
-                    height={mapHeight}
-                    interactive={showingSV}
-                    onUnavailable={showingSV ? onSvUnavailable : undefined}
-                />
+                {!showingSV && isTooFar ? (
+                    /* No se carga Google Maps — placeholder CSS + overlay blurry */
+                    <>
+                      <MapFallback height={mapHeight} />
+                      <View
+                          style={[
+                            StyleSheet.absoluteFillObject,
+                            styles.tooFarOverlay,
+                            Platform.OS === 'web'
+                                ? ({ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' } as any)
+                                : null,
+                          ]}
+                      >
+                        <Ionicons name="location-outline" size={28} color={ORANGE} />
+                        <Text style={styles.tooFarTitle}>{t('step.tooFarTitle')}</Text>
+                        <Text style={styles.tooFarBody}>
+                          {t('step.tooFarBody', { km: MAX_ROUTE_DISTANCE_KM })}
+                        </Text>
+                      </View>
+                    </>
+                ) : (
+                    <GoogleEmbed
+                        key={showingSV ? `sv-${svKey}` : `map-${selectedMode}`}
+                        uri={mapUri}
+                        height={mapHeight}
+                        interactive={showingSV}
+                        onUnavailable={showingSV ? onSvUnavailable : undefined}
+                    />
+                )}
               </View>
 
               {/* Botones */}
@@ -372,6 +421,7 @@ export function StepContent({
   const [historyOpen, setHistoryOpen]           = useState(isCompleted);
   const [navOpen, setNavOpen]                   = useState(true);
   const [waveContainerWidth, setWaveContainerWidth] = useState(0);
+  const [isTooFar, setIsTooFar]                 = useState(false);
 
   const svRetriesRef = useRef(0);
   const MAX_SV_RETRIES = 1;
@@ -452,6 +502,25 @@ export function StepContent({
       setSelectedMode('walking');
     }
   }, [isCompleted]);
+
+  // ── Distance check (web only: legacy embed fails for very long routes) ───────
+
+  useEffect(() => {
+    if (!step.location || Platform.OS !== 'web') return;
+    if (!navigator?.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const dist = haversineKm(
+          coords.latitude, coords.longitude,
+          step.location!.lat, step.location!.lon,
+        );
+        setIsTooFar(dist > MAX_ROUTE_DISTANCE_KM);
+      },
+      () => { /* permission denied or error — keep map visible */ },
+      { timeout: 5000, maximumAge: 300_000 },
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step.location?.lat, step.location?.lon]);
 
   // ── Street View retry / fallback ─────────────────────────────────────────
 
@@ -572,6 +641,7 @@ export function StepContent({
                   svKey={svKey}
                   svAvailable={svAvailable}
                   isDesktop={isDesktop}
+                  isTooFar={isTooFar}
                   onModeSelect={handleModeSelect}
                   onGoToSite={handleGoToSite}
                   onToggleStreetView={() => setStreetViewExpanded((v) => !v)}
@@ -1118,6 +1188,33 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+
+  // ── Map fallback (bundled image, no network) ────────────────────────────────
+  mapFallback: {
+    width: '100%',
+  },
+
+  // ── Too far overlay ─────────────────────────────────────────────────────────
+  tooFarOverlay: {
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    gap: 10,
+    borderRadius: 10,
+  },
+  tooFarTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1c1917',
+    textAlign: 'center',
+  },
+  tooFarBody: {
+    fontSize: 13,
+    color: '#78716c',
+    textAlign: 'center',
+    lineHeight: 19,
   },
 
   // ── TTS warning ─────────────────────────────────────────────────────────────

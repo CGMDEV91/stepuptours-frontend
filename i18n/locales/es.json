@@ -560,6 +560,8 @@
   "step.streetView": "Ver en Street View",
   "step.showMap": "Mostrar mapa",
   "step.historyAndAudio": "Historia y audioguía",
+  "step.tooFarTitle": "Estás demasiado lejos",
+  "step.tooFarBody": "La previsualización de ruta está disponible en un radio de {{km}} km. Inténtalo de nuevo cuando estés en la ciudad del tour.",
   "footer.quickLinks": "Enlaces Rápidos",
   "footer.contactInfo": "Información de Contacto",
   "footer.allRights": "Todos los derechos reservados.",
