@@ -541,13 +541,15 @@ export default function HomePage() {
       clearFilters();
       setSearch('');
       fetchTours({});
+      fetchCities(); // all cities — filters were just cleared
     } else {
       // Re-focus: fetch with whatever filters the user has active (page reset to 1)
       fetchTours({ page: 1 });
+      // Preserve country-filtered city list; fall back to all cities
+      fetchCities(filters.countries?.length ? filters.countries : undefined);
     }
 
     fetchCountries();
-    fetchCities();
   }, [currentLanguageId, langcode, focusGeneration]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -600,18 +602,16 @@ export default function HomePage() {
     const updated = current.includes(country)
       ? current.filter((c) => c !== country)
       : [...current, country];
-    const next: Partial<TourFilters> = { countries: updated.length ? updated : undefined, city: undefined };
-    setFilters(next);
+    setFilters({ countries: updated.length ? updated : undefined, city: undefined });
     fetchCities(updated);
-    fetchTours({ ...filters, ...next, page: 1 });
+    fetchTours({ page: 1 });
     void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `country:${country}` });
   };
 
   const handleCountryClear = () => {
-    const next: Partial<TourFilters> = { countries: undefined, city: undefined };
-    setFilters(next);
+    setFilters({ countries: undefined, city: undefined });
     fetchCities([]);
-    fetchTours({ ...filters, ...next, page: 1 });
+    fetchTours({ page: 1 });
   };
 
   const handleCitySelect = (city: string | null) => {
@@ -626,7 +626,7 @@ export default function HomePage() {
       }
     }
     setFilters(next);
-    fetchTours({ ...filters, ...next, page: 1 });
+    fetchTours({ page: 1 });
     if (city) {
       void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `city:${city}` });
     }
@@ -634,7 +634,7 @@ export default function HomePage() {
 
   const handleSortSelect = (sort: TourFilters['sort']) => {
     setFilters({ sort });
-    fetchTours({ ...filters, sort, page: 1 });
+    fetchTours({ page: 1 });
     if (sort) {
       void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `sort:${sort}` });
     }

@@ -66,8 +66,9 @@ const DEFAULT_FILTERS: TourFilters = {
   limit: 9,
 };
 
-// Monotonic counter: ensures stale async fetches never overwrite newer results.
+// Monotonic counters: ensure stale async responses never overwrite newer results.
 let _activeFetchId = 0;
+let _activeCitiesFetchId = 0;
 
 export const useToursStore = create<ToursState>((set, get) => ({
   tours: [],
@@ -233,8 +234,10 @@ export const useToursStore = create<ToursState>((set, get) => ({
   },
 
   fetchCities: async (countries?: string[]) => {
+    const citiesId = ++_activeCitiesFetchId;
     try {
       const cities = await getCitiesByCountry(countries);
+      if (citiesId !== _activeCitiesFetchId) return;
       set({ cities });
     } catch {
       // No crítico
@@ -246,7 +249,7 @@ export const useToursStore = create<ToursState>((set, get) => ({
   },
 
   clearFilters: () => {
-    set({ filters: DEFAULT_FILTERS, cities: [] });
+    set({ filters: DEFAULT_FILTERS });
   },
 
   clearError: () => set({ error: null }),
