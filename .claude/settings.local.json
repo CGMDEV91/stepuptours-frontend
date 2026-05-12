@@ -17,7 +17,8 @@
       "PowerShell(wsl -e bash -c \"cd /home/carlos/devel/stepuptours/stepuptours-frontend && npx tsc --noEmit 2>&1 | head -60\")",
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(git -C .claude/worktrees/zealous-euclid-9812e5 log --oneline main..HEAD)",
-      "Bash(git log *)"
+      "Bash(git log *)",
+      "Bash(cd \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\")"
     ]
   }
 }

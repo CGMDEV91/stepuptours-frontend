@@ -58,6 +58,7 @@ interface ToursState {
   fetchCities: (countries?: string[]) => Promise<void>;
   setFilters: (filters: Partial<TourFilters>) => void;
   clearFilters: () => void;
+  clearTours: () => void;
   clearError: () => void;
 }
 
@@ -250,6 +251,10 @@ export const useToursStore = create<ToursState>((set, get) => ({
 
   clearFilters: () => {
     set({ filters: DEFAULT_FILTERS });
+  },
+
+  clearTours: () => {
+    set({ tours: [], total: 0, isLoading: true });
   },
 
   clearError: () => set({ error: null }),

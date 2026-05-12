@@ -492,7 +492,7 @@ export default function HomePage() {
   const {
     tours, total, isLoading, hasMore, filters,
     countries, cities, fetchTours, fetchCountries, fetchCities,
-    setFilters, clearFilters,
+    setFilters, clearFilters, clearTours,
     userActivities, fetchUserActivities, toggleFavorite,
   } = useToursStore();
 
@@ -642,6 +642,7 @@ export default function HomePage() {
 
   const handleClear = () => {
     clearFilters();
+    clearTours();
     setSearch('');
     fetchCities();
     fetchTours({});
@@ -830,6 +831,11 @@ export default function HomePage() {
           </>
         }
       />
+      {isLoading && !isLoadingMore && tours.length > 0 && (
+        <View style={styles.gridLoadingOverlay} pointerEvents="none">
+          <ActivityIndicator color={AMBER} size="large" />
+        </View>
+      )}
     </View>
     </>
   );
@@ -838,6 +844,13 @@ export default function HomePage() {
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#FFFFFF', ...webFullHeight },
+  gridLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.60)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  } as const,
 
   btnPrimary: { backgroundColor: AMBER, paddingHorizontal: 20, paddingVertical: 9, borderRadius: 20 },
   btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
