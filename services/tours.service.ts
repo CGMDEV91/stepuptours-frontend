@@ -206,11 +206,19 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
 
   // Count request: same filters as data query but no pagination, base URL so all
   // published tours matching the filters are counted regardless of translation status.
+  // Promise.allSettled prevents a slow/failing count query from blocking tour display —
+  // combined city+country filters on the base (non-language) URL can be slow on some
+  // environments; falling back to the data-page length keeps the UI responsive.
   const countParams = [filterStr, 'fields[node--tour]=id', 'page[limit]=500'].filter(Boolean).join('&');
-  const [{ data }, allTours] = await Promise.all([
+  const [dataResult, countResult] = await Promise.allSettled([
     drupalGetRaw('/node/tour', dataParams),
     drupalGetJsonApiBase('/node/tour', countParams),
   ]);
+
+  if (dataResult.status === 'rejected') throw dataResult.reason;
+
+  const { data } = dataResult.value;
+  const allTours = countResult.status === 'fulfilled' ? countResult.value : [];
 
   const rawList = Array.isArray(data) ? data : [data];
   const mapped = rawList.map(mapDrupalTour);
@@ -222,10 +230,17 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
     });
   }
 
+  // If count query failed, fall back to data-page size so hasMore is conservative
+  // (may show "load more" when none exist) rather than cutting off real results.
+  const total = countResult.status === 'fulfilled' ? allTours.length : mapped.length;
+  const hasMore = countResult.status === 'fulfilled'
+    ? page * limit < allTours.length
+    : mapped.length === limit;
+
   return {
     data: mapped,
-    total: allTours.length,
-    hasMore: page * limit < allTours.length,
+    total,
+    hasMore,
   };
 }
 

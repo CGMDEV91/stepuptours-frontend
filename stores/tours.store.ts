@@ -97,7 +97,12 @@ export const useToursStore = create<ToursState>((set, get) => ({
       const result: PaginatedResult<Tour> = await getTours(mergedFilters);
 
       // Discard result if a newer fetch has already been dispatched.
-      if (fetchId !== _activeFetchId) return;
+      // Still clear isLoading to prevent a permanently stuck spinner in case
+      // the newer fetch also gets abandoned before it resolves.
+      if (fetchId !== _activeFetchId) {
+        set({ isLoading: false });
+        return;
+      }
 
       set((state) => ({
         tours: append
@@ -109,7 +114,10 @@ export const useToursStore = create<ToursState>((set, get) => ({
         isLoading: false,
       }));
     } catch (err: any) {
-      if (fetchId !== _activeFetchId) return;
+      if (fetchId !== _activeFetchId) {
+        set({ isLoading: false });
+        return;
+      }
       set({ isLoading: false, error: err.message ?? 'Error al cargar tours' });
     }
   },
