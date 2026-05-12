@@ -20,6 +20,18 @@ function extractErrorMessage(err: any, fallback: string): string {
   return fallback;
 }
 
+/**
+ * btoa() nativo solo soporta Latin-1 (≤ U+00FF) y lanza InvalidCharacterError
+ * con contraseñas que contengan Unicode fuera de ese rango.
+ * Esta función codifica primero en UTF-8 para soportar cualquier contraseña.
+ */
+function toBasicAuthToken(username: string, password: string): string {
+  const bytes = new TextEncoder().encode(`${username}:${password}`);
+  let binary = '';
+  bytes.forEach(b => { binary += String.fromCharCode(b); });
+  return btoa(binary);
+}
+
 /** Obtiene los roles actuales de un usuario desde Drupal JSON:API */
 async function fetchUserRoles(userId: string, authHeader: string): Promise<string[]> {
   const res = await axios.get(`${BASE_URL}/api/me`, {
@@ -35,7 +47,7 @@ async function fetchUserRoles(userId: string, authHeader: string): Promise<strin
 // ── Login ─────────────────────────────────────────────────────────────────────
 
 export async function login(credentials: AuthCredentials, rememberMe = false): Promise<AuthSession> {
-  const token = btoa(`${credentials.username}:${credentials.password}`);
+  const token = toBasicAuthToken(credentials.username, credentials.password);
   const authHeader = `Basic ${token}`;
 
   let response: any;
