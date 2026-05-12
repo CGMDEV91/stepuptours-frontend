@@ -35,6 +35,7 @@
   "step.tts.pause": "Pausa",
   "step.tts.stop": "Ferma",
   "step.tts.listen": "Ascolta la descrizione",
+  "step.tts.loading": "Caricamento audioguida...",
   "step.description": "Descrizione",
   "step.progress": "{{completed}} di {{total}} tappe completate",
   "popup.congratulations": "Congratulazioni!",

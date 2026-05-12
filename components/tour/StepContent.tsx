@@ -733,6 +733,21 @@ export function StepContent({
                         </View>
                     ) : (
                         <View style={[styles.playerCard, isDesktop && styles.playerCardDesktop]}>
+                          {/* Overlay de carga mientras el backend genera el audio */}
+                          {tts.playState === 'loading' && (
+                              <View
+                                  style={[
+                                    StyleSheet.absoluteFillObject,
+                                    styles.playerLoadingOverlay,
+                                    Platform.OS === 'web'
+                                        ? ({ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' } as any)
+                                        : null,
+                                  ]}
+                              >
+                                <ActivityIndicator color={ORANGE} size="small" />
+                                <Text style={styles.playerLoadingText}>{t('step.tts.loading')}</Text>
+                              </View>
+                          )}
                           {/* Título + velocidad + stop */}
                           <View style={styles.playerTopRow}>
                             <Text style={styles.playerTitle} numberOfLines={1}>{step.title}</Text>
@@ -1071,9 +1086,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     gap: 8,
+    overflow: 'hidden',
   },
   playerCardDesktop: {
     alignSelf: 'stretch',
+  },
+  playerLoadingOverlay: {
+    backgroundColor: 'rgba(28, 25, 23, 0.82)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    borderRadius: 12,
+    zIndex: 10,
+  },
+  playerLoadingText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.85)',
   },
   playerTopRow: {
     flexDirection: 'row',
