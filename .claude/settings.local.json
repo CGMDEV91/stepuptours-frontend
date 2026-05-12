@@ -18,7 +18,11 @@
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(git -C .claude/worktrees/zealous-euclid-9812e5 log --oneline main..HEAD)",
       "Bash(git log *)",
-      "Bash(cd \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\")"
+      "Bash(cd \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\")",
+      "Read(///wsl.localhost/Ubuntu/home/carlos/devel/stepuptours/**)",
+      "Bash(dir \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\")",
+      "Bash(cmd /c \"dir /s /b \\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\\\\app\")",
+      "Bash(cmd /c \"dir /s /b \\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\\\\components\")"
     ]
   }
 }

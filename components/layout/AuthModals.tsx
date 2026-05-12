@@ -306,6 +306,13 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     if (found) setSelectedLangLabel(found.name);
   }, [languages, selectedLangCode]);
 
+  useEffect(() => {
+    if (!allowProfessional && (role === 'guide' || role === 'business')) {
+      setRole('traveller');
+      setConsent(false);
+    }
+  }, [allowProfessional]);
+
   const langButtonRef = useRef<any>(null);
   const publicNameRef = useRef<RNTextInput>(null);
   const emailRef = useRef<RNTextInput>(null);
@@ -408,7 +415,7 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
           <Text style={[modalStyles.title, { marginBottom: 4 }]}>{t('auth.chooseYourProfile')}</Text>
           <Text style={[modalStyles.subtitle, { marginBottom: 16 }]}>{t('auth.chooseYourProfileHint')}</Text>
 
-          {/* Role cards — always shown regardless of allowProfessional */}
+          {/* Role cards — Guide and Business locked when allowProfessional is false */}
           <View style={proStyles.section}>
             {(
               [
@@ -418,27 +425,32 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
               ] as const
             ).map(({ value, icon, titleKey, hintKey }) => {
               const selected = role === value;
+              const locked = !allowProfessional && value !== 'traveller';
               const isBusiness = value === 'business';
               return (
                 <TouchableOpacity
                   key={value}
-                  style={[proStyles.card, selected && (isBusiness ? proStyles.cardBusiness : proStyles.cardGuide)]}
+                  style={[proStyles.card, locked ? proStyles.cardLocked : (selected && (isBusiness ? proStyles.cardBusiness : proStyles.cardGuide))]}
                   onPress={() => handleRoleSelect(value)}
-                  activeOpacity={0.8}
+                  disabled={locked}
+                  activeOpacity={locked ? 1 : 0.8}
                 >
-                  <View style={[proStyles.radio, selected && (isBusiness ? proStyles.radioBusiness : proStyles.radioGuide)]}>
-                    {selected && <Ionicons name="checkmark" size={10} color="#fff" />}
+                  <View style={[proStyles.radio, locked ? proStyles.radioLocked : (selected && (isBusiness ? proStyles.radioBusiness : proStyles.radioGuide))]}>
+                    {locked
+                      ? <Ionicons name="lock-closed" size={9} color="#9CA3AF" />
+                      : (selected && <Ionicons name="checkmark" size={10} color="#fff" />)
+                    }
                   </View>
                   <Ionicons
                     name={icon}
                     size={16}
-                    color={selected ? (isBusiness ? '#059669' : '#D97706') : '#9CA3AF'}
+                    color={locked ? '#D1D5DB' : (selected ? (isBusiness ? '#059669' : '#D97706') : '#9CA3AF')}
                   />
                   <View style={proStyles.cardText}>
-                    <Text style={[proStyles.cardTitle, selected && (isBusiness ? proStyles.cardTitleBusiness : proStyles.cardTitleGuide)]}>
+                    <Text style={[proStyles.cardTitle, locked ? proStyles.cardTitleLocked : (selected && (isBusiness ? proStyles.cardTitleBusiness : proStyles.cardTitleGuide))]}>
                       {t(titleKey)}
                     </Text>
-                    <Text style={proStyles.cardHint}>{t(hintKey)}</Text>
+                    <Text style={[proStyles.cardHint, locked && { color: '#D1D5DB' }]}>{t(hintKey)}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -612,69 +624,72 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
         <Ionicons name="chevron-down" size={16} color="#6B7280" />
       </TouchableOpacity>
 
-      {/* Sección profesional — visible solo si allowProfessional */}
-      {allowProfessional && (
-        <View style={proStyles.section}>
-          <Text style={proStyles.question}>{t('auth.roleProfessionalQuestion')}</Text>
+      {/* Sección de rol — siempre visible; Guide y Business bloqueadas si !allowProfessional */}
+      <View style={proStyles.section}>
+        {allowProfessional && <Text style={proStyles.question}>{t('auth.roleProfessionalQuestion')}</Text>}
 
-          {(
-            [
-              { value: 'traveller', icon: 'person-outline',     titleKey: 'auth.roleTraveller',  hintKey: 'auth.roleTravellerHint'  },
-              { value: 'guide',     icon: 'map-outline',        titleKey: 'auth.roleGuide',      hintKey: 'auth.roleGuideHint'      },
-              { value: 'business',  icon: 'storefront-outline', titleKey: 'auth.roleBusiness',   hintKey: 'auth.roleBusinessHint'   },
-            ] as const
-          ).map(({ value, icon, titleKey, hintKey }) => {
-            const selected = role === value;
-            const isBusiness = value === 'business';
-            return (
-              <TouchableOpacity
-                key={value}
-                style={[proStyles.card, selected && (isBusiness ? proStyles.cardBusiness : proStyles.cardGuide)]}
-                onPress={() => handleRoleSelect(value)}
-                activeOpacity={0.8}
-              >
-                <View style={[proStyles.radio, selected && (isBusiness ? proStyles.radioBusiness : proStyles.radioGuide)]}>
-                  {selected && <Ionicons name="checkmark" size={10} color="#fff" />}
-                </View>
-                <Ionicons
-                  name={icon}
-                  size={16}
-                  color={selected ? (isBusiness ? '#059669' : '#D97706') : '#9CA3AF'}
-                />
-                <View style={proStyles.cardText}>
-                  <Text style={[proStyles.cardTitle, selected && (isBusiness ? proStyles.cardTitleBusiness : proStyles.cardTitleGuide)]}>
-                    {t(titleKey)}
-                  </Text>
-                  <Text style={proStyles.cardHint}>{t(hintKey)}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-
-          {(role === 'guide' || role === 'business') && (
-            <>
-              <TouchableOpacity
-                style={proStyles.consentRow}
-                onPress={() => {
-                  setConsent((v) => !v);
-                  setFieldErrors((e) => ({ ...e, consent: undefined }));
-                }}
-                activeOpacity={0.7}
-              >
-                <View style={[proStyles.checkbox, consent && proStyles.checkboxChecked]}>
-                  {consent && <Ionicons name="checkmark" size={12} color="#fff" />}
-                </View>
-                <Text style={proStyles.consentText}>
-                  {t(role === 'guide' ? 'auth.consentGuide' : 'auth.consentBusiness')}
+        {(
+          [
+            { value: 'traveller', icon: 'person-outline',     titleKey: 'auth.roleTraveller',  hintKey: 'auth.roleTravellerHint'  },
+            { value: 'guide',     icon: 'map-outline',        titleKey: 'auth.roleGuide',      hintKey: 'auth.roleGuideHint'      },
+            { value: 'business',  icon: 'storefront-outline', titleKey: 'auth.roleBusiness',   hintKey: 'auth.roleBusinessHint'   },
+          ] as const
+        ).map(({ value, icon, titleKey, hintKey }) => {
+          const selected = role === value;
+          const locked = !allowProfessional && value !== 'traveller';
+          const isBusiness = value === 'business';
+          return (
+            <TouchableOpacity
+              key={value}
+              style={[proStyles.card, locked ? proStyles.cardLocked : (selected && (isBusiness ? proStyles.cardBusiness : proStyles.cardGuide))]}
+              onPress={() => handleRoleSelect(value)}
+              disabled={locked}
+              activeOpacity={locked ? 1 : 0.8}
+            >
+              <View style={[proStyles.radio, locked ? proStyles.radioLocked : (selected && (isBusiness ? proStyles.radioBusiness : proStyles.radioGuide))]}>
+                {locked
+                  ? <Ionicons name="lock-closed" size={9} color="#9CA3AF" />
+                  : (selected && <Ionicons name="checkmark" size={10} color="#fff" />)
+                }
+              </View>
+              <Ionicons
+                name={icon}
+                size={16}
+                color={locked ? '#D1D5DB' : (selected ? (isBusiness ? '#059669' : '#D97706') : '#9CA3AF')}
+              />
+              <View style={proStyles.cardText}>
+                <Text style={[proStyles.cardTitle, locked ? proStyles.cardTitleLocked : (selected && (isBusiness ? proStyles.cardTitleBusiness : proStyles.cardTitleGuide))]}>
+                  {t(titleKey)}
                 </Text>
-              </TouchableOpacity>
-              {fieldErrors.consent && (
-                <Text style={proStyles.fieldError}>{fieldErrors.consent}</Text>
-              )}
-            </>
-          )}
-        </View>
-      )}
+                <Text style={[proStyles.cardHint, locked && { color: '#D1D5DB' }]}>{t(hintKey)}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+
+        {(role === 'guide' || role === 'business') && (
+          <>
+            <TouchableOpacity
+              style={proStyles.consentRow}
+              onPress={() => {
+                setConsent((v) => !v);
+                setFieldErrors((e) => ({ ...e, consent: undefined }));
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={[proStyles.checkbox, consent && proStyles.checkboxChecked]}>
+                {consent && <Ionicons name="checkmark" size={12} color="#fff" />}
+              </View>
+              <Text style={proStyles.consentText}>
+                {t(role === 'guide' ? 'auth.consentGuide' : 'auth.consentBusiness')}
+              </Text>
+            </TouchableOpacity>
+            {fieldErrors.consent && (
+              <Text style={proStyles.fieldError}>{fieldErrors.consent}</Text>
+            )}
+          </>
+        )}
+      </View>
 
       {/* Aceptación política de privacidad */}
       <View style={{ marginBottom: 12 }}>
@@ -992,6 +1007,7 @@ const proStyles = StyleSheet.create({
   },
   cardGuide:     { borderColor: '#F59E0B', backgroundColor: '#FFFBEB' },
   cardBusiness:  { borderColor: '#10B981', backgroundColor: '#ECFDF5' },
+  cardLocked:    { borderColor: '#E5E7EB', backgroundColor: '#F9FAFB', opacity: 0.55 },
   radio: {
     width: 18,
     height: 18,
@@ -1005,6 +1021,7 @@ const proStyles = StyleSheet.create({
   },
   radioGuide:    { borderColor: '#F59E0B', backgroundColor: '#F59E0B' },
   radioBusiness: { borderColor: '#10B981', backgroundColor: '#10B981' },
+  radioLocked:   { borderColor: '#D1D5DB', backgroundColor: '#F3F4F6' },
   cardText: { flex: 1 },
   cardTitle: {
     fontSize: 13,
@@ -1013,6 +1030,7 @@ const proStyles = StyleSheet.create({
   },
   cardTitleGuide:    { color: '#D97706' },
   cardTitleBusiness: { color: '#059669' },
+  cardTitleLocked:   { color: '#9CA3AF' },
   cardHint: {
     fontSize: 11,
     color: '#9CA3AF',
