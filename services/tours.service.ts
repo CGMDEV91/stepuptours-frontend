@@ -4,8 +4,6 @@
 import {
   drupalGet,
   drupalGetRaw,
-  drupalGetJsonApi,
-  drupalGetJsonApiBase,
   drupalPost,
   drupalPatch,
   buildFilters,
@@ -41,6 +39,7 @@ const TOUR_FIELDS = {
     'field_location',
     'field_city',
     'field_country',
+    'field_steps_count',
     'field_featured_business_1',
     'field_featured_business_2',
     'field_featured_business_3',
@@ -81,6 +80,7 @@ const TOUR_CARD_FIELDS = {
     'field_donation_count',
     'field_city',
     'field_country',
+    'field_steps_count',
     'status',
   ],
   'taxonomy_term--cities': ['name'],
@@ -89,80 +89,6 @@ const TOUR_CARD_FIELDS = {
 };
 
 const TOUR_CARD_INCLUDE = ['field_image', 'field_city', 'field_country'];
-
-// ── Step count cache ──────────────────────────────────────────────────────────
-// Avoids a second API round-trip for counts that haven't changed.
-// Keyed by tourId; entries expire after 5 minutes.
-
-const STEP_COUNT_CACHE_TTL = 5 * 60 * 1000; // 5 min
-
-interface StepCountEntry {
-  count: number;
-  expiresAt: number;
-}
-
-const stepCountCache = new Map<string, StepCountEntry>();
-
-function getCachedStepCounts(tourIds: string[]): {
-  cached: Record<string, number>;
-  missing: string[];
-} {
-  const now = Date.now();
-  const cached: Record<string, number> = {};
-  const missing: string[] = [];
-
-  for (const id of tourIds) {
-    const entry = stepCountCache.get(id);
-    if (entry && entry.expiresAt > now) {
-      cached[id] = entry.count;
-    } else {
-      missing.push(id);
-    }
-  }
-  return { cached, missing };
-}
-
-function setCachedStepCounts(counts: Record<string, number>): void {
-  const expiresAt = Date.now() + STEP_COUNT_CACHE_TTL;
-  for (const [id, count] of Object.entries(counts)) {
-    stepCountCache.set(id, { count, expiresAt });
-  }
-}
-
-// ── Batch step count helper ───────────────────────────────────────────────────
-
-async function batchGetStepCounts(tourIds: string[]): Promise<Record<string, number>> {
-  if (tourIds.length === 0) return {};
-
-  const { cached, missing } = getCachedStepCounts(tourIds);
-  if (missing.length === 0) return cached;
-
-  // One parallel call per tour — identical filter to getTourById (proven to work).
-  // A single batch IN-filter was unreliable: Drupal JSON:API returned 0 for some
-  // tours even when steps existed, likely due to how the IN condition is parsed
-  // server-side. Parallel individual calls are guaranteed correct.
-  const results = await Promise.allSettled(
-      missing.map(async (id) => {
-        const steps = await drupalGetJsonApi(
-            '/node/tour_step',
-            `filter[field_tour.id]=${id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
-        );
-        return { id, count: Array.isArray(steps) ? steps.length : 0 };
-      })
-  );
-
-  const fetched: Record<string, number> = {};
-  for (const id of missing) fetched[id] = 0;
-  for (const result of results) {
-    if (result.status === 'fulfilled') {
-      fetched[result.value.id] = result.value.count;
-    }
-    // 'rejected' leaves the tour at 0 — not cached, so it retries on next fetch
-  }
-
-  setCachedStepCounts(fetched);
-  return { ...cached, ...fetched };
-}
 
 // ── Obtener listado de tours ───────────────────────────────────────────────────
 
@@ -215,13 +141,6 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
   const rawList = Array.isArray(data) ? data : [data];
   const mapped = rawList.map(mapDrupalTour);
 
-  if (mapped.length > 0) {
-    const stepCounts = await batchGetStepCounts(mapped.map((t) => t.id));
-    mapped.forEach((t) => {
-      t.stopsCount = stepCounts[t.id] ?? 0;
-    });
-  }
-
   const total = typeof (meta as any)?.count === 'number' ? (meta as any).count : undefined;
   const hasMore = total !== undefined ? page * limit < total : mapped.length === limit;
 
@@ -241,21 +160,7 @@ export async function getTourById(id: string): Promise<Tour> {
   ].join('&');
 
   const raw = await drupalGet<any>(`/node/tour/${id}`, params);
-  const tour = mapDrupalTour(raw);
-
-  try {
-    // Use base URL (no language prefix) so the count includes all published steps
-    // regardless of whether they have a translation in the current language.
-    const steps = await drupalGetJsonApiBase(
-        '/node/tour_step',
-        `filter[field_tour.id]=${raw.id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`
-    );
-    tour.stopsCount = steps.length;
-  } catch {
-    tour.stopsCount = 0;
-  }
-
-  return tour;
+  return mapDrupalTour(raw);
 }
 
 // ── Obtener tour por nid (Drupal internal node ID) ────────────────────────────
@@ -272,18 +177,7 @@ export async function getTourByNid(nid: number): Promise<Tour> {
   const list = Array.isArray(data) ? data : data ? [data] : [];
   if (list.length === 0) throw new Error(`Tour with nid ${nid} not found`);
 
-  const tour = mapDrupalTour(list[0]);
-  try {
-    const steps = await drupalGetJsonApiBase(
-        '/node/tour_step',
-        `filter[field_tour.id]=${list[0].id}&filter[status]=1&fields[node--tour_step]=id&page[limit]=100`,
-    );
-    tour.stopsCount = steps.length;
-  } catch {
-    tour.stopsCount = 0;
-  }
-
-  return tour;
+  return mapDrupalTour(list[0]);
 }
 
 // ── Obtener steps de un tour ──────────────────────────────────────────────────
@@ -437,6 +331,7 @@ export async function getUserTourActivities(userId: string): Promise<TourActivit
         'field_donation_count',
         'field_city',
         'field_country',
+        'field_steps_count',
         'status',
       ],
       'taxonomy_term--cities': ['name'],
@@ -480,6 +375,7 @@ export async function getUserActivitiesWithTours(userId: string): Promise<Activi
         'field_donation_count',
         'field_city',
         'field_country',
+        'field_steps_count',
         'status',
       ],
       'taxonomy_term--cities': ['name'],
@@ -499,14 +395,6 @@ export async function getUserActivitiesWithTours(userId: string): Promise<Activi
     if (tour) {
       results.push({ activity, tour });
     }
-  }
-
-  if (results.length > 0) {
-    const tourIds = results.map((r) => r.tour.id);
-    const stepCounts = await batchGetStepCounts(tourIds);
-    results.forEach((r) => {
-      r.tour.stopsCount = stepCounts[r.tour.id] ?? 0;
-    });
   }
 
   return results;
@@ -532,16 +420,7 @@ export async function getToursByIds(ids: string[]): Promise<Tour[]> {
 
   const { data } = await drupalGetRaw('/node/tour', params);
   const rawList = Array.isArray(data) ? data : data ? [data] : [];
-  const mapped = rawList.map(mapDrupalTour);
-
-  if (mapped.length > 0) {
-    const stepCounts = await batchGetStepCounts(mapped.map((t) => t.id));
-    mapped.forEach((t) => {
-      t.stopsCount = stepCounts[t.id] ?? 0;
-    });
-  }
-
-  return mapped;
+  return rawList.map(mapDrupalTour);
 }
 
 // ── Obtener países disponibles ─────────────────────────────────────────────────
