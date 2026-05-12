@@ -562,6 +562,7 @@
   "step.historyAndAudio": "Geschichte & Audioguide",
   "step.tooFarTitle": "Sie sind zu weit entfernt",
   "step.tooFarBody": "Die Routenvorschau ist nur innerhalb von {{km}} km verfügbar. Versuchen Sie es erneut, wenn Sie sich in der Tourstadt befinden.",
+  "step.mapLoading": "Route wird geladen…",
   "subscription.complete.sessionNotFound": "Sitzung nicht gefunden",
   "subscription.complete.backToDashboard": "Zurück zum Dashboard",
   "subscription.complete.paymentComplete": "Zahlung abgeschlossen!",

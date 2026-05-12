@@ -562,6 +562,7 @@
   "step.historyAndAudio": "Ιστορία και ηχητικός οδηγός",
   "step.tooFarTitle": "Είστε πολύ μακριά",
   "step.tooFarBody": "Η προεπισκόπηση διαδρομής είναι διαθέσιμη εντός {{km}} χλμ. Δοκιμάστε ξανά όταν βρίσκεστε στην πόλη της περιήγησης.",
+  "step.mapLoading": "Φόρτωση διαδρομής…",
   "subscription.complete.sessionNotFound": "Η συνεδρία δεν βρέθηκε",
   "subscription.complete.backToDashboard": "Επιστροφή στον πίνακα ελέγχου",
   "subscription.complete.paymentComplete": "Η πληρωμή ολοκληρώθηκε!",

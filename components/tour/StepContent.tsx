@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
+  ActivityIndicator,
   Platform,
   Linking,
   LayoutChangeEvent,
@@ -66,9 +67,10 @@ interface EmbedProps {
   height: number;
   interactive?: boolean;
   onUnavailable?: () => void;
+  onLoad?: () => void;
 }
 
-function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedProps) {
+function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable, onLoad }: EmbedProps) {
   const SV_WEB_TIMEOUT = 7_000;
   const iframeRef  = useRef<HTMLIFrameElement>(null);
   const isMounted  = useRef(true);
@@ -113,13 +115,14 @@ function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable }: Emb
             allowFullScreen
             allow="accelerometer *; gyroscope *; geolocation *; fullscreen *; xr-spatial-tracking *"
             referrerPolicy="no-referrer-when-downgrade"
+            onLoad={onLoad}
         />
         {!interactive && <View style={StyleSheet.absoluteFill} />}
       </View>
   );
 }
 
-function GoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedProps) {
+function GoogleEmbed({ uri, height, interactive = false, onUnavailable, onLoad }: EmbedProps) {
   const wrapStyle    = { height, overflow: 'hidden' as const, position: 'relative' as const };
   const webViewRef   = useRef<WebView>(null);
 
@@ -128,7 +131,7 @@ function GoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedP
   }, []);
 
   if (Platform.OS === 'web') {
-    return <WebGoogleEmbed uri={uri} height={height} interactive={interactive} onUnavailable={onUnavailable} />;
+    return <WebGoogleEmbed uri={uri} height={height} interactive={interactive} onUnavailable={onUnavailable} onLoad={onLoad} />;
   }
 
   return (
@@ -143,6 +146,7 @@ function GoogleEmbed({ uri, height, interactive = false, onUnavailable }: EmbedP
             injectedJavaScript={onUnavailable ? SV_INJECT_JS : undefined}
             onMessage={(e) => { if (e.nativeEvent.data === 'sv_unavailable') onUnavailable?.(); }}
             onShouldStartLoadWithRequest={(req) => isGoogleMapsUrl(req.url)}
+            onLoadEnd={onLoad}
             style={{ flex: 1, backgroundColor: '#e8e8e8' }}
         />
         {!interactive && <View style={StyleSheet.absoluteFill} pointerEvents="box-only" />}
@@ -281,10 +285,13 @@ interface NavBlockProps {
   svAvailable: boolean;
   isDesktop: boolean;
   isTooFar: boolean;
+  isMapLoading: boolean;
+  onMapLoad: () => void;
   onModeSelect: (mode: NavMode) => void;
   onGoToSite: () => void;
   onToggleStreetView: () => void;
   onSvUnavailable: () => void;
+  mapLoadAnim: Animated.Value;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }
 
@@ -300,10 +307,13 @@ function NavBlock({
                     svAvailable,
                     isDesktop,
                     isTooFar,
+                    isMapLoading,
+                    onMapLoad,
                     onModeSelect,
                     onGoToSite,
                     onToggleStreetView,
                     onSvUnavailable,
+                    mapLoadAnim,
                     t,
                   }: NavBlockProps) {
   if (!step.location) return null;
@@ -358,13 +368,32 @@ function NavBlock({
                       </View>
                     </>
                 ) : (
-                    <GoogleEmbed
-                        key={showingSV ? `sv-${svKey}` : `map-${selectedMode}`}
-                        uri={mapUri}
-                        height={mapHeight}
-                        interactive={showingSV}
-                        onUnavailable={showingSV ? onSvUnavailable : undefined}
-                    />
+                    <>
+                      <GoogleEmbed
+                          key={showingSV ? `sv-${svKey}` : `map-${selectedMode}`}
+                          uri={mapUri}
+                          height={mapHeight}
+                          interactive={showingSV}
+                          onUnavailable={showingSV ? onSvUnavailable : undefined}
+                          onLoad={!showingSV ? onMapLoad : undefined}
+                      />
+                      {!showingSV && isMapLoading && (
+                          <Animated.View
+                              style={[
+                                StyleSheet.absoluteFillObject,
+                                styles.mapLoadingOverlay,
+                                Platform.OS === 'web'
+                                    ? ({ backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' } as any)
+                                    : null,
+                                { opacity: mapLoadAnim },
+                              ]}
+                              pointerEvents="none"
+                          >
+                            <ActivityIndicator color={ORANGE} size="small" />
+                            <Text style={styles.mapLoadingText}>{t('step.mapLoading')}</Text>
+                          </Animated.View>
+                      )}
+                    </>
                 )}
               </View>
 
@@ -422,6 +451,8 @@ export function StepContent({
   const [navOpen, setNavOpen]                   = useState(true);
   const [waveContainerWidth, setWaveContainerWidth] = useState(0);
   const [isTooFar, setIsTooFar]                 = useState(false);
+  const [isMapLoading, setIsMapLoading]         = useState(true);
+  const mapLoadAnim = useRef(new Animated.Value(1)).current;
 
   const svRetriesRef = useRef(0);
   const MAX_SV_RETRIES = 1;
@@ -534,6 +565,22 @@ export function StepContent({
     }
   }, []);
 
+  // Reset loading overlay whenever the directions mode changes (new iframe = new route request)
+  useEffect(() => {
+    if (selectedMode && !streetViewExpanded) {
+      setIsMapLoading(true);
+      mapLoadAnim.setValue(1);
+    }
+  }, [selectedMode, streetViewExpanded]);
+
+  const handleMapLoad = useCallback(() => {
+    Animated.timing(mapLoadAnim, {
+      toValue: 0,
+      duration: 400,
+      useNativeDriver: USE_NATIVE_DRIVER,
+    }).start(() => setIsMapLoading(false));
+  }, [mapLoadAnim]);
+
   // ── URLs ──────────────────────────────────────────────────────────────────
 
   const hasLocation = !!step.location;
@@ -642,10 +689,13 @@ export function StepContent({
                   svAvailable={svAvailable}
                   isDesktop={isDesktop}
                   isTooFar={isTooFar}
+                  isMapLoading={isMapLoading}
+                  onMapLoad={handleMapLoad}
                   onModeSelect={handleModeSelect}
                   onGoToSite={handleGoToSite}
                   onToggleStreetView={() => setStreetViewExpanded((v) => !v)}
                   onSvUnavailable={handleSvUnavailable}
+                  mapLoadAnim={mapLoadAnim}
                   t={t}
               />
             </AccordionSection>
@@ -1215,6 +1265,19 @@ const styles = StyleSheet.create({
     color: '#78716c',
     textAlign: 'center',
     lineHeight: 19,
+  },
+
+  // ── Map loading overlay ─────────────────────────────────────────────────────
+  mapLoadingOverlay: {
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  mapLoadingText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#44403c',
   },
 
   // ── TTS warning ─────────────────────────────────────────────────────────────

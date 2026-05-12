@@ -562,6 +562,7 @@
   "step.historyAndAudio": "History & audio guide",
   "step.tooFarTitle": "You're too far away",
   "step.tooFarBody": "Route preview is only available within {{km}} km of the destination. Try again when you're in the tour city.",
+  "step.mapLoading": "Loading route…",
   "subscription.complete.sessionNotFound": "Session not found",
   "subscription.complete.backToDashboard": "Back to dashboard",
   "subscription.complete.paymentComplete": "Payment completed!",

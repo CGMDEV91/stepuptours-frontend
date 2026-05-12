@@ -562,6 +562,7 @@
   "step.historyAndAudio": "Historia y audioguía",
   "step.tooFarTitle": "Estás demasiado lejos",
   "step.tooFarBody": "La previsualización de ruta está disponible en un radio de {{km}} km. Inténtalo de nuevo cuando estés en la ciudad del tour.",
+  "step.mapLoading": "Cargando ruta…",
   "footer.quickLinks": "Enlaces Rápidos",
   "footer.contactInfo": "Información de Contacto",
   "footer.allRights": "Todos los derechos reservados.",

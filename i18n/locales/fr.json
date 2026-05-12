@@ -562,6 +562,7 @@
   "step.historyAndAudio": "Histoire et audioguide",
   "step.tooFarTitle": "Vous êtes trop loin",
   "step.tooFarBody": "L'aperçu d'itinéraire est disponible dans un rayon de {{km}} km. Réessayez lorsque vous serez dans la ville du circuit.",
+  "step.mapLoading": "Chargement de l'itinéraire…",
   "subscription.complete.sessionNotFound": "Session introuvable",
   "subscription.complete.backToDashboard": "Retour au tableau de bord",
   "subscription.complete.paymentComplete": "Paiement effectué !",
