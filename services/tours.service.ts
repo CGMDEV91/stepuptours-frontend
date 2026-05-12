@@ -222,8 +222,8 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
     });
   }
 
-  const total = typeof (meta as any)?.count === 'number' ? (meta as any).count : mapped.length;
-  const hasMore = page * limit < total;
+  const total = typeof (meta as any)?.count === 'number' ? (meta as any).count : undefined;
+  const hasMore = total !== undefined ? page * limit < total : mapped.length === limit;
 
   return {
     data: mapped,
