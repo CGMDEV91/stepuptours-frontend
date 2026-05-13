@@ -28,7 +28,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'users' | 'legal' | 'analytics';
+type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'legal' | 'analytics';
 
 interface Tab {
   id: TabId;
@@ -43,10 +43,9 @@ const TABS: Tab[] = [
   { id: 'businesses',   labelKey: 'admin.tabs.businesses',   icon: 'business-outline' },
   { id: 'donations',    labelKey: 'admin.tabs.donations',    icon: 'cash-outline' },
   { id: 'analytics',    labelKey: 'admin.tabs.analytics',    icon: 'bar-chart-outline' },
-  { id: 'users',        labelKey: 'admin.tabs.users',        icon: 'people-outline' },
 ];
 
-const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics', 'users'];
+const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics'];
 function isValidAdminTab(value: string): value is TabId {
   return VALID_ADMIN_TABS.includes(value as TabId);
 }
@@ -189,13 +188,6 @@ export default function AdminScreen() {
         return <DonationsView mode="admin" />;
       case 'analytics':
         return <AnalyticsTab />;
-      case 'users':
-        return (
-            <View style={styles.placeholder}>
-              <Ionicons name="people-outline" size={48} color="#D1D5DB" />
-              <Text style={styles.placeholderText}>Coming soon</Text>
-            </View>
-        );
     }
   };
 
@@ -267,18 +259,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#F9FAFB',
   },
-  placeholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    gap: 12,
-  },
-  placeholderText: {
-    fontSize: 15,
-    color: '#9CA3AF',
-    fontWeight: '500',
-  },
-
   // ── Desktop tab bar ───────────────────────────────────────────────────────
   tabBarWrapper: {
     backgroundColor: '#FFFFFF',

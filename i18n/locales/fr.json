@@ -451,7 +451,6 @@
   "ranking.subtitle": "Les explorateurs les plus actifs",
   "admin.title": "Administration",
   "admin.tabs.translations": "Traductions",
-  "admin.tabs.users": "Utilisateurs",
   "admin.translations.selectLanguage": "Sélectionner une langue",
   "admin.translations.source": "Anglais (Source)",
   "admin.translations.target": "Traduction cible",
