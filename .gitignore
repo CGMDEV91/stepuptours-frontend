@@ -13,6 +13,7 @@ yarn-error.log*
 *.swo
 .vscode/
 .idea/
+.claude/worktrees/
 coverage/
 .metro/
 ios/build/
