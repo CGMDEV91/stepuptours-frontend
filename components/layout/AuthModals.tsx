@@ -368,7 +368,11 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
   const handleGoogleCredential = async (idToken: string) => {
     setGoogleError(null);
     try {
-      await signInWithGoogle(idToken, allowProfessional && (role === 'guide' || role === 'business') ? role : undefined);
+      await signInWithGoogle(
+        idToken,
+        allowProfessional && (role === 'guide' || role === 'business') ? role : undefined,
+        selectedLangCode || undefined,
+      );
       if (!useAuthStore.getState().error) onClose();
     } catch (e: any) {
       setGoogleError(t('auth.googleAuthError'));

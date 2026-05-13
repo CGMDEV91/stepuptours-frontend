@@ -20,6 +20,7 @@ import { MyBusinessesTab } from '../../components/business/MyBusinessesTab';
 import { FindToursTab } from '../../components/business/FindToursTab';
 import { MyPromotionsTab } from '../../components/business/MyPromotionsTab';
 import { BillingTab } from '../../components/business/BillingTab';
+import { MyDonationsTab } from '../../components/dashboard/MyDonationsTab';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
@@ -28,7 +29,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const GREEN = '#10B981';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'my-businesses' | 'find-tours' | 'my-promotions' | 'billing';
+type TabId = 'my-businesses' | 'find-tours' | 'my-promotions' | 'billing' | 'my-donations';
 
 interface Tab {
   id: TabId;
@@ -41,9 +42,10 @@ const TABS: Tab[] = [
   { id: 'find-tours',     labelKey: 'businessDashboard.tabs.findTours',      icon: 'search-outline' },
   { id: 'my-promotions',  labelKey: 'businessDashboard.tabs.myPromotions',   icon: 'megaphone-outline' },
   { id: 'billing',        labelKey: 'businessDashboard.tabs.billing',        icon: 'receipt-outline' },
+  { id: 'my-donations',   labelKey: 'businessDashboard.tabs.myDonations',    icon: 'gift-outline' },
 ];
 
-const VALID_TABS: TabId[] = ['my-businesses', 'find-tours', 'my-promotions', 'billing'];
+const VALID_TABS: TabId[] = ['my-businesses', 'find-tours', 'my-promotions', 'billing', 'my-donations'];
 
 function isValidTab(v: string): v is TabId {
   return VALID_TABS.includes(v as TabId);
@@ -174,6 +176,7 @@ export default function BusinessDashboardScreen() {
       {activeTab === 'find-tours'     && <FindToursTab userId={user.id} />}
       {activeTab === 'my-promotions'  && <MyPromotionsTab userId={user.id} />}
       {activeTab === 'billing'        && <BillingTab userId={user.id} />}
+      {activeTab === 'my-donations'   && <MyDonationsTab />}
     </View>
   );
 

@@ -88,9 +88,11 @@ export default function LangcodeLayout() {
     }
   }, [ready, user, isAuthLoading, langcode, segments]);
 
-  // Redirect to the user's preferred language only on a fresh login.
+  // Redirect to the user's preferred language only on a fresh login/registration.
   // isNewLogin is true after signIn/signUp/signInWithGoogle and false after restore(),
   // so page reloads with an existing session never trigger this redirect.
+  // isNewLogin IS included in deps so that registration flows — which set isNewLogin
+  // only after updateProfile() completes — still trigger this effect correctly.
   useEffect(() => {
     if (!ready || !user || languages.length === 0) return;
     if (!isNewLogin) return;
@@ -105,8 +107,7 @@ export default function LangcodeLayout() {
     setLanguageByCode(preferredLang);
     const pathWithoutLang = pathname.replace(/^\/[^\/]+/, '');
     router.replace(`/${preferredLang}${pathWithoutLang}` as any);
-  // isNewLogin intentionally omitted from deps — read as current value when user/languages change
-  }, [ready, user?.id, languages]);
+  }, [ready, user?.id, languages, isNewLogin]);
 
   return (
       <View style={{ flex: 1, minHeight: 0 }}>

@@ -16,7 +16,7 @@ interface AuthState {
   // Actions
   signIn: (credentials: AuthCredentials) => Promise<void>;
   signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'guide' | 'business'; langcode?: string; preferredLanguage?: string }) => Promise<void>;
-  signInWithGoogle: (googleIdToken: string, role?: 'guide' | 'business') => Promise<void>;
+  signInWithGoogle: (googleIdToken: string, role?: 'guide' | 'business', preferredLanguage?: string) => Promise<void>;
   signOut: () => Promise<void>;
   restore: () => Promise<void>;
   clearError: () => void;
@@ -48,11 +48,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await register(data);
-      set({ session, user: session.user, isNewLogin: true });
+      set({ session, user: session.user });
       inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
       if (data.preferredLanguage) {
+        // Update preferred language BEFORE setting isNewLogin so the layout
+        // redirect reads the correct language when the effect fires.
         await get().updateProfile({ preferredLanguage: data.preferredLanguage });
       }
+      set({ isNewLogin: true });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Error al registrarse' });
       return;
@@ -60,13 +63,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: false });
   },
 
-  signInWithGoogle: async (googleIdToken, role) => {
+  signInWithGoogle: async (googleIdToken, role, preferredLanguage?) => {
     set({ isLoading: true, error: null });
     try {
       const { loginWithGoogle } = await import('../services/auth.service');
       const session = await loginWithGoogle(googleIdToken, role);
-      set({ session, user: session.user, isLoading: false, isNewLogin: true });
+      set({ session, user: session.user });
       inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
+      if (preferredLanguage) {
+        await get().updateProfile({ preferredLanguage });
+      }
+      set({ isLoading: false, isNewLogin: true });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Google sign-in failed' });
     }

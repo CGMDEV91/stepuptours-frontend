@@ -65,6 +65,12 @@ export default function DashboardScreen() {
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
 
+  // Compatibilidad temporal: 'professional' → 'guide' durante la transición de roles
+  const isGuide =
+    user?.roles?.includes('guide') || user?.roles?.includes('professional');
+  const isBusiness = user?.roles?.includes('business');
+  const isAdmin = user?.roles?.includes('administrator');
+
   const initialTab: TabId = tabParam && isValidTab(tabParam) ? tabParam : 'subscription';
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const scrollRef = useRef<ScrollView>(null);
@@ -126,10 +132,6 @@ export default function DashboardScreen() {
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     };
   }, [toastParam]);
-
-  // Compatibilidad temporal: 'professional' → 'guide' durante la transición de roles
-  const isGuide =
-    user?.roles?.includes('guide') || user?.roles?.includes('professional');
 
   useEffect(() => {
     if (!isAuthLoading && (!user || !isGuide)) {

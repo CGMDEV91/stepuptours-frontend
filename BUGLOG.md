@@ -51,6 +51,17 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 
 ---
 
+## BUG-006 — Preferred language not saved or applied after registration
+
+**Status:** Fixed
+**Date:** 2026-05-13
+**Symptom:** After registering (form or Google), the preferred language selected during registration was neither saved to the user profile nor used to redirect the app to the correct langcode.
+**Root cause:** `signUp()` set `isNewLogin: true` before `updateProfile()` resolved, so the layout redirect fired while `user.preferredLanguage` was still empty; additionally `isNewLogin` was omitted from the layout effect's deps so setting it after the PATCH would not re-trigger the effect anyway. For Google registration, `selectedLangCode` was never passed to `signInWithGoogle` at all.
+**Fix:** In `signUp()` and `signInWithGoogle()`, moved `set({ isNewLogin: true })` to after `await updateProfile()` completes; added `isNewLogin` to the `_layout.tsx` effect deps so it fires when the flag is set post-PATCH; passed `selectedLangCode` from RegisterModal to `signInWithGoogle`.
+**Files:** `stores/auth.store.ts`, `app/[langcode]/_layout.tsx`, `components/layout/AuthModals.tsx`
+
+---
+
 ## BUG-002 — TourCard shows stopsCount = 0 for some tours
 
 **Status:** Fixed

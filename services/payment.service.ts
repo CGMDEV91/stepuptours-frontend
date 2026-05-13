@@ -89,3 +89,20 @@ export async function getAdminDonationsSummary(): Promise<DonationsSummary> {
   });
   return data;
 }
+
+export interface MyDonation {
+  id: string;
+  tourId: string;
+  tourTitle: string;
+  tourOwnerName: string;
+  amount: number;
+  currency: string;
+  createdAt: string;
+}
+
+export async function getMyDonations(): Promise<MyDonation[]> {
+  const { data } = await axios.get(`${BASE_URL}/api/user/donations`, {
+    headers: getAuthHeader(),
+  });
+  return data;
+}

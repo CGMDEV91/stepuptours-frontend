@@ -16,6 +16,7 @@ import { getDonationsForAuthor } from '../../services/dashboard.service';
 import {
   getAdminDonations,
   getAdminDonationsSummary,
+  getMyDonations,
   type AdminDonation,
   type DonationsSummary,
 } from '../../services/payment.service';
@@ -27,7 +28,7 @@ const GREEN = '#16A34A';
 const NAVY = '#1E293B';
 
 interface DonationsViewProps {
-  mode: 'admin' | 'professional';
+  mode: 'admin' | 'professional' | 'donor';
   userId?: string; // required for professional mode
 }
 
@@ -94,6 +95,20 @@ export function DonationsView({ mode, userId }: DonationsViewProps) {
           })),
         );
         setSummary(sum);
+      } else if (mode === 'donor') {
+        const list = await getMyDonations();
+        setRows(
+          list.map((d) => ({
+            id: d.id,
+            createdAt: d.createdAt,
+            tourTitle: d.tourTitle,
+            donorName: '',
+            amount: d.amount,
+            currency: d.currency,
+            tourOwnerName: d.tourOwnerName,
+          })),
+        );
+        setTotal(list.reduce((s, d) => s + d.amount, 0));
       } else {
         if (!userId) return;
         const result = await getDonationsForAuthor(userId);
@@ -144,7 +159,9 @@ export function DonationsView({ mode, userId }: DonationsViewProps) {
         <AdminSummaryCards summary={summary} t={t} />
       ) : (
         <View style={styles.totalCard}>
-          <Text style={styles.totalLabel}>{t('dashboard.donations.total')}</Text>
+          <Text style={styles.totalLabel}>
+            {t(mode === 'donor' ? 'dashboard.myDonations.total' : 'dashboard.donations.total')}
+          </Text>
           <Text style={styles.totalAmount}>{total.toFixed(2)} €</Text>
         </View>
       )}
@@ -152,7 +169,9 @@ export function DonationsView({ mode, userId }: DonationsViewProps) {
       {rows.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="cash-outline" size={56} color="#D1D5DB" />
-          <Text style={styles.emptyText}>{t('dashboard.donations.empty')}</Text>
+          <Text style={styles.emptyText}>
+            {t(mode === 'donor' ? 'dashboard.myDonations.empty' : 'dashboard.donations.empty')}
+          </Text>
         </View>
       ) : isDesktop ? (
         <DonationsTable rows={rows} mode={mode} t={t} />
@@ -214,10 +233,11 @@ function DonationsTable({
   t,
 }: {
   rows: DonationRow[];
-  mode: 'admin' | 'professional';
+  mode: 'admin' | 'professional' | 'donor';
   t: (key: string) => string;
 }) {
   const isAdmin = mode === 'admin';
+  const isDonor = mode === 'donor';
 
   return (
     <View style={styles.table}>
@@ -234,7 +254,7 @@ function DonationsTable({
           </Text>
         )}
         <Text style={[styles.tableCell, styles.tableHeader, styles.cellDonor]}>
-          {t('dashboard.donations.donor')}
+          {t(isDonor ? 'dashboard.myDonations.toGuide' : 'dashboard.donations.donor')}
         </Text>
         <Text style={[styles.tableCell, styles.tableHeader, styles.cellAmount]}>
           {t('dashboard.donations.amount')}
@@ -280,7 +300,7 @@ function DonationsTable({
             </View>
           )}
           <Text style={[styles.tableCell, styles.cellDonor]} numberOfLines={1}>
-            {row.donorName || 'Anónimo'}
+            {isDonor ? (row.tourOwnerName || '—') : (row.donorName || 'Anónimo')}
           </Text>
           <Text style={[styles.tableCell, styles.cellAmount, styles.amountText]}>
             {formatCurrency(row.amount, row.currency)}
@@ -309,10 +329,11 @@ function DonationCards({
   t,
 }: {
   rows: DonationRow[];
-  mode: 'admin' | 'professional';
+  mode: 'admin' | 'professional' | 'donor';
   t: (key: string) => string;
 }) {
   const isAdmin = mode === 'admin';
+  const isDonor = mode === 'donor';
 
   return (
     <View style={styles.cardList}>
@@ -324,7 +345,9 @@ function DonationCards({
               {row.tourTitle || '—'}
             </Text>
             <Text style={styles.donationDonor}>
-              {row.donorName || 'Anónimo'}
+              {isDonor
+                ? `${t('dashboard.myDonations.toGuide')}: ${row.tourOwnerName || '—'}`
+                : (row.donorName || 'Anónimo')}
             </Text>
             {isAdmin && row.tourOwnerName && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>

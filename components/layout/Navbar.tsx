@@ -214,6 +214,19 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           <Text style={styles.dropdownItemText}>{t('nav.dashboard')}</Text>
         </TouchableOpacity>
       )}
+      {!roles.includes('guide') &&
+        !roles.includes('professional') &&
+        !roles.includes('business') &&
+        !roles.includes('administrator') && (
+          <TouchableOpacity
+            onPress={() => handleNavigate(`/${lang}/donations`)}
+            activeOpacity={0.7}
+            style={styles.dropdownItem}
+          >
+            <Ionicons name="gift-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
+            <Text style={styles.dropdownItemText}>{t('nav.myDonations')}</Text>
+          </TouchableOpacity>
+        )}
       <View style={styles.dropdownDivider} />
       <TouchableOpacity
         onPress={handleSignOut}
