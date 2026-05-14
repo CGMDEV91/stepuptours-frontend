@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AppState, Platform, View } from 'react-native';
 import { Slot, useLocalSearchParams, usePathname, useRouter, useSegments } from 'expo-router';
 import { inactivityTracker, subscribeToExternalSessionChange } from '../../lib/session';
+import { setApiLanguage } from '../../lib/drupal-client';
 import { useLanguageStore } from '../../stores/language.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
@@ -29,6 +30,11 @@ export default function LangcodeLayout() {
   const isAuthLoading = useAuthStore((s) => s.isLoading);
   const isNewLogin = useAuthStore((s) => s.isNewLogin);
   const clearNewLogin = useAuthStore((s) => s.clearNewLogin);
+
+  // Sync API language immediately from URL — no guards needed, runs before child effects
+  useEffect(() => {
+    if (langcode) setApiLanguage(langcode);
+  }, [langcode]);
 
   // Pause inactivity timer when app goes to background on native
   useEffect(() => {

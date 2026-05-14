@@ -26,7 +26,14 @@ const JSON_API_PREFIX = '/jsonapi';
 const deserializer = new Jsona();
 
 // ── Langcode para peticiones traducidas ────────────────────────────────────
-let currentLangcode = 'en';
+function getInitialLangcode(): string {
+  if (typeof window !== 'undefined') {
+    const segment = window.location.pathname.split('/')[1];
+    if (segment && /^[a-z]{2}(-[a-z]{2})?$/.test(segment)) return segment;
+  }
+  return 'en';
+}
+let currentLangcode = getInitialLangcode();
 
 export function setApiLanguage(langcode: string): void {
   currentLangcode = langcode;
