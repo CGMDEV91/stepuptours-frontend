@@ -348,7 +348,6 @@ function NavBlock({
               {/* Mapa o Street View */}
               <View style={[styles.navMapWrap, isDesktop && styles.navMapWrapDesktop]}>
                 {!showingSV && isTooFar ? (
-                    /* No se carga Google Maps — placeholder CSS + overlay blurry */
                     <>
                       <MapFallback height={mapHeight} />
                       <View
@@ -362,9 +361,7 @@ function NavBlock({
                       >
                         <Ionicons name="location-outline" size={28} color={ORANGE} />
                         <Text style={styles.tooFarTitle}>{t('step.tooFarTitle')}</Text>
-                        <Text style={styles.tooFarBody}>
-                          {t('step.tooFarBody', { km: MAX_ROUTE_DISTANCE_KM })}
-                        </Text>
+                        <Text style={styles.tooFarBody}>{t('step.tooFarBody')}</Text>
                       </View>
                     </>
                 ) : (
@@ -586,10 +583,6 @@ export function StepContent({
   const hasLocation = !!step.location;
 
   const streetViewUrl = buildStreetViewUrl(step);
-
-  const staticMapUrl = step.location
-      ? `https://maps.google.com/maps?q=${step.location.lat},${step.location.lon}&z=17&output=embed`
-      : null;
 
   const activeMode    = NAV_MODES.find((m) => m.travelmode === selectedMode);
   const directionsUrl = step.location && activeMode
@@ -1276,7 +1269,7 @@ const styles = StyleSheet.create({
 
   // ── Too far overlay ─────────────────────────────────────────────────────────
   tooFarOverlay: {
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -1295,7 +1288,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 19,
   },
-
   // ── Map loading overlay ─────────────────────────────────────────────────────
   mapLoadingOverlay: {
     backgroundColor: 'rgba(255, 255, 255, 0.72)',
