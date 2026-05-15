@@ -188,7 +188,7 @@ export interface TourFilters {
   search?: string;
   page?: number;
   limit?: number;
-  sort?: 'rating' | 'alphabetical' | 'popular';
+  sort?: 'rating' | 'alphabetical' | 'alphabetical_desc' | 'stops_desc' | 'stops_asc';
 }
 
 // Tipos de autenticación

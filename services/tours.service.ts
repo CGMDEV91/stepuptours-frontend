@@ -111,9 +111,11 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
   const drupalFilters: Record<string, any> = { status: 1 };
   if (city) drupalFilters['field_city.name'] = city;
 
-  let sortParam = 'sort=-field_average_rate,drupal_internal__nid';
-  if (sort === 'alphabetical') sortParam = 'sort=title,drupal_internal__nid';
-  else if (sort === 'popular') sortParam = 'sort=-field_donation_count,drupal_internal__nid';
+  let sortParam = 'sort=-field_average_rate,-field_rating_count,drupal_internal__nid';
+  if (sort === 'alphabetical')      sortParam = 'sort=title,drupal_internal__nid';
+  if (sort === 'alphabetical_desc') sortParam = 'sort=-title,drupal_internal__nid';
+  if (sort === 'stops_desc')        sortParam = 'sort=-field_steps_count,drupal_internal__nid';
+  if (sort === 'stops_asc')         sortParam = 'sort=field_steps_count,drupal_internal__nid';
 
   // Skip the country relationship filter when a city is selected:
   // a city already implies its country unambiguously, and combining

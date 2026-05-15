@@ -73,9 +73,11 @@ function DesktopChipRow({
   const cityRef = useRef<any>(null);
 
   const sortOptions: { key: NonNullable<TourFilters['sort']>; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { key: 'rating', label: t('filter.sortRating'), icon: 'star-outline' },
-    { key: 'alphabetical', label: t('filter.sortAlpha'), icon: 'text-outline' },
-    { key: 'popular', label: t('filter.sortPopular'), icon: 'flame-outline' },
+    { key: 'rating',            label: t('filter.sortRating'),    icon: 'star-outline'      },
+    { key: 'alphabetical',      label: t('filter.sortAlpha'),     icon: 'text-outline'      },
+    { key: 'alphabetical_desc', label: t('filter.sortAlphaDesc'), icon: 'text-outline'      },
+    { key: 'stops_desc',        label: t('filter.sortStopsDesc'), icon: 'footsteps-outline' },
+    { key: 'stops_asc',         label: t('filter.sortStopsAsc'),  icon: 'footsteps-outline' },
   ];
 
   const activeSortLabel =
@@ -266,9 +268,11 @@ function MobileFilterBar({
   const [expandedSection, setExpandedSection] = useState<'sort' | 'country' | 'city' | null>(null);
 
   const sortOptions: { key: NonNullable<TourFilters['sort']>; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { key: 'rating', label: t('filter.sortRating'), icon: 'star-outline' },
-    { key: 'alphabetical', label: t('filter.sortAlpha'), icon: 'text-outline' },
-    { key: 'popular', label: t('filter.sortPopular'), icon: 'flame-outline' },
+    { key: 'rating',            label: t('filter.sortRating'),    icon: 'star-outline'      },
+    { key: 'alphabetical',      label: t('filter.sortAlpha'),     icon: 'text-outline'      },
+    { key: 'alphabetical_desc', label: t('filter.sortAlphaDesc'), icon: 'text-outline'      },
+    { key: 'stops_desc',        label: t('filter.sortStopsDesc'), icon: 'footsteps-outline' },
+    { key: 'stops_asc',         label: t('filter.sortStopsAsc'),  icon: 'footsteps-outline' },
   ];
 
   const selectedCountriesMobile = filters.countries ?? [];
