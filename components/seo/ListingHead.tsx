@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 const SITE = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://stepuptours.com';
 const SUPPORTED_LANGS = ['es', 'en', 'fr', 'de', 'it', 'el'];
+const HERO_IMAGE =
+  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80';
 
 interface ListingHeadProps {
   langcode: string;
@@ -34,6 +36,11 @@ export function ListingHead({ langcode }: ListingHeadProps) {
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonical} />
       <meta property="og:site_name" content="StepUp Tours" />
+      <meta property="og:image" content={HERO_IMAGE} />
+      <meta property="og:image:width" content="1920" />
+      <meta property="og:image:height" content="1080" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content={HERO_IMAGE} />
 
       {SUPPORTED_LANGS.map((lang) => (
         <link key={lang} rel="alternate" hrefLang={lang} href={`${SITE}/${lang}`} />
