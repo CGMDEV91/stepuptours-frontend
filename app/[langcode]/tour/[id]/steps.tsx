@@ -77,11 +77,13 @@ export default function TourStepsScreen() {
     }
   }, [id, user?.id, isAuthLoading]);
 
-  // Load locally-stored progress for anonymous users
+  // Load locally-stored progress for anonymous users.
+  // Must use tour.id (UUID) as key — the URL param `id` can be a slug, which
+  // would mismatch the key written by handleCompleteStep (always uses tour.id).
   useEffect(() => {
-    if (isAuthLoading || user || !id) return;
-    getAnonProgress(id).then(setAnonStepsCompleted).catch(() => {});
-  }, [isAuthLoading, user, id]);
+    if (isAuthLoading || user || !tour?.id) return;
+    getAnonProgress(tour.id).then(setAnonStepsCompleted).catch(() => {});
+  }, [isAuthLoading, user, tour?.id]);
 
   // Track tour start once tour is loaded
   useEffect(() => {
