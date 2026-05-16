@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Tour } from '../../types';
 import { StarRating } from './StarRating';
-import { imageHeaders } from '../../lib/drupal-client';
+import { imageHeaders, pickTourImage } from '../../lib/drupal-client';
 import { buildTourSlug } from '../../lib/tour-slug';
 
 interface TourCardProps {
@@ -74,6 +74,9 @@ export function TourCard({
     .filter(Boolean)
     .join(', ');
 
+  // Derivada AVIF 'large' (480px) — ~20x más ligera que el original.
+  const cardImage = pickTourImage(tour, 'large');
+
   return (
     <TouchableOpacity
       activeOpacity={0.85}
@@ -84,9 +87,9 @@ export function TourCard({
       <View style={[styles.imageContainer, { height: imageHeight }]}>
         <Image
           source={
-            tour.image
+            cardImage
               ? {
-                  uri: tour.image,
+                  uri: cardImage,
                   ...(Object.keys(imageHeaders).length > 0 ? { headers: imageHeaders } : {}),
                 }
               : stableDefault
@@ -94,6 +97,9 @@ export function TourCard({
           style={styles.image}
           contentFit="cover"
           transition={200}
+          cachePolicy="memory-disk"
+          recyclingKey={tour.id}
+          placeholder={{ blurhash: 'L6PZfSjE.AyE_3t7t7R**0o#DgR4' }}
         />
 
         {/* Title & location overlay at bottom */}

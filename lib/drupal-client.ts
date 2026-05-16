@@ -171,23 +171,49 @@ export function buildPage(page: number, limit: number): string {
 
 // ── Helpers de imagen ─────────────────────────────────────────────────────────
 
-function resolveImageUrl(raw: any): string | null {
-  const url = raw?.uri?.url ?? raw?.url ?? null;
+// Convierte una URL relativa en absoluta y redirige los assets de Pantheon por
+// el Worker de Cloudflare (que añade CORS).
+function normalizeAssetUrl(url: string | null | undefined): string | null {
   if (!url) return null;
-
   const fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
-
   try {
     const parsed = new URL(fullUrl);
-    // Redirigir assets de Pantheon por el Worker de Cloudflare (que añade CORS)
     if (parsed.hostname.endsWith('pantheonsite.io')) {
       parsed.protocol = 'https:';
       parsed.hostname = 'stepuptours.com';
       return parsed.toString();
     }
   } catch { /* ignore */ }
-
   return fullUrl;
+}
+
+function resolveImageUrl(raw: any): string | null {
+  return normalizeAssetUrl(raw?.uri?.url ?? raw?.url ?? null);
+}
+
+// Derivadas de estilo de imagen expuestas por el módulo Drupal jsonapi_image_styles
+// como atributo `image_style_uri` del recurso file--file. Devuelve un mapa
+// { large, medium, wide, thumbnail } con URLs ya normalizadas, o null.
+export type ImageStyleMap = Record<string, string>;
+
+// Devuelve la URL de la derivada de imagen pedida para un tour, con fallback al
+// original si la derivada no está disponible (p.ej. backend sin desplegar aún).
+export function pickTourImage(
+  tour: { image: string | null; imageStyles: Record<string, string> | null },
+  style: 'thumbnail' | 'medium' | 'large' | 'wide',
+): string | null {
+  return tour.imageStyles?.[style] ?? tour.image;
+}
+
+function resolveImageStyles(raw: any): ImageStyleMap | null {
+  const styles = raw?.image_style_uri;
+  if (!styles || typeof styles !== 'object') return null;
+  const out: ImageStyleMap = {};
+  for (const [name, url] of Object.entries(styles)) {
+    const resolved = normalizeAssetUrl(url as string);
+    if (resolved) out[name] = resolved;
+  }
+  return Object.keys(out).length > 0 ? out : null;
 }
 
 // ── Geofield helper ───────────────────────────────────────────────────────────
@@ -383,6 +409,7 @@ export function mapDrupalTour(raw: any): Tour {
     title: raw.title ?? '',
     description: raw.field_description?.value ?? raw.field_description ?? '',
     image: resolveImageUrl(raw.field_image),
+    imageStyles: resolveImageStyles(raw.field_image),
     duration: raw.field_duration ?? 0,
     averageRate: parseFloat(raw.field_average_rate ?? '0'),
     ratingCount: parseInt(raw.field_rating_count ?? '0', 10),

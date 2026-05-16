@@ -64,7 +64,7 @@ interface ToursState {
 
 const DEFAULT_FILTERS: TourFilters = {
   page: 1,
-  limit: 9,
+  limit: 18,
 };
 
 // Monotonic counters: ensure stale async responses never overwrite newer results.

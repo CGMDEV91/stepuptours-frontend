@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { notifyConsentGranted, notifyConsentRevoked } from '../../services/analytics.service';
+import { notifyConsentGranted, notifyConsentRevoked, trackSiteVisit } from '../../services/analytics.service';
 
 const CONSENT_KEY = 'cookie_consent';
 
@@ -62,6 +62,9 @@ export default function CookieBanner() {
   const handleAccept = async () => {
     await storage.setItem(CONSENT_KEY, 'accepted');
     notifyConsentGranted();
+    // Count the visit now that consent exists — the layout's earlier call
+    // no-opped while consent was still pending.
+    void trackSiteVisit(langcode ?? 'en');
     setVisible(false);
   };
 

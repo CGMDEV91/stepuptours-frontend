@@ -16,7 +16,9 @@ import {
   mapDrupalTourStep,
   mapDrupalActivity,
   extractTourFromActivity,
+  getApiLanguage,
 } from '../lib/drupal-client';
+import { cached } from '../lib/mem-cache';
 import type {
   Tour,
   TourStep,
@@ -53,7 +55,7 @@ const TOUR_FIELDS = {
   'taxonomy_term--cities': ['name'],
   'taxonomy_term--countries': ['name'],
   'taxonomy_term--business_category': ['name'],
-  'file--file': ['uri', 'url'],
+  'file--file': ['uri', 'url', 'image_style_uri'],
 };
 
 const TOUR_INCLUDE = [
@@ -87,10 +89,14 @@ const TOUR_CARD_FIELDS = {
   ],
   'taxonomy_term--cities': ['name'],
   'taxonomy_term--countries': ['name'],
-  'file--file': ['uri', 'url'],
+  'file--file': ['uri', 'url', 'image_style_uri'],
 };
 
 const TOUR_CARD_INCLUDE = ['field_image', 'field_city', 'field_country'];
+
+// TTLs de la caché en memoria (ms).
+const TOURS_TTL = 5 * 60 * 1000;       // listados de tours
+const TAXONOMY_TTL = 10 * 60 * 1000;   // países / ciudades (casi estáticos)
 
 // ── Obtener listado de tours ───────────────────────────────────────────────────
 
@@ -108,6 +114,12 @@ function buildCountriesFilter(countries: string[]): string {
 }
 
 export async function getTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
+  // Caché por idioma + filtros: revisitar una vista ya cargada no relanza la API.
+  const cacheKey = `tours:${getApiLanguage()}:${JSON.stringify(filters)}`;
+  return cached(cacheKey, TOURS_TTL, () => fetchTours(filters));
+}
+
+async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
   const { page = 1, limit = 20, countries, city, minRating, search, sort } = filters;
 
   const drupalFilters: Record<string, any> = { status: 1 };
@@ -209,7 +221,7 @@ export async function getTourSteps(tourId: string): Promise<TourStep[]> {
       ],
       'node--business': ['title', 'field_description', 'field_logo', 'field_website', 'field_phone', 'field_location', 'field_category'],
       'taxonomy_term--business_category': ['name'],
-      'file--file': ['uri', 'url'],
+      'file--file': ['uri', 'url', 'image_style_uri'],
     }),
     buildInclude(['field_featured_business', 'field_featured_business.field_logo', 'field_featured_business.field_category']),
   ].join('&');
@@ -362,7 +374,7 @@ export async function getUserTourActivities(userId: string): Promise<TourActivit
       ],
       'taxonomy_term--cities': ['name'],
       'taxonomy_term--countries': ['name'],
-      'file--file': ['uri', 'url'],
+      'file--file': ['uri', 'url', 'image_style_uri'],
     }),
     buildInclude(['field_tour', 'field_tour.field_city', 'field_tour.field_country', 'field_tour.field_image']),
   ].join('&');
@@ -406,7 +418,7 @@ export async function getUserActivitiesWithTours(userId: string): Promise<Activi
       ],
       'taxonomy_term--cities': ['name'],
       'taxonomy_term--countries': ['name'],
-      'file--file': ['uri', 'url'],
+      'file--file': ['uri', 'url', 'image_style_uri'],
     }),
     buildInclude(['field_tour', 'field_tour.field_city', 'field_tour.field_country', 'field_tour.field_image']),
   ].join('&');
@@ -452,6 +464,10 @@ export async function getToursByIds(ids: string[]): Promise<Tour[]> {
 // ── Obtener países disponibles ─────────────────────────────────────────────────
 
 export async function getCountries(): Promise<{ id: string; name: string }[]> {
+  return cached(`countries:${getApiLanguage()}`, TAXONOMY_TTL, fetchCountries);
+}
+
+async function fetchCountries(): Promise<{ id: string; name: string }[]> {
   const params = [
     'filter[status]=1',
     'page[limit]=500',
@@ -495,6 +511,11 @@ async function fetchCitiesForCountry(countryName?: string): Promise<{ id: string
 }
 
 export async function getCitiesByCountry(countries?: string[]): Promise<{ id: string; name: string; countryName?: string }[]> {
+  const key = `cities:${getApiLanguage()}:${[...(countries ?? [])].sort().join(',')}`;
+  return cached(key, TAXONOMY_TTL, () => fetchCitiesByCountry(countries));
+}
+
+async function fetchCitiesByCountry(countries?: string[]): Promise<{ id: string; name: string; countryName?: string }[]> {
   if (!countries?.length) {
     const all = await fetchCitiesForCountry();
     return all.sort((a, b) => a.name.localeCompare(b.name));

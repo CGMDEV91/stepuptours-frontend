@@ -560,12 +560,6 @@ export default function HomePage() {
     if (user) fetchUserActivities(user.id);
   }, [user?.id]);
 
-  // Track site_view once per visit (fires when langcode is resolved)
-  useEffect(() => {
-    if (!langcode) return;
-    void track('site_view', { langcode, valueStr: `/${langcode}` });
-  }, [langcode]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const cols = width >= 768 ? 3 : width >= 640 ? 2 : 1;
   const GRID_MAX_WIDTH = 1200;
   const PADDING = width >= 768 ? 32 : 16;

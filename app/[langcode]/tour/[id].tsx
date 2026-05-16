@@ -27,7 +27,7 @@ import { PageScrollView } from '../../../components/layout/PageScrollView';
 import { TourHead } from '../../../components/seo/TourHead';
 import { webFullHeight } from '../../../lib/web-styles';
 import { LAYOUT } from '../../../styles/theme';
-import { imageHeaders } from '../../../lib/drupal-client';
+import { imageHeaders, pickTourImage } from '../../../lib/drupal-client';
 import { track } from '../../../services/analytics.service';
 
 const AMBER = '#F59E0B';
@@ -211,6 +211,9 @@ export default function TourDetailScreen() {
   const hashId = tour.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const stableDefault = DEFAULT_IMAGES[hashId % DEFAULT_IMAGES.length];
 
+  // Derivada AVIF 'wide' (1090px) para el banner a ancho completo.
+  const bannerImage = pickTourImage(tour, 'wide');
+
   return (
     <>
     <TourHead tour={tour} langcode={langcode ?? 'en'} />
@@ -223,9 +226,9 @@ export default function TourDetailScreen() {
         <View style={styles.bannerContainer}>
           <Image
             source={
-              tour.image
+              bannerImage
                 ? {
-                    uri: tour.image,
+                    uri: bannerImage,
                     ...(Object.keys(imageHeaders).length > 0 ? { headers: imageHeaders } : {}),
                   }
                 : stableDefault
@@ -233,6 +236,9 @@ export default function TourDetailScreen() {
             style={styles.bannerImage}
             contentFit="cover"
             transition={300}
+            cachePolicy="memory-disk"
+            priority="high"
+            placeholder={{ blurhash: 'L6PZfSjE.AyE_3t7t7R**0o#DgR4' }}
           />
           <View style={styles.bannerOverlay} />
           <View style={styles.bannerTextContainer}>

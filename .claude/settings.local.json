@@ -23,7 +23,8 @@
       "Bash(dir \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\")",
       "Bash(cmd /c \"dir /s /b \\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\\\\app\")",
       "Bash(cmd /c \"dir /s /b \\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\\\\components\")",
-      "Bash(ls /home/carlos/devel/stepuptours/stepuptours-frontend/web/ 2>/dev/null || echo \"no web dir\")"
+      "Bash(ls /home/carlos/devel/stepuptours/stepuptours-frontend/web/ 2>/dev/null || echo \"no web dir\")",
+      "Bash(ddev describe *)"
     ]
   }
 }

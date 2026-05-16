@@ -10,6 +10,7 @@ import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
 import { Navbar } from '../../components/layout/Navbar';
 import CookieBanner from '../../components/layout/CookieBanner';
+import { trackSiteVisit } from '../../services/analytics.service';
 
 export default function LangcodeLayout() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
@@ -34,6 +35,12 @@ export default function LangcodeLayout() {
   // Sync API language immediately from URL — no guards needed, runs before child effects
   useEffect(() => {
     if (langcode) setApiLanguage(langcode);
+  }, [langcode]);
+
+  // Count one site visit per browser session, regardless of the entry page.
+  // trackSiteVisit dedupes via sessionStorage so reloads never recount.
+  useEffect(() => {
+    if (langcode) void trackSiteVisit(langcode);
   }, [langcode]);
 
   // Pause inactivity timer when app goes to background on native

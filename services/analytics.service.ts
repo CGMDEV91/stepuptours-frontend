@@ -6,6 +6,7 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.si
 const ENDPOINT = `${BASE_URL}/api/analytics/events`;
 const CONSENT_KEY = 'cookie_consent';
 const SESSION_KEY = 'analytics_session_id';
+const SITE_VIEW_KEY = 'analytics_site_view_sent';
 const BATCH_SIZE = 10;
 const FLUSH_INTERVAL_MS = 5000;
 const MAX_QUEUE_SIZE = 100;
@@ -129,6 +130,7 @@ let _queue: AnalyticsEvent[] = [];
 let _flushTimer: ReturnType<typeof setInterval> | null = null;
 let _consentGranted: boolean | null = null;
 let _sessionId: string | null = null;
+let _siteViewSent = false;
 const _sessionSeen = new Set<string>();
 
 const DEDUPE_EVENTS: AnalyticsEventType[] = ['site_view', 'tour_view', 'step_view'];
@@ -278,6 +280,29 @@ export async function track(
   _queue.push(event);
   if (!_flushTimer) startFlushLoop();
   if (_queue.length >= BATCH_SIZE) void flush();
+}
+
+// Cuenta UNA sola visita al sitio por sesión de navegador, sin importar por qué
+// página entre el usuario ni cuántas páginas recorra. En web la marca persiste en
+// sessionStorage (se borra al cerrar el navegador → la próxima apertura vuelve a
+// contar). En native el flag en memoria se reinicia en cada cold start. Idempotente:
+// es seguro llamarla varias veces.
+export async function trackSiteVisit(langcode: string): Promise<void> {
+  if (_siteViewSent) return;
+
+  const granted = await isConsentGranted();
+  if (!granted) return; // se reintenta cuando se conceda el consentimiento
+
+  if (Platform.OS === 'web' && typeof sessionStorage !== 'undefined') {
+    if (sessionStorage.getItem(SITE_VIEW_KEY) === '1') {
+      _siteViewSent = true;
+      return;
+    }
+    sessionStorage.setItem(SITE_VIEW_KEY, '1');
+  }
+
+  _siteViewSent = true;
+  await track('site_view', { langcode });
 }
 
 export async function fetchAnalyticsSummary(

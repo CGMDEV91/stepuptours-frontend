@@ -61,6 +61,7 @@ export interface Tour {
   title: string;
   description: string;
   image: string | null;
+  imageStyles: Record<string, string> | null;
   duration: number;
   averageRate: number;
   ratingCount: number;

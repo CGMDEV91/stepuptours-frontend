@@ -9,6 +9,7 @@ import { useLanguageStore } from "../stores/language.store";
 import { useFonts } from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 import { initAnalytics } from "../services/analytics.service";
+import { registerServiceWorker } from "../lib/register-sw";
 
 export default function RootLayout() {
   useFonts({ ...Ionicons.font });
@@ -18,6 +19,7 @@ export default function RootLayout() {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
+    registerServiceWorker();
     Promise.all([restore(), fetchLanguages(), initAnalytics()]).then(() => {
       setInitialized(true);
     });
