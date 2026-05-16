@@ -701,6 +701,29 @@ export default function HomePage() {
                 </View>
                 <Text style={styles.bannerTitle}>{t('home.heroTitle')}</Text>
                 <Text style={styles.bannerSubtitle}>{t('home.subtitle')}</Text>
+
+                {/* Trust badges */}
+                <View style={styles.heroBadges}>
+                  <View style={styles.heroBadgeItem}>
+                    <Ionicons name="checkmark-circle" size={16} color="#22C55E" />
+                    <Text style={styles.heroBadgeText}>{t('home.badgeFree')}</Text>
+                  </View>
+                  <Text style={styles.heroBadgeSep}>|</Text>
+                  <View style={styles.heroBadgeItem}>
+                    <Ionicons name="checkmark-circle" size={16} color="#22C55E" />
+                    <Text style={styles.heroBadgeText}>{t('home.badgeNoAds')}</Text>
+                  </View>
+                  <Text style={styles.heroBadgeSep}>|</Text>
+                  <View style={styles.heroBadgeItem}>
+                    <Ionicons name="checkmark-circle" size={16} color="#22C55E" />
+                    <Text style={styles.heroBadgeText}>{t('home.badgeForever')}</Text>
+                  </View>
+                </View>
+                <View style={styles.heroTagline}>
+                  <Ionicons name="return-down-back-outline" size={14} color="rgba(255,255,255,0.55)" style={{ transform: [{ scaleX: -1 }] }} />
+                  <Text style={styles.heroTaglineText}>{t('home.tagline')}</Text>
+                </View>
+
                 <View style={[styles.searchBar, { width: Math.min(width - 48, 640) }]}>
                   <Ionicons name="search-outline" size={18} color="#9CA3AF" />
                   <TextInput
@@ -910,9 +933,45 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255,255,255,0.72)',
     textAlign: 'center',
-    marginBottom: 22,
+    marginBottom: 14,
     fontWeight: '400',
     letterSpacing: 0.1,
+  },
+  heroBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  heroBadgeItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  heroBadgeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  heroBadgeSep: {
+    color: 'rgba(255,255,255,0.35)',
+    fontSize: 14,
+    fontWeight: '300',
+    paddingHorizontal: 2,
+  },
+  heroTagline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 28,
+  },
+  heroTaglineText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.60)',
   },
   searchBar: {
     flexDirection: 'row',
