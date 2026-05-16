@@ -27,7 +27,7 @@ import { PageScrollView } from '../../../components/layout/PageScrollView';
 import { TourHead } from '../../../components/seo/TourHead';
 import { webFullHeight } from '../../../lib/web-styles';
 import { LAYOUT } from '../../../styles/theme';
-import { imageHeaders, pickTourImage } from '../../../lib/drupal-client';
+import { imageHeaders } from '../../../lib/drupal-client';
 import { track } from '../../../services/analytics.service';
 
 const AMBER = '#F59E0B';
@@ -211,8 +211,7 @@ export default function TourDetailScreen() {
   const hashId = tour.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const stableDefault = DEFAULT_IMAGES[hashId % DEFAULT_IMAGES.length];
 
-  // Derivada AVIF 'wide' (1090px) para el banner a ancho completo.
-  const bannerImage = pickTourImage(tour, 'wide');
+  const bannerImage = tour.image;
 
   return (
     <>

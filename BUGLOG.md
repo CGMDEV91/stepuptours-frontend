@@ -62,6 +62,28 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 
 ---
 
+## BUG-007 — Image style derivatives 404 in production after jsonapi_image_styles activation
+
+**Status:** Fixed
+**Date:** 2026-05-16
+**Symptom:** After activating the Drupal `jsonapi_image_styles` module, all tour card images and banner images returned 404 in production. The URLs pointed to `stepuptours.com/sites/default/files/styles/large/...` with an AVIF extension.
+**Root cause:** `resolveImageStyles()` in `lib/drupal-client.ts` called `normalizeAssetUrl()` for each derivative URL. `normalizeAssetUrl` rewrites any `pantheonsite.io` hostname to `stepuptours.com` (Cloudflare Worker) to add CORS headers. However, the Cloudflare Worker at `stepuptours.com` only proxies the root and certain paths — it does **not** proxy `/sites/default/files/styles/**`. So derivative AVIF URLs served by Pantheon were rewritten to a Cloudflare path that returned 404. Original images (via `resolveImageUrl`) share the same rewrite but are served by the Worker correctly; only style derivatives break.
+**Fix:** In `resolveImageStyles()`, keep derivative URLs pointing directly to Pantheon without passing through `normalizeAssetUrl`. Image GETs are CORS-free (no `fetch()` with credentials), so the Cloudflare proxy is unnecessary for derivatives.
+**Files:** `lib/drupal-client.ts`
+
+---
+
+## BUG-008 — site_view counter inflated: +1 per page reload instead of +1 per browser session
+
+**Status:** Fixed
+**Date:** 2026-05-16
+**Symptom:** `total_views` in the analytics dashboard was growing much faster than real unique visits. Every reload of the home page counted as a new `site_view` event. Deep-linking directly to a tour page counted 0 visits.
+**Root cause:** `track('site_view')` was called only from `app/[langcode]/(tabs)/index.tsx` (the home). The deduplication flag `_sessionSeen` was a module-level `Set` in `services/analytics.service.ts` — which resets on every page reload in a web SPA (JS module state is not persistent). Result: each reload = new `site_view`.
+**Fix:** Extracted to a new `trackSiteVisit(langcode)` function with dedup persisted in `sessionStorage` (key `analytics_site_view_sent`). `sessionStorage` survives same-tab navigation but clears when the browser tab/window is closed, matching the desired "one visit per browser session" semantics. The call was moved to `app/[langcode]/_layout.tsx` (fires on any first page under `[langcode]`, including deep-links). Also called in `CookieBanner.tsx` after consent is granted, to catch users who accept after the initial load. The old `track('site_view')` in the home was removed.
+**Files:** `services/analytics.service.ts`, `app/[langcode]/_layout.tsx`, `components/layout/CookieBanner.tsx`, `app/[langcode]/(tabs)/index.tsx`
+
+---
+
 ## BUG-002 — TourCard shows stopsCount = 0 for some tours
 
 **Status:** Fixed

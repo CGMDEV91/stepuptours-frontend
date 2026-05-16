@@ -87,6 +87,60 @@
 
 ---
 
+## Sesión 2026-05-16 — Analíticas anónimas, site_view, imágenes y rendimiento
+
+**Resumen**: Sprint multi-área cubriendo analíticas para usuarios anónimos, corrección del contador de visitas, optimización de imágenes con derivadas WebP/AVIF, caché TTL en cliente, service worker y corrección de bugs en modales.
+
+**Trabajo realizado**:
+
+### Modales de usuario anónimo
+- `lib/anon-progress.ts` — añadida `ANON_INFO_DISMISSED_KEY`, y helpers `getAnonInfoDismissed/setAnonInfoDismissed/clearAnonInfoDismissed` con `sessionStorage` en web (la clave se borra al cerrar el navegador) y `AsyncStorage` en native.
+- `components/tour/AnonInfoModal.tsx` — persistencia de dismissal migrada al helper de `lib/anon-progress`; `ANON_INFO_STORAGE_KEY` re-exportada como alias.
+- `app/[langcode]/tour/[id]/steps.tsx` — reads de dismiss reemplazados con `getAnonInfoDismissed()`.
+- `stores/auth.store.ts` — añadida limpieza de `ONBOARDING_STORAGE_KEY` en `signOut()`.
+- `i18n/locales/*.json` (6 locales) — eliminados `—` del texto `anonInfo.bullet2`.
+- Orden de modales corregido: intro de onboarding primero, AnonInfoModal después.
+
+### site_view — un solo evento por sesión de navegador
+- `services/analytics.service.ts` — nueva función `trackSiteVisit(langcode)` con dedup por `sessionStorage` (clave `analytics_site_view_sent`); no-op si no hay consentimiento.
+- `app/[langcode]/_layout.tsx` — `useEffect` de montaje llama `trackSiteVisit(langcode)` en cualquier página bajo `[langcode]`.
+- `components/layout/CookieBanner.tsx` — tras aceptar cookies, llama `trackSiteVisit` para no perder la visita del usuario que acepta tarde.
+- `app/[langcode]/(tabs)/index.tsx` — eliminado el antiguo `track('site_view')` de la home.
+
+### Imágenes — derivadas WebP/AVIF vía jsonapi_image_styles
+- Backend: instalado y activado `drupal/jsonapi_image_styles`, config exportada y commiteada (pendiente que el usuario pushee y ejecute `drush cim` en Pantheon).
+- `lib/drupal-client.ts` — añadidas `ImageStyleMap`, `pickTourImage`, `resolveImageStyles`. `mapDrupalTour` popula `tour.imageStyles`. **Bug-007**: `resolveImageStyles` inicialmente pasaba URLs por `normalizeAssetUrl` (reescribía a Cloudflare) causando 404; corregido para mantener URLs directas de Pantheon.
+- `types/index.ts` — añadido `imageStyles: Record<string, string> | null` a `Tour`.
+- `services/tours.service.ts` — añadido `image_style_uri` a `TOUR_FIELDS` y `TOUR_CARD_FIELDS`.
+- `components/tour/TourCard.tsx` — usa `pickTourImage(tour, 'large')`, añadido `cachePolicy="memory-disk"`, `recyclingKey`, `placeholder` con blurhash genérico.
+- `app/[langcode]/tour/[id].tsx` — banner usa `pickTourImage(tour, 'wide')`, `cachePolicy="memory-disk"`, `priority="high"`.
+
+### Rendimiento — caché TTL, tamaño de página, service worker
+- `lib/mem-cache.ts` (nuevo) — caché en memoria con TTL: `cached(key, ttlMs, fn)` e `invalidateCache(prefix?)`.
+- `services/tours.service.ts` — `getTours`, `getCountries`, `getCitiesByCountry` envueltos en `cached()` (5 min / 10 min TTL), keyed por langcode.
+- `stores/tours.store.ts` — `DEFAULT_FILTERS.limit` 9 → 18.
+- `public/sw.js` (nuevo) — service worker: cache-first para `/_expo/static/**` y assets estáticos, network-first para HTML navigate, nunca cachea `/api/` ni `/jsonapi/`.
+- `lib/register-sw.ts` (nuevo) — registra el SW solo en web al inicio de la app.
+- `app/_layout.tsx` — llama `registerServiceWorker()` en el `useEffect` inicial.
+
+**Archivos modificados** (frontend):
+`lib/drupal-client.ts`, `lib/anon-progress.ts`, `lib/mem-cache.ts` (nuevo), `lib/register-sw.ts` (nuevo),
+`services/analytics.service.ts`, `services/tours.service.ts`,
+`stores/tours.store.ts`, `stores/auth.store.ts`,
+`types/index.ts`,
+`components/tour/TourCard.tsx`, `components/tour/AnonInfoModal.tsx`,
+`components/layout/CookieBanner.tsx`,
+`app/_layout.tsx`, `app/[langcode]/_layout.tsx`,
+`app/[langcode]/(tabs)/index.tsx`, `app/[langcode]/tour/[id].tsx`, `app/[langcode]/tour/[id]/steps.tsx`,
+`public/sw.js` (nuevo),
+`i18n/locales/en.json`, `es.json`, `fr.json`, `de.json`, `it.json`, `el.json`
+
+**Pendiente**:
+- Usuario debe pushear el commit del backend y ejecutar `ddev terminus -- drush @site.env cim -y && drush cr` para activar `jsonapi_image_styles` en Pantheon producción.
+- Verificar en DevTools que las imágenes se sirven como derivadas AVIF (Network → URL con `/styles/large/`) y el bundle se sirve desde ServiceWorker en revisitas.
+
+---
+
 ## Sesión 2026-05-07 (continuación) — Business Analytics Tab
 
 **Resumen**: Nuevo tab "Analíticas" en el dashboard individual de negocio (`/business-dashboard/[businessId]`).

@@ -74,8 +74,7 @@ export function TourCard({
     .filter(Boolean)
     .join(', ');
 
-  // Derivada AVIF 'large' (480px) — ~20x más ligera que el original.
-  const cardImage = pickTourImage(tour, 'large');
+  const cardImage = pickTourImage(tour, 'wide');
 
   return (
     <TouchableOpacity
