@@ -505,19 +505,15 @@ export function CompletionPopup({
         )}
       </View>
 
-      {/* Rating (first completion only) */}
-      {isFirstCompletion && (
-        <>
-          <View style={styles.divider} />
-          <View style={styles.ratingSection}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-              <Ionicons name="star" size={13} color={AMBER} />
-              <Text style={styles.ratingPrompt}>{t('popup.rateExperience')}</Text>
-            </View>
-            <StarRating value={rating} interactive onRate={handleRate} size={30} />
-          </View>
-        </>
-      )}
+      {/* Rating — available every time a tour is completed */}
+      <View style={styles.divider} />
+      <View style={styles.ratingSection}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Ionicons name="star" size={13} color={AMBER} />
+          <Text style={styles.ratingPrompt}>{t('popup.rateExperience')}</Text>
+        </View>
+        <StarRating value={rating} interactive onRate={handleRate} size={30} />
+      </View>
 
       {/* Donation section */}
       <View style={styles.divider} />

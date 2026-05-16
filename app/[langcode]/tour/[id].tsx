@@ -127,9 +127,10 @@ export default function TourDetailScreen() {
   // CTA logic — driven by step count comparison
   const getCtaConfig = useCallback(() => {
     if (!user) {
+      // Anonymous users can take the tour; progress is kept locally
       return {
         label: t('tour.start'),
-        onPress: () => openAuthModal('login'),
+        onPress: () => router.push(`/${langcode}/tour/${id}/steps`),
       };
     }
 

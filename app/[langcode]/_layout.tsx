@@ -86,7 +86,7 @@ export default function LangcodeLayout() {
   useEffect(() => {
     if (!ready) return;
     if (!isAuthLoading && !user && langcode) {
-      const protectedSegments = ['profile', 'favourites', 'completed', 'dashboard', 'steps'];
+      const protectedSegments = ['profile', 'favourites', 'completed', 'dashboard'];
       const currentSegment = segments[segments.length - 1];
       if (protectedSegments.includes(currentSegment)) {
         router.replace(`/${langcode}` as any);

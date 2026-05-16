@@ -2,8 +2,10 @@
 // Estado global de autenticación
 
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login, logout, restoreSession, register } from '../services/auth.service';
 import { inactivityTracker } from '../lib/session';
+import { ONBOARDING_STORAGE_KEY } from '../components/tour/TourOnboardingModal';
 import type { AuthCredentials, AuthSession, User } from '../types';
 
 interface AuthState {
@@ -82,6 +84,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signOut: async () => {
     set({ isLoading: true });
     await logout();
+    await AsyncStorage.removeItem(ONBOARDING_STORAGE_KEY).catch(() => {});
     set({ session: null, user: null, isLoading: false, error: null });
   },
 

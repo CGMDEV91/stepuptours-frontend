@@ -26,6 +26,9 @@ import type { User } from '../../../../types';
 import { StepTimeline } from '../../../../components/tour/StepTimeline';
 import { CompletionPopup } from '../../../../components/tour/CompletionPopup';
 import { TourOnboardingModal, ONBOARDING_STORAGE_KEY } from '../../../../components/tour/TourOnboardingModal';
+import { AnonInfoModal } from '../../../../components/tour/AnonInfoModal';
+import { getAnonProgress, setAnonProgress, clearAnonProgress, getAnonInfoDismissed } from '../../../../lib/anon-progress';
+import { submitTourRating } from '../../../../services/tours.service';
 import BackButton from '../../../../components/layout/BackButton';
 import { CONTENT_MAX_WIDTH } from '../../../../styles/theme';
 import { webFullHeight } from '../../../../lib/web-styles';
@@ -41,6 +44,7 @@ export default function TourStepsScreen() {
 
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
+  const openAuthModal = useAuthStore((s) => s.openAuthModal);
   const {
     currentTour: tour,
     currentSteps: steps,
@@ -53,6 +57,8 @@ export default function TourStepsScreen() {
   const [showCompletion, setShowCompletion] = useState(false);
   const [xpAwardedBefore, setXpAwardedBefore] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showAnonInfo, setShowAnonInfo] = useState(false);
+  const [anonStepsCompleted, setAnonStepsCompleted] = useState<string[]>([]);
   const [guideUser, setGuideUser] = useState<User | null>(null);
 
   // Animated progress bar
@@ -61,15 +67,21 @@ export default function TourStepsScreen() {
   // Ref for scroll-to-next-step
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Auth guard is handled by [langcode]/_layout.tsx which redirects to home
-  // when user is null after auth loading completes. Nothing to do here.
+  // No auth guard: this page is open to anonymous users. Authenticated users
+  // persist progress in tour_user_activity; anonymous users keep it locally.
 
-  // Load tour detail + activity on mount
+  // Load tour detail + activity once auth is resolved (userId optional → anonymous)
   useEffect(() => {
-    if (id && user) {
-      fetchTourDetail(id, user.id);
+    if (id && !isAuthLoading) {
+      fetchTourDetail(id, user?.id);
     }
-  }, [id, user?.id]);
+  }, [id, user?.id, isAuthLoading]);
+
+  // Load locally-stored progress for anonymous users
+  useEffect(() => {
+    if (isAuthLoading || user || !id) return;
+    getAnonProgress(id).then(setAnonStepsCompleted).catch(() => {});
+  }, [isAuthLoading, user, id]);
 
   // Track tour start once tour is loaded
   useEffect(() => {
@@ -87,15 +99,26 @@ export default function TourStepsScreen() {
     }
   }, [tour?.authorId]);
 
-  // Show onboarding on first visit (no completed steps and not dismissed before)
+  // Show onboarding on first visit; for anonymous users follow it with the
+  // info modal (or show the info modal directly if onboarding is dismissed).
   useEffect(() => {
-    AsyncStorage.getItem(ONBOARDING_STORAGE_KEY).then((value) => {
-      if (!value && stepsCompleted.length === 0) {
+    if (isAuthLoading) return;
+    let cancelled = false;
+    (async () => {
+      const onboardingDone = await AsyncStorage.getItem(ONBOARDING_STORAGE_KEY).catch(() => null);
+      if (cancelled) return;
+      if (!onboardingDone && stepsCompleted.length === 0) {
         setShowOnboarding(true);
+        return;
       }
-    }).catch(() => {});
+      if (!user) {
+        const anonInfoDone = await getAnonInfoDismissed();
+        if (!cancelled && !anonInfoDone) setShowAnonInfo(true);
+      }
+    })();
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAuthLoading]);
 
   // Track xpAwarded state before completion
   useEffect(() => {
@@ -104,7 +127,7 @@ export default function TourStepsScreen() {
     }
   }, [activity?.id]);
 
-  const stepsCompleted = activity?.stepsCompleted ?? [];
+  const stepsCompleted = user ? (activity?.stepsCompleted ?? []) : anonStepsCompleted;
   const totalSteps = steps.length;
 
   // Animate progress bar whenever stepsCompleted changes
@@ -120,15 +143,21 @@ export default function TourStepsScreen() {
 
   const handleCompleteStep = useCallback(
     async (stepId: string) => {
-      if (!user || !tour) return;
+      if (!tour) return;
 
       const newCompleted = [...stepsCompleted, stepId];
       const isLastStep = newCompleted.length >= totalSteps;
 
-      await updateActivity(user.id, tour.id, {
-        stepsCompleted: newCompleted,
-        ...(isLastStep ? { isCompleted: true } : {}),
-      });
+      if (user) {
+        await updateActivity(user.id, tour.id, {
+          stepsCompleted: newCompleted,
+          ...(isLastStep ? { isCompleted: true } : {}),
+        });
+      } else {
+        // Anonymous: progress lives only in local storage, never on the backend
+        setAnonStepsCompleted(newCompleted);
+        void setAnonProgress(tour.id, newCompleted);
+      }
 
       if (isLastStep) {
         setShowCompletion(true);
@@ -138,17 +167,27 @@ export default function TourStepsScreen() {
   );
 
   const handleRestart = useCallback(async () => {
-    if (!user || !tour) return;
-    await updateActivity(user.id, tour.id, {
-      stepsCompleted: [],
-      isCompleted: false,
-    });
+    if (!tour) return;
+    if (user) {
+      await updateActivity(user.id, tour.id, {
+        stepsCompleted: [],
+        isCompleted: false,
+      });
+    } else {
+      setAnonStepsCompleted([]);
+      void clearAnonProgress(tour.id);
+    }
   }, [user, tour, updateActivity]);
 
   const handleRate = useCallback(
     async (rating: number) => {
-      if (!user || !tour) return;
-      await updateActivity(user.id, tour.id, { userRating: rating });
+      if (!tour) return;
+      if (user) {
+        await updateActivity(user.id, tour.id, { userRating: rating });
+      } else {
+        // Anonymous rating: persisted server-side as a uid-0 activity node
+        await submitTourRating(tour.id, rating).catch(() => {});
+      }
     },
     [user, tour, updateActivity],
   );
@@ -165,6 +204,19 @@ export default function TourStepsScreen() {
     router.replace(`/${langcode}`);
   }, [langcode, router]);
 
+  const handleCloseOnboarding = useCallback(async () => {
+    setShowOnboarding(false);
+    if (!user) {
+      const anonInfoDone = await getAnonInfoDismissed();
+      if (!anonInfoDone) setShowAnonInfo(true);
+    }
+  }, [user]);
+
+  const handleRegisterFromAnonInfo = useCallback(() => {
+    setShowAnonInfo(false);
+    openAuthModal('register');
+  }, [openAuthModal]);
+
   // Detect tour abandon (close tab / app background) — only when tour is loaded
   useAbandonDetector({
     tourId: tour?.id ?? '',
@@ -174,8 +226,8 @@ export default function TourStepsScreen() {
     isCompleted: activity?.isCompleted ?? false,
   });
 
-  // While auth is restoring, show spinner. Once done, layout redirects if no user.
-  if (isAuthLoading || !user) {
+  // While auth is restoring, show spinner. The page is open to anonymous users.
+  if (isAuthLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={AMBER} />
@@ -256,7 +308,14 @@ export default function TourStepsScreen() {
       {/* Onboarding Modal */}
       <TourOnboardingModal
         visible={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
+        onClose={handleCloseOnboarding}
+      />
+
+      {/* Anonymous info modal — shown after onboarding for non-authenticated users */}
+      <AnonInfoModal
+        visible={showAnonInfo}
+        onClose={() => setShowAnonInfo(false)}
+        onRegister={handleRegisterFromAnonInfo}
       />
 
       {/* Completion Popup */}

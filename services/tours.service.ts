@@ -1,6 +1,8 @@
 // services/tours.service.ts
 // Servicio de tours — agnóstico del backend
 
+import axios from 'axios';
+import { useAuthStore } from '../stores/auth.store';
 import {
   drupalGet,
   drupalGetRaw,
@@ -313,6 +315,22 @@ export async function upsertTourActivity(
   }
 
   return activity;
+}
+
+// ── Enviar rating de tour (usuarios anónimos) ─────────────────────────────────
+// Los usuarios autenticados siguen usando upsertTourActivity. Este endpoint
+// acepta anónimos: el backend crea un tour_user_activity con uid 0 que solo
+// contiene el rating, y el hook de recálculo actualiza field_average_rate.
+
+export async function submitTourRating(tourId: string, rating: number): Promise<void> {
+  const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
+  const session = useAuthStore.getState().session;
+  const authHeader = session?.token ? { Authorization: `Basic ${session.token}` } : {};
+  await axios.post(
+    `${BASE_URL}/api/tour/rate`,
+    { tourId, rating },
+    { headers: { 'Content-Type': 'application/json', ...authHeader } },
+  );
 }
 
 // ── Obtener todos los tours con actividad del usuario ─────────────────────────
