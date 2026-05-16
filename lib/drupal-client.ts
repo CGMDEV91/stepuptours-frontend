@@ -210,8 +210,11 @@ function resolveImageStyles(raw: any): ImageStyleMap | null {
   if (!styles || typeof styles !== 'object') return null;
   const out: ImageStyleMap = {};
   for (const [name, url] of Object.entries(styles)) {
-    const resolved = normalizeAssetUrl(url as string);
-    if (resolved) out[name] = resolved;
+    // Keep derivative URLs pointing directly to Pantheon — do NOT rewrite through
+    // Cloudflare. The Cloudflare Worker proxies original uploads but does not proxy
+    // /sites/default/files/styles/** paths, so rewriting them causes 404s.
+    const str = (url as string) || '';
+    if (str) out[name] = str;
   }
   return Object.keys(out).length > 0 ? out : null;
 }
