@@ -28,6 +28,7 @@ import { TourHead } from '../../../components/seo/TourHead';
 import { webFullHeight } from '../../../lib/web-styles';
 import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
+import { getAnonProgress } from '../../../lib/anon-progress';
 import { track } from '../../../services/analytics.service';
 
 const AMBER = '#F59E0B';
@@ -57,6 +58,7 @@ export default function TourDetailScreen() {
 
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [pendingRating, setPendingRating] = useState(0);
+  const [anonStepsCompleted, setAnonStepsCompleted] = useState<string[]>([]);
 
   // Fetch tour detail on mount
   useEffect(() => {
@@ -71,6 +73,13 @@ export default function TourDetailScreen() {
       void track('tour_view', { langcode, tourId: tour.id });
     }
   }, [tour?.id, langcode]);
+
+  // Load anon session progress to show "Continue" label on the CTA.
+  // Runs only for anonymous users once the tour UUID is available.
+  useEffect(() => {
+    if (user || !tour?.id) return;
+    getAnonProgress(tour.id).then(setAnonStepsCompleted).catch(() => {});
+  }, [user, tour?.id]);
 
   // Show rating prompt when tour is completed but not yet rated
   useEffect(() => {
@@ -127,7 +136,20 @@ export default function TourDetailScreen() {
   // CTA logic — driven by step count comparison
   const getCtaConfig = useCallback(() => {
     if (!user) {
-      // Anonymous users can take the tour; progress is kept locally
+      const totalSteps = steps.length;
+      const completedCount = anonStepsCompleted.length;
+      if (totalSteps > 0 && completedCount >= totalSteps) {
+        return {
+          label: t('tour.startAgain'),
+          onPress: () => router.push(`/${langcode}/tour/${id}/steps`),
+        };
+      }
+      if (completedCount > 0) {
+        return {
+          label: t('tour.continue'),
+          onPress: () => router.push(`/${langcode}/tour/${id}/steps`),
+        };
+      }
       return {
         label: t('tour.start'),
         onPress: () => router.push(`/${langcode}/tour/${id}/steps`),
@@ -180,7 +202,7 @@ export default function TourDetailScreen() {
       label: t('tour.continue'),
       onPress: () => router.push(`/${langcode}/tour/${id}/steps`),
     };
-  }, [user, activity, steps, id, tourUuid, langcode, router, t, openAuthModal, updateActivity]);
+  }, [user, activity, steps, anonStepsCompleted, id, tourUuid, langcode, router, t, openAuthModal, updateActivity]);
 
   if (isLoadingDetail || !tour) {
     return (
