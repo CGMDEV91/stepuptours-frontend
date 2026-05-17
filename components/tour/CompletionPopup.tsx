@@ -23,6 +23,7 @@ import { StarRating } from './StarRating';
 import { createDonationIntent, activateDonation } from '../../services/payment.service';
 import { getStripePromise } from '../../lib/stripe';
 import { track } from '../../services/analytics.service';
+import { ManageOnWebButton } from '../layout/ManageOnWebButton';
 
 // Stripe imports — web only (tree-shaken on native)
 let Elements: any = null;
@@ -434,12 +435,6 @@ export function CompletionPopup({
     onDonate(paidAmount);
   };
 
-  // Native-only donate (no Stripe Elements)
-  const handleNativeDonate = () => {
-    if (!isDonationValid) return;
-    onDonate(parsedAmount);
-  };
-
   // Animate Stripe form in/out
   useEffect(() => {
     Animated.timing(paymentAnim, {
@@ -619,22 +614,12 @@ export function CompletionPopup({
               </Animated.View>
             )}
 
-            {/* Native: simple donate button */}
+            {/* Native: el pago se gestiona en la web app (sin comisión de tiendas) */}
             {Platform.OS !== 'web' && (
-              <TouchableOpacity
-                style={[styles.payBtn, !isDonationValid && styles.payBtnDisabled]}
-                onPress={() => {
-                  void track('tour_donation_click', { langcode, tourId });
-                  handleNativeDonate();
-                }}
-                disabled={!isDonationValid}
-                activeOpacity={0.85}
-              >
-                <Ionicons name="heart" size={14} color="#FFFFFF" />
-                <Text style={styles.payBtnText}>
-                  {t('popup.donate')} €{donationAmount}
-                </Text>
-              </TouchableOpacity>
+              <ManageOnWebButton
+                path={`/${langcode}/tour/${tourId}`}
+                label={`${t('popup.donate')} €${donationAmount}`}
+              />
             )}
           </>
         )}

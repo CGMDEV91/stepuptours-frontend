@@ -9,8 +9,12 @@ import { useLanguageStore } from '../../stores/language.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
 import { Navbar } from '../../components/layout/Navbar';
+import { BottomTabBar } from '../../components/layout/BottomTabBar';
+import { IntroSlides } from '../../components/layout/IntroSlides';
 import CookieBanner from '../../components/layout/CookieBanner';
 import { trackSiteVisit } from '../../services/analytics.service';
+import { isNative } from '../../lib/platform';
+import { wasIntroShown, markIntroShown } from '../../lib/intro-state';
 
 export default function LangcodeLayout() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
@@ -122,19 +126,32 @@ export default function LangcodeLayout() {
     router.replace(`/${preferredLang}${pathWithoutLang}` as any);
   }, [ready, user?.id, languages, isNewLogin]);
 
+  // Intro deslizante: solo en nativo, solo invitado, una vez por apertura de app.
+  // No se decide hasta que termina la restauración de sesión, para no mostrarla a
+  // un usuario autenticado durante el arranque.
+  const [introDone, setIntroDone] = useState(wasIntroShown());
+  const showIntro = isNative && !user && !isAuthLoading && !introDone;
+
+  const handleIntroDone = () => {
+    markIntroShown();
+    setIntroDone(true);
+  };
+
   return (
       <View style={{ flex: 1, minHeight: 0 }}>
-      <Navbar onOpenAuth={(mode) => openAuthModal(mode)} />
+      {!isNative && <Navbar onOpenAuth={(mode) => openAuthModal(mode)} />}
         <View style={{ flex: 1, minHeight: 0 }}>
         <Slot />
       </View>
+      {isNative && <BottomTabBar />}
       <AuthModals
         visible={pendingAuthModal}
         onClose={closeAuthModal}
         onSwitch={(mode) => openAuthModal(mode)}
       />
-      {/* Cookie consent banner — position: absolute, renders above content */}
-      <CookieBanner />
+      {/* Cookie consent banner — solo web */}
+      {!isNative && <CookieBanner />}
+      {showIntro && <IntroSlides onDone={handleIntroDone} />}
     </View>
   );
 }

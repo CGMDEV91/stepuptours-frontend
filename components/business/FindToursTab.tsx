@@ -34,6 +34,7 @@ import {
 import { getSubscriptionPlans } from '../../services/dashboard.service';
 import { getCheckoutSessionStatus } from '../../services/subscription.service';
 import { getStripePromise } from '../../lib/stripe';
+import { ManageOnWebButton } from '../layout/ManageOnWebButton';
 import { getBusinessesByAuthor } from '../../services/business.service';
 import type { Business, TourWithSlots, BusinessPromotion, SubscriptionPlan, PromotionTargetType } from '../../types';
 
@@ -216,6 +217,8 @@ interface SlotCheckoutModalProps {
 
 function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuccess, onClose }: SlotCheckoutModalProps) {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  const lang = pathname.split('/').filter(Boolean)[0] ?? 'es';
   const [step, setStep]                         = useState<CheckoutStep>('plan-picker');
   const [selectedOption, setSelectedOption]     = useState<string | null>(null);
   const [clientSecret, setClientSecret]         = useState<string | null>(null);
@@ -455,9 +458,10 @@ function SlotCheckoutModal({ visible, slotData, plans, trialEverExhausted, onSuc
           {step === 'checkout' && Platform.OS !== 'web' && (
             <>
               <Ionicons name="phone-portrait-outline" size={40} color="#9CA3AF" style={{ alignSelf: 'center', marginVertical: 16 }} />
-              <Text style={{ color: '#6B7280', textAlign: 'center', paddingHorizontal: 16 }}>
+              <Text style={{ color: '#6B7280', textAlign: 'center', paddingHorizontal: 16, marginBottom: 12 }}>
                 {t('business.findTours.paymentWebOnly')}
               </Text>
+              <ManageOnWebButton path={`/${lang}/business-dashboard`} />
               <TouchableOpacity style={styles.modalCancelBtn} onPress={onClose} activeOpacity={0.8}>
                 <Text style={styles.modalCancelText}>{t('business.findTours.cancel')}</Text>
               </TouchableOpacity>

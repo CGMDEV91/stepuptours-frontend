@@ -24,7 +24,29 @@
       "Bash(cmd /c \"dir /s /b \\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\\\\app\")",
       "Bash(cmd /c \"dir /s /b \\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\\\\components\")",
       "Bash(ls /home/carlos/devel/stepuptours/stepuptours-frontend/web/ 2>/dev/null || echo \"no web dir\")",
-      "Bash(ddev describe *)"
+      "Bash(ddev describe *)",
+      "Bash(node -e \"const e=require\\('./i18n/locales/en.json'\\); console.log\\(JSON.stringify\\(e.nav,null,1\\)\\); console.log\\('--onboarding--'\\); console.log\\(JSON.stringify\\(e.onboarding,null,1\\)\\);\")",
+      "Bash(node -e \"const e=require\\('./i18n/locales/en.json'\\); console.log\\('NAV:',JSON.stringify\\(e.nav\\)\\); console.log\\('ONB:',JSON.stringify\\(e.onboarding\\)\\); console.log\\('KEYS:',Object.keys\\(e\\).join\\(','\\)\\);\")",
+      "Bash(npx expo *)",
+      "Bash(wsl bash *)",
+      "Bash(node node_modules/typescript/bin/tsc --noEmit --skipLibCheck)",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\" -type d -name \"custom\")",
+      "Bash(cd /mnt/c/Users/cgonzale && find . -maxdepth 5 -name \"step-up-tours\" -type d 2>/dev/null | head -5)",
+      "Bash(cd /mnt/wsl/Ubuntu/home/carlos/devel/stepuptours/pantheon-site/step-up-tours && pwd && ls -la web/modules/custom/ 2>&1 | head -50)",
+      "Bash(ls -la \"\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\pantheon-site\\\\\\\\step-up-tours\\\\\\\\web\\\\\\\\modules\\\\\\\\custom\\\\\\\\\" 2>&1 | head -50)",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\modules\\\\custom\\\\stepuptours_api\" -type f \\\\\\( -name \"*.routing.yml\" -o -name \"*.module\" -o -name \"*.php\" \\\\\\))",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\" -type f -name \"*.yml\")",
+      "Bash(ls -la \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\sites\\\\default\\\\files\\\\config_\")",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\" -type d -name \"config\")",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\" -type f -path \"*config*\" -name \"*tour_activity*\")",
+      "Bash(ls -la \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\config\\\\sync\")",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\config\\\\sync\" -type f -name \"*tour_user_activity*\")",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\config\\\\sync\" -type f -name \"*field.storage*tour_user_activity*\")",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\modules\\\\custom\" -type f -name \"*.module\")",
+      "Bash(grep -r \"httpClient\\\\|Guzzle\\\\|GuzzleHttp\\\\|http_client\" \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\modules\\\\custom\" --include=\"*.php\")",
+      "Bash(grep -r \"Stripe\\\\|stripe\" \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\modules\\\\custom\\\\stepuptours_api\\\\src\" --include=\"*.php\")",
+      "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\" -type f -name \"settings.php\" -o -name \"services.yml\")",
+      "Bash(tee /tmp/tsc-out.txt)"
     ]
   }
 }

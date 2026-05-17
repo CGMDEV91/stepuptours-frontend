@@ -228,15 +228,27 @@ export async function loginWithGoogle(googleIdToken: string, role?: 'guide' | 'b
 
   const { token, username } = response.data;
   // token is base64(username:derivedPassword) — ready to use as Basic Auth
+  return buildBasicAuthSession(token, username, rememberMe, 'User not found after Google auth');
+}
+
+/**
+ * Construye una AuthSession a partir de un token Basic Auth ya emitido por el
+ * backend (Google sign-in o handoff web). Recupera el perfil y los roles.
+ */
+async function buildBasicAuthSession(
+  token: string,
+  username: string,
+  rememberMe: boolean,
+  notFoundMessage: string,
+): Promise<AuthSession> {
   const authHeader = `Basic ${token}`;
 
-  // Fetch full user profile
   const users = await axios.get(
     `${BASE_URL}/jsonapi/user/user?filter[name]=${encodeURIComponent(username)}&fields[user--user]=name,mail,field_public_name,field_experience_points,field_country,user_picture,created,preferred_langcode,langcode&include=field_country`,
     { headers: { Accept: 'application/vnd.api+json', Authorization: authHeader } }
   );
   const rawUsers = users.data?.data ?? [];
-  if (!rawUsers.length) throw new Error('User not found after Google auth');
+  if (!rawUsers.length) throw new Error(notFoundMessage);
 
   const roles = await fetchUserRoles(rawUsers[0].id, authHeader);
   const rawUser = {
@@ -254,4 +266,27 @@ export async function loginWithGoogle(googleIdToken: string, role?: 'guide' | 'b
   const session: AuthSession = { token, tokenType: 'basic', user, expiresAt: null, rememberMe };
   await sessionStorage.saveSession(session, rememberMe);
   return session;
+}
+
+// ── Handoff app nativa → web app ──────────────────────────────────────────────
+
+/**
+ * Canjea un token de un solo uso (OTT) emitido por la app nativa por una sesión
+ * Basic Auth completa. Usado por la ruta /handoff de la web app.
+ */
+export async function loginWithHandoffToken(ott: string): Promise<AuthSession> {
+  let response: any;
+  try {
+    response = await axios.post(
+      `${BASE_URL}/api/auth/web-handoff-exchange`,
+      { token: ott },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+  } catch (err: any) {
+    throw new Error(extractErrorMessage(err, 'Handoff failed'));
+  }
+
+  const { token, username } = response.data;
+  if (!token) throw new Error('Invalid handoff token');
+  return buildBasicAuthSession(token, username, false, 'User not found after handoff');
 }

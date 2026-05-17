@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '../../stores/auth.store';
 import { getSocialLinks, type SocialLinksConfig } from '../../services/admin.service';
+import { isNative } from '../../lib/platform';
 
 const NAVY = '#1C2B3A';
 const NAVY_LIGHT = '#243447';
@@ -35,6 +36,14 @@ interface SiteSettings {
 }
 
 export default function Footer() {
+  // Las apps nativas no llevan footer — su contenido legal/contacto se reubica
+  // en la sección "Información" del perfil y en la pantalla de info del tab bar.
+  if (isNative) return null;
+
+  return <FooterWeb />;
+}
+
+function FooterWeb() {
   const { t } = useTranslation();
   const router = useRouter();
   const { langcode } = useLocalSearchParams<{ langcode: string }>();

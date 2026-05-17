@@ -19,6 +19,7 @@ interface AuthState {
   signIn: (credentials: AuthCredentials) => Promise<void>;
   signUp: (data: { username: string; publicName?: string; email: string; password: string; role?: 'guide' | 'business'; langcode?: string; preferredLanguage?: string }) => Promise<void>;
   signInWithGoogle: (googleIdToken: string, role?: 'guide' | 'business', preferredLanguage?: string) => Promise<void>;
+  signInWithHandoff: (ott: string) => Promise<void>;
   signOut: () => Promise<void>;
   restore: () => Promise<void>;
   clearError: () => void;
@@ -78,6 +79,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false, isNewLogin: true });
     } catch (err: any) {
       set({ isLoading: false, error: err.message ?? 'Google sign-in failed' });
+    }
+  },
+
+  signInWithHandoff: async (ott) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { loginWithHandoffToken } = await import('../services/auth.service');
+      const session = await loginWithHandoffToken(ott);
+      set({ session, user: session.user, isLoading: false, isNewLogin: false });
+      inactivityTracker.start(() => { get().signOut(); }, { rememberMe: false });
+    } catch (err: any) {
+      set({ isLoading: false, error: err.message ?? 'Handoff failed' });
+      throw err;
     }
   },
 

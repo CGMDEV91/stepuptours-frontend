@@ -12,7 +12,9 @@ import {
   Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { ManageOnWebButton } from '../layout/ManageOnWebButton';
 import { getActiveSubscription, getSubscriptionPlans, getPaymentHistoryByUser } from '../../services/dashboard.service';
 import { createStripeCheckoutSession, getCheckoutSessionStatus, cancelStripeSubscription, disableSubscriptionAutoRenewal, enableSubscriptionAutoRenewal } from '../../services/subscription.service';
 import { getStripePromise } from '../../lib/stripe';
@@ -652,12 +654,15 @@ function StripeCheckoutForm({ plan, checkoutSessionId, onSuccess, onCancel }: St
 
 function NativeCheckoutPlaceholder({ onCancel }: { onCancel: () => void }) {
   const { t } = useTranslation();
+  const { langcode } = useLocalSearchParams<{ langcode: string }>();
+  const lang = langcode || 'en';
   return (
     <View style={checkoutStyles.wrap}>
       <View style={checkoutStyles.nativePlaceholder}>
         <Ionicons name="phone-portrait-outline" size={32} color="#9CA3AF" />
         <Text style={checkoutStyles.nativePlaceholderText}>{t('subscription.nativeCheckoutHint')}</Text>
       </View>
+      <ManageOnWebButton path={`/${lang}/dashboard`} />
       <TouchableOpacity style={checkoutStyles.cancelLink} onPress={onCancel}>
         <Text style={checkoutStyles.cancelLinkText}>{t('subscription.cancelCheckout')}</Text>
       </TouchableOpacity>

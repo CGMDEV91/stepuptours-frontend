@@ -12,6 +12,8 @@ import {
   useWindowDimensions,
   Platform,
   Alert,
+  Switch,
+  Linking,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +29,17 @@ import type { PickerItem } from '../../components/layout/Picker';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
+import { isNative } from '../../lib/platform';
+import { getAbandonedTourPref, setAbandonedTourPref } from '../../lib/notification-prefs';
+import { syncPushToken } from '../../services/notifications.service';
 import type { TourActivity } from '../../types';
+
+const LEGAL_LINKS: { labelKey: string; icon: string; slug: string }[] = [
+  { labelKey: 'more.faq', icon: 'help-circle-outline', slug: 'faq' },
+  { labelKey: 'more.privacy', icon: 'shield-checkmark-outline', slug: 'privacy-policy' },
+  { labelKey: 'more.cookies', icon: 'settings-outline', slug: 'cookie-policy' },
+  { labelKey: 'more.terms', icon: 'document-text-outline', slug: 'terms-of-use' },
+];
 
 const AMBER = '#F59E0B';
 const AMBER_DARK = '#D97706';
@@ -89,6 +101,30 @@ export default function ProfileScreen() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [langPickerVisible, setLangPickerVisible] = useState(false);
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
+
+  // Notificaciones (solo nativo) y contacto
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  const [siteEmail, setSiteEmail] = useState('');
+
+  useEffect(() => {
+    if (!isNative) return;
+    getAbandonedTourPref().then(setNotifEnabled);
+  }, []);
+
+  useEffect(() => {
+    if (!isNative) return;
+    const base = process.env.EXPO_PUBLIC_API_URL ?? '';
+    fetch(`${base}/api/site-settings`)
+      .then((r) => r.json())
+      .then((d) => { if (d?.siteEmail) setSiteEmail(d.siteEmail); })
+      .catch(() => {});
+  }, []);
+
+  const handleToggleNotif = useCallback(async (value: boolean) => {
+    setNotifEnabled(value);
+    await setAbandonedTourPref(value);
+    void syncPushToken();
+  }, []);
 
   // Guard: evita router.replace antes de que el Root Layout esté montado
   const [ready, setReady] = useState(false);
@@ -353,6 +389,55 @@ export default function ProfileScreen() {
               )}
             </TouchableOpacity>
           </View>
+
+          {/* ── Notifications (solo nativo) ── */}
+          {isNative && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('profile.notifications')}</Text>
+              <View style={styles.notifRow}>
+                <View style={styles.notifTextWrap}>
+                  <Text style={styles.notifTitle}>{t('profile.notifications.abandonedTour')}</Text>
+                  <Text style={styles.notifDesc}>{t('profile.notifications.abandonedTourDesc')}</Text>
+                </View>
+                <Switch
+                  value={notifEnabled}
+                  onValueChange={handleToggleNotif}
+                  trackColor={{ false: '#E5E7EB', true: '#FCD34D' }}
+                  thumbColor={notifEnabled ? AMBER : '#F3F4F6'}
+                />
+              </View>
+            </View>
+          )}
+
+          {/* ── App information (solo nativo — en web está en el footer) ── */}
+          {isNative && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('profile.information')}</Text>
+              {LEGAL_LINKS.map((link, i) => (
+                <TouchableOpacity
+                  key={link.slug}
+                  style={[styles.infoRow, i < LEGAL_LINKS.length - 1 && styles.infoRowBorder]}
+                  onPress={() => router.push(`/${langcode}/${link.slug}` as any)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name={link.icon as any} size={20} color="#6B7280" />
+                  <Text style={styles.infoRowText}>{t(link.labelKey)}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+                </TouchableOpacity>
+              ))}
+              {siteEmail ? (
+                <TouchableOpacity
+                  style={styles.infoRow}
+                  onPress={() => Linking.openURL(`mailto:${siteEmail}`)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="mail-outline" size={20} color="#6B7280" />
+                  <Text style={styles.infoRowText}>{t('more.contact')}</Text>
+                  <Text style={styles.infoRowValue}>{siteEmail}</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          )}
         </View>
         <Footer />
       </PageScrollView>
@@ -608,5 +693,44 @@ const styles = StyleSheet.create({
   },
   btnDisabled: {
     opacity: 0.6,
+  },
+  notifRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  notifTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  notifTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  notifDesc: {
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+  },
+  infoRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  infoRowText: {
+    flex: 1,
+    fontSize: 15,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  infoRowValue: {
+    fontSize: 13,
+    color: '#9CA3AF',
   },
 });
