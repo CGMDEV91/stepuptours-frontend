@@ -13,6 +13,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { notifyConsentGranted, notifyConsentRevoked, trackSiteVisit } from '../../services/analytics.service';
+import { updateAnalyticsConsent } from '../../lib/consent';
 
 const CONSENT_KEY = 'cookie_consent';
 
@@ -61,6 +62,8 @@ export default function CookieBanner() {
 
   const handleAccept = async () => {
     await storage.setItem(CONSENT_KEY, 'accepted');
+    // Google Consent Mode v2: activar analytics_storage/ad_storage.
+    updateAnalyticsConsent(true);
     notifyConsentGranted();
     // Count the visit now that consent exists — the layout's earlier call
     // no-opped while consent was still pending.
@@ -70,6 +73,8 @@ export default function CookieBanner() {
 
   const handleDecline = async () => {
     await storage.setItem(CONSENT_KEY, 'declined');
+    // Mantener el consentimiento denegado en Google Consent Mode v2.
+    updateAnalyticsConsent(false);
     notifyConsentRevoked();
     setVisible(false);
   };
