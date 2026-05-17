@@ -10,6 +10,7 @@ import { useFonts } from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 import { initAnalytics } from "../services/analytics.service";
 import { registerServiceWorker } from "../lib/register-sw";
+import { initGtm } from "../lib/gtm";
 import { isNative } from "../lib/platform";
 import { syncPushToken, addNotificationTapListener } from "../services/notifications.service";
 
@@ -23,6 +24,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     registerServiceWorker();
+    initGtm();
     Promise.all([restore(), fetchLanguages(), initAnalytics()]).then(() => {
       setInitialized(true);
     });

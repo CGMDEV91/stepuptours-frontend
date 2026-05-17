@@ -46,7 +46,15 @@
       "Bash(grep -r \"httpClient\\\\|Guzzle\\\\|GuzzleHttp\\\\|http_client\" \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\modules\\\\custom\" --include=\"*.php\")",
       "Bash(grep -r \"Stripe\\\\|stripe\" \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\\\\web\\\\modules\\\\custom\\\\stepuptours_api\\\\src\" --include=\"*.php\")",
       "Bash(find \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\pantheon-site\\\\step-up-tours\" -type f -name \"settings.php\" -o -name \"services.yml\")",
-      "Bash(tee /tmp/tsc-out.txt)"
+      "Bash(tee /tmp/tsc-out.txt)",
+      "Bash(curl -s \"https://stepuptours.com\" -H \"Cache-Control: no-cache\")",
+      "WebFetch(domain:stepuptours.com)",
+      "Bash(curl -s -o /dev/null -w \"status=%{http_code}\\\\n\" \"https://stepuptours.com\")",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://stepuptours.com\")",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com\")",
+      "Bash(git fetch *)",
+      "Bash(curl -s -D - -o /dev/null -A \"Mozilla/5.0\" \"https://stepuptours.com/?cb=$\\(date +%s\\)\")",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com/?cb=$\\(date +%s\\)\")"
     ]
   }
 }
