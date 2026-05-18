@@ -27,7 +27,7 @@ const deserializer = new Jsona();
 
 // ── Langcode para peticiones traducidas ────────────────────────────────────
 function getInitialLangcode(): string {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && window.location?.pathname) {
     const segment = window.location.pathname.split('/')[1];
     if (segment && /^[a-z]{2}(-[a-z]{2})?$/.test(segment)) return segment;
   }

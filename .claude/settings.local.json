@@ -54,7 +54,9 @@
       "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com\")",
       "Bash(git fetch *)",
       "Bash(curl -s -D - -o /dev/null -A \"Mozilla/5.0\" \"https://stepuptours.com/?cb=$\\(date +%s\\)\")",
-      "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com/?cb=$\\(date +%s\\)\")"
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com/?cb=$\\(date +%s\\)\")",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com/_expo/static/js/web/entry-0e0cb6f392b892e827d64d7fc707386c.js\")",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://www.googletagmanager.com/gtm.js?id=GTM-WKH29VMH\")"
     ]
   }
 }
