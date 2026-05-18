@@ -15,8 +15,11 @@ import CookieBanner from '../../components/layout/CookieBanner';
 import { trackSiteVisit } from '../../services/analytics.service';
 import { isNative } from '../../lib/platform';
 import { wasIntroShown, markIntroShown } from '../../lib/intro-state';
+import { useLocationPermission } from '../../hooks/useLocationPermission';
 
 export default function LangcodeLayout() {
+  useLocationPermission();
+
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const languages = useLanguageStore((s) => s.languages);
   const currentLanguage = useLanguageStore((s) => s.currentLanguage);
@@ -116,14 +119,17 @@ export default function LangcodeLayout() {
     clearNewLogin();
 
     const preferredLang = user.preferredLanguage;
-    if (!preferredLang || preferredLang === langcode) return;
-
-    const isAvailable = languages.some((l) => l.id === preferredLang);
-    if (!isAvailable) return;
-
-    setLanguageByCode(preferredLang);
-    const pathWithoutLang = pathname.replace(/^\/[^\/]+/, '');
-    router.replace(`/${preferredLang}${pathWithoutLang}` as any);
+    let targetLang = langcode;
+    if (
+      preferredLang &&
+      preferredLang !== langcode &&
+      languages.some((l) => l.id === preferredLang)
+    ) {
+      setLanguageByCode(preferredLang);
+      targetLang = preferredLang;
+    }
+    // A fresh login always lands on the home screen.
+    router.replace(`/${targetLang}` as any);
   }, [ready, user?.id, languages, isNewLogin]);
 
   // Intro deslizante: solo en nativo, solo invitado, una vez por apertura de app.

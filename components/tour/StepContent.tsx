@@ -14,6 +14,7 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTTS } from '../../hooks/useTTS';
@@ -122,9 +123,17 @@ function WebGoogleEmbed({ uri, height, interactive = false, onUnavailable, onLoa
   );
 }
 
+function isStreetViewUri(uri: string): boolean {
+  return uri.includes('layer=c') || uri.includes('svembed') || uri.includes('cbll=');
+}
+
+function buildIframeHtml(uri: string): string {
+  return `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><style>*{margin:0;padding:0;touch-action:manipulation}html,body,iframe{width:100%;height:100%;border:none;overflow:hidden}</style></head><body><iframe src="${uri}" width="100%" height="100%" frameborder="0" allowfullscreen allow="accelerometer *; gyroscope *; geolocation *; xr-spatial-tracking *"></iframe></body></html>`;
+}
+
 function GoogleEmbed({ uri, height, interactive = false, onUnavailable, onLoad }: EmbedProps) {
-  const wrapStyle    = { height, overflow: 'hidden' as const, position: 'relative' as const };
-  const webViewRef   = useRef<WebView>(null);
+  const wrapStyle = { height, overflow: 'hidden' as const, position: 'relative' as const };
+  const webViewRef = useRef<WebView>(null);
 
   useEffect(() => {
     return () => { webViewRef.current?.stopLoading(); };
@@ -135,18 +144,21 @@ function GoogleEmbed({ uri, height, interactive = false, onUnavailable, onLoad }
   }
 
   return (
-      <View style={wrapStyle}>
+      <View style={wrapStyle} renderToHardwareTextureAndroid>
         <WebView
             ref={webViewRef}
-            source={{ uri }}
-            scrollEnabled={interactive}
+            source={{ html: buildIframeHtml(uri) }}
+            originWhitelist={['*']}
+            scrollEnabled={false}
             javaScriptEnabled
             geolocationEnabled={interactive}
             allowsInlineMediaPlayback
-            injectedJavaScript={onUnavailable ? SV_INJECT_JS : undefined}
-            onMessage={(e) => { if (e.nativeEvent.data === 'sv_unavailable') onUnavailable?.(); }}
-            onShouldStartLoadWithRequest={(req) => isGoogleMapsUrl(req.url)}
+            mixedContentMode="always"
+            overScrollMode="never"
+            androidLayerType="hardware"
             onLoadEnd={onLoad}
+            onError={() => onUnavailable?.()}
+            onHttpError={() => onUnavailable?.()}
             style={{ flex: 1, backgroundColor: '#e8e8e8' }}
         />
         {!interactive && <View style={StyleSheet.absoluteFill} pointerEvents="box-only" />}
@@ -531,22 +543,38 @@ export function StepContent({
     }
   }, [isCompleted]);
 
-  // ── Distance check (web only: legacy embed fails for very long routes) ───────
+  // ── Distance check: the embed fails for very long routes; show a fallback ────
 
   useEffect(() => {
-    if (!step.location || Platform.OS !== 'web') return;
-    if (!navigator?.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const dist = haversineKm(
-          coords.latitude, coords.longitude,
-          step.location!.lat, step.location!.lon,
-        );
+    const loc = step.location;
+    if (!loc) return;
+
+    if (Platform.OS === 'web') {
+      if (!navigator?.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const dist = haversineKm(coords.latitude, coords.longitude, loc.lat, loc.lon);
+          setIsTooFar(dist > MAX_ROUTE_DISTANCE_KM);
+        },
+        () => { /* permission denied or error — keep map visible */ },
+        { timeout: 5000, maximumAge: 300_000 },
+      );
+      return;
+    }
+
+    // Native: use expo-location (permission requested at app launch).
+    let cancelled = false;
+    (async () => {
+      try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status !== 'granted') return;
+        const pos = await Location.getCurrentPositionAsync({});
+        if (cancelled) return;
+        const dist = haversineKm(pos.coords.latitude, pos.coords.longitude, loc.lat, loc.lon);
         setIsTooFar(dist > MAX_ROUTE_DISTANCE_KM);
-      },
-      () => { /* permission denied or error — keep map visible */ },
-      { timeout: 5000, maximumAge: 300_000 },
-    );
+      } catch { /* keep map visible */ }
+    })();
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step.location?.lat, step.location?.lon]);
 

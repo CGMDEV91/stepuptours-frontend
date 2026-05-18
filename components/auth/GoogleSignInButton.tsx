@@ -12,11 +12,13 @@
 // the modal design we render the GIS button invisibly above our own.
 
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import {
   initializeGoogleIdSignIn,
   renderGoogleSignInButton,
 } from '../../services/googleAuth.service';
+import { useGoogleAuth } from '../../hooks/useGoogleAuth';
+import { GoogleLogo } from './GoogleLogo';
 
 interface Props {
   /** Visible label, e.g. t('auth.continueWithGoogle'). */
@@ -39,22 +41,64 @@ function clampGisWidth(px: number): number {
   return Math.max(GIS_MIN_WIDTH, Math.min(GIS_MAX_WIDTH, Math.round(px)));
 }
 
-const GoogleLogo = () => (
-  // @ts-ignore — react-native typings don't include native SVG, but on web
-  // it falls through to a real <svg> element.
-  <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-    {/* @ts-ignore */}
-    <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-    {/* @ts-ignore */}
-    <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-    {/* @ts-ignore */}
-    <path d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
-    {/* @ts-ignore */}
-    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z" fill="#EA4335"/>
-  </svg>
-);
+// Visible button styles — mirror modalStyles.googleBtn from AuthModals.tsx.
+function visibleButtonStyle(disabled: boolean) {
+  return {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    gap: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    width: '100%' as const,
+    opacity: disabled ? 0.55 : 1,
+  };
+}
 
-export function GoogleSignInButton({
+// ── Native button — expo-auth-session OAuth flow ─────────────────────────────
+function GoogleSignInButtonNative({ label, onSuccess, onError, disabled }: Props) {
+  const { promptAsync, ready } = useGoogleAuth(onSuccess, onError);
+  const blocked = disabled || !ready;
+
+  return (
+    <View style={{ width: '100%', marginBottom: 8 }}>
+      <TouchableOpacity
+        style={visibleButtonStyle(blocked)}
+        onPress={() => promptAsync()}
+        disabled={blocked}
+        activeOpacity={0.7}
+      >
+        <GoogleLogo />
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ── Platform dispatcher ──────────────────────────────────────────────────────
+export function GoogleSignInButton(props: Props) {
+  if (Platform.OS === 'web') return <GoogleSignInButtonWeb {...props} />;
+
+  // Native needs a platform-specific OAuth client ID. Until it's configured
+  // in Google Cloud Console + .env.local, hide the button instead of crashing.
+  const nativeClientId =
+    Platform.OS === 'ios'
+      ? process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
+      : process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+  if (!nativeClientId) return null;
+
+  return <GoogleSignInButtonNative {...props} />;
+}
+
+export default GoogleSignInButton;
+
+function GoogleSignInButtonWeb({
   label,
   onSuccess,
   onError,
@@ -121,29 +165,11 @@ export function GoogleSignInButton({
     }
   }, [ready, width, text, locale]);
 
-  if (Platform.OS !== 'web') return null;
-
-  // Visible button styles — mirror modalStyles.googleBtn from AuthModals.tsx.
-  const visibleButtonStyle = {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-    gap: 10,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    width: '100%' as const,
-    opacity: disabled ? 0.55 : 1,
-  };
-
   return (
     <View style={{ position: 'relative', width: '100%', marginBottom: 8 }}>
       {/* Visible custom-styled button (no click logic; the GIS iframe on top
           captures the click). */}
-      <View style={visibleButtonStyle}>
+      <View style={visibleButtonStyle(disabled)}>
         <GoogleLogo />
         <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>
           {label}
@@ -179,5 +205,3 @@ export function GoogleSignInButton({
     </View>
   );
 }
-
-export default GoogleSignInButton;

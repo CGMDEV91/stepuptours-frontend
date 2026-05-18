@@ -19,10 +19,19 @@ interface TabDef {
   path: (lang: string) => string;
 }
 
-const BASE_TABS: TabDef[] = [
-  { key: 'home', labelKey: 'nav.home', icon: 'search-outline', path: (l) => `/${l}` },
-  { key: 'ranking', labelKey: 'nav.ranking', icon: 'trophy-outline', path: (l) => `/${l}/ranking` },
-  { key: 'favourites', labelKey: 'nav.favourites', icon: 'heart-outline', path: (l) => `/${l}/favourites` },
+const GUEST_TABS: TabDef[] = [
+  { key: 'home',       labelKey: 'nav.home',       icon: 'home-outline',          path: (l) => `/${l}` },
+  { key: 'ranking',    labelKey: 'nav.ranking',     icon: 'trophy-outline',        path: (l) => `/${l}/ranking` },
+  { key: 'favourites', labelKey: 'nav.favourites',  icon: 'heart-outline',         path: (l) => `/${l}/favourites` },
+  { key: 'more',       labelKey: 'nav.account',     icon: 'person-circle-outline', path: (l) => `/${l}/more` },
+];
+
+const AUTH_TABS: TabDef[] = [
+  { key: 'home',       labelKey: 'nav.home',       icon: 'home-outline',             path: (l) => `/${l}` },
+  { key: 'ranking',    labelKey: 'nav.ranking',     icon: 'trophy-outline',           path: (l) => `/${l}/ranking` },
+  { key: 'completed',  labelKey: 'nav.completed',   icon: 'checkmark-circle-outline', path: (l) => `/${l}/completed` },
+  { key: 'favourites', labelKey: 'nav.favourites',  icon: 'heart-outline',            path: (l) => `/${l}/favourites` },
+  { key: 'profile',    labelKey: 'nav.profile',     icon: 'person-outline',           path: (l) => `/${l}/profile` },
 ];
 
 export function BottomTabBar() {
@@ -34,13 +43,7 @@ export function BottomTabBar() {
   const user = useAuthStore((s) => s.user);
 
   const lang = langcode || 'en';
-
-  // Última pestaña: Perfil (autenticado) o Más/Cuenta (invitado)
-  const lastTab: TabDef = user
-    ? { key: 'profile', labelKey: 'nav.profile', icon: 'person-outline', path: (l) => `/${l}/profile` }
-    : { key: 'more', labelKey: 'nav.account', icon: 'person-circle-outline', path: (l) => `/${l}/more` };
-
-  const tabs = [...BASE_TABS, lastTab];
+  const tabs = user ? AUTH_TABS : GUEST_TABS;
 
   const isActive = useCallback(
     (tab: TabDef) => {

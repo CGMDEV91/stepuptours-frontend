@@ -27,12 +27,26 @@ import BackButton from '../../components/layout/BackButton';
 import { Picker } from '../../components/layout/Picker';
 import type { PickerItem } from '../../components/layout/Picker';
 import Footer from '../../components/layout/Footer';
+import { LanguageSelector } from '../../components/layout/LanguageSelector';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import { isNative } from '../../lib/platform';
 import { getAbandonedTourPref, setAbandonedTourPref } from '../../lib/notification-prefs';
 import { syncPushToken } from '../../services/notifications.service';
-import type { TourActivity } from '../../types';
+import type { TourActivity, User } from '../../types';
+
+function getRolePanel(user: User, lang: string): { labelKey: string; icon: string; route: string } {
+  if (user.roles?.includes('administrator')) {
+    return { labelKey: 'nav.administration', icon: 'shield-checkmark-outline', route: `/${lang}/admin` };
+  }
+  if (user.roles?.includes('guide') || user.roles?.includes('professional')) {
+    return { labelKey: 'nav.dashboard', icon: 'grid-outline', route: `/${lang}/dashboard` };
+  }
+  if (user.roles?.includes('business')) {
+    return { labelKey: 'nav.business', icon: 'storefront-outline', route: `/${lang}/business-dashboard` };
+  }
+  return { labelKey: 'nav.myDonations', icon: 'heart-circle-outline', route: `/${lang}/donations` };
+}
 
 const LEGAL_LINKS: { labelKey: string; icon: string; slug: string }[] = [
   { labelKey: 'more.faq', icon: 'help-circle-outline', slug: 'faq' },
@@ -78,6 +92,7 @@ export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
   const updateProfile = useAuthStore((s) => s.updateProfile);
+  const signOut = useAuthStore((s) => s.signOut);
   const countries = useToursStore((s) => s.countries);
   const fetchCountries = useToursStore((s) => s.fetchCountries);
   const languages = useLanguageStore((s) => s.languages);
@@ -224,6 +239,11 @@ export default function ProfileScreen() {
     }
   }, [user, publicName, newPassword, confirmPassword, selectedLangCode, selectedCountryId, updateProfile, t]);
 
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    router.replace(`/${langcode}` as any);
+  }, [signOut, router, langcode]);
+
   const countryItems: PickerItem[] = [
     { id: '', label: t('profile.selectCountry') },
     ...countries.map((c) => ({ id: c.id, label: c.name })),
@@ -269,6 +289,33 @@ export default function ProfileScreen() {
         </View>
 
         <View style={[styles.contentWrapper, { maxWidth: CONTENT_MAX_WIDTH }]}>
+          {/* ── Language section (solo nativo — en web está en el navbar) ── */}
+          {isNative && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('profile.language')}</Text>
+              <LanguageSelector variant="field" />
+            </View>
+          )}
+
+          {/* ── My panel (solo nativo — en web está en el navbar) ── */}
+          {isNative && (() => {
+            const panel = getRolePanel(user, langcode ?? 'en');
+            return (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>{t('profile.myPanel')}</Text>
+                <TouchableOpacity
+                  style={styles.infoRow}
+                  onPress={() => router.push(panel.route as any)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name={panel.icon as any} size={20} color={AMBER} />
+                  <Text style={styles.infoRowText}>{t(panel.labelKey)}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+            );
+          })()}
+
           {/* ── Stats section ── */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('profile.stats')}</Text>
@@ -345,6 +392,7 @@ export default function ProfileScreen() {
                 </Text>
                 <Ionicons name="chevron-down" size={18} color="#6B7280" />
               </TouchableOpacity>
+              <Text style={styles.fieldHelp}>{t('profile.edit.languageHelp')}</Text>
             </View>
 
             <View style={styles.fieldGroup}>
@@ -437,6 +485,18 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               ) : null}
             </View>
+          )}
+
+          {/* ── Sign out (solo nativo — en web está en el navbar) ── */}
+          {isNative && (
+            <TouchableOpacity
+              style={styles.signOutBtn}
+              onPress={handleSignOut}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="log-out-outline" size={20} color="#DC2626" />
+              <Text style={styles.signOutText}>{t('nav.signout')}</Text>
+            </TouchableOpacity>
           )}
         </View>
         <Footer />
@@ -612,6 +672,12 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 6,
   },
+  fieldHelp: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 6,
+    lineHeight: 16,
+  },
   input: {
     height: 44,
     borderWidth: 1,
@@ -732,5 +798,22 @@ const styles = StyleSheet.create({
   infoRowValue: {
     fontSize: 13,
     color: '#9CA3AF',
+  },
+  signOutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    borderRadius: 12,
+    paddingVertical: 13,
+    marginBottom: 16,
+  },
+  signOutText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#DC2626',
   },
 });
