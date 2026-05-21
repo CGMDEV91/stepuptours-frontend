@@ -944,5 +944,35 @@
   "businessDashboard.tabs.myBusinesses": "Mis Negocios",
   "businessDashboard.tabs.findTours": "Buscar Tours",
   "businessDashboard.tabs.myPromotions": "Mis Promociones",
-  "businessDashboard.tabs.billing": "Facturación"
+  "businessDashboard.tabs.billing": "Facturación",
+
+  "common.close": "Cerrar",
+  "common.loadMore": "Cargar más",
+
+  "admin.tabs.feedback": "Feedback",
+  "admin.feedback.title": "Feedback de usuarios",
+  "admin.feedback.empty": "Aún no hay envíos de feedback.",
+  "admin.feedback.rowHint": "Pulsa una fila para leer el mensaje completo.",
+  "admin.feedback.loadError": "Error al cargar el feedback. Inténtalo de nuevo.",
+  "admin.feedback.noDescription": "Sin descripción.",
+  "admin.feedback.col.title": "Título",
+  "admin.feedback.col.user": "Usuario",
+  "admin.feedback.col.email": "Email",
+  "admin.feedback.col.rating": "Valoración",
+  "admin.feedback.col.date": "Fecha",
+
+  "feedback.title": "Enviar feedback",
+  "feedback.fabLabel": "FEEDBACK",
+  "feedback.dismiss": "Ocultar botón de feedback",
+  "footer.feedback": "Enviar feedback",
+  "feedback.ratingLabel": "¿Cómo valorarías tu experiencia?",
+  "feedback.titleLabel": "Título",
+  "feedback.titlePlaceholder": "Resumen breve de tu feedback",
+  "feedback.descriptionLabel": "Descripción (opcional)",
+  "feedback.descriptionPlaceholder": "Cuéntanos más sobre tu experiencia...",
+  "feedback.submit": "Enviar feedback",
+  "feedback.successMessage": "¡Gracias! Tu feedback ha sido recibido.",
+  "feedback.errorTitle": "Por favor, escribe un título.",
+  "feedback.errorRating": "Por favor, selecciona una valoración.",
+  "feedback.errorSubmit": "Algo salió mal. Inténtalo de nuevo."
 }

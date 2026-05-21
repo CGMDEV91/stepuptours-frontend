@@ -8,6 +8,7 @@ import { setApiLanguage } from '../../lib/drupal-client';
 import { useLanguageStore } from '../../stores/language.store';
 import { useAuthStore } from '../../stores/auth.store';
 import { AuthModals } from '../../components/layout/AuthModals';
+import { FeedbackButton } from '../../components/layout/FeedbackButton';
 import { Navbar } from '../../components/layout/Navbar';
 import { BottomTabBar } from '../../components/layout/BottomTabBar';
 import { IntroSlides } from '../../components/layout/IntroSlides';
@@ -189,6 +190,7 @@ export default function LangcodeLayout() {
       {/* Cookie consent banner — solo web */}
       {!isNative && <CookieBanner />}
       {showIntro && <IntroSlides onDone={handleIntroDone} />}
+      {user && <FeedbackButton />}
     </View>
   );
 }

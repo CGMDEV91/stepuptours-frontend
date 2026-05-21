@@ -944,5 +944,35 @@
   "businessDashboard.tabs.myBusinesses": "My Businesses",
   "businessDashboard.tabs.findTours": "Find Tours",
   "businessDashboard.tabs.myPromotions": "My Promotions",
-  "businessDashboard.tabs.billing": "Billing"
+  "businessDashboard.tabs.billing": "Billing",
+
+  "common.close": "Close",
+  "common.loadMore": "Load more",
+
+  "admin.tabs.feedback": "Feedback",
+  "admin.feedback.title": "User Feedback",
+  "admin.feedback.empty": "No feedback submissions yet.",
+  "admin.feedback.rowHint": "Click a row to read the full message.",
+  "admin.feedback.loadError": "Failed to load feedback. Please try again.",
+  "admin.feedback.noDescription": "No description provided.",
+  "admin.feedback.col.title": "Title",
+  "admin.feedback.col.user": "User",
+  "admin.feedback.col.email": "Email",
+  "admin.feedback.col.rating": "Rating",
+  "admin.feedback.col.date": "Date",
+
+  "feedback.title": "Send feedback",
+  "feedback.fabLabel": "FEEDBACK",
+  "feedback.dismiss": "Hide feedback button",
+  "footer.feedback": "Send feedback",
+  "feedback.ratingLabel": "How would you rate your experience?",
+  "feedback.titleLabel": "Title",
+  "feedback.titlePlaceholder": "Brief summary of your feedback",
+  "feedback.descriptionLabel": "Description (optional)",
+  "feedback.descriptionPlaceholder": "Tell us more about your experience...",
+  "feedback.submit": "Send feedback",
+  "feedback.successMessage": "Thank you! Your feedback has been received.",
+  "feedback.errorTitle": "Please enter a title.",
+  "feedback.errorRating": "Please select a rating.",
+  "feedback.errorSubmit": "Something went wrong. Please try again."
 }

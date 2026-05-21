@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '../../stores/auth.store';
 import { getSocialLinks, type SocialLinksConfig } from '../../services/admin.service';
+import { useFeedbackStore } from '../../stores/feedback.store';
 import { isNative } from '../../lib/platform';
 
 const NAVY = '#1C2B3A';
@@ -49,6 +50,7 @@ function FooterWeb() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { width } = useWindowDimensions();
   const user = useAuthStore((s) => s.user);
+  const openFeedback = useFeedbackStore((s) => s.openFeedback);
   const isDesktop = width >= 768;
 
   const lang = langcode ?? 'en';
@@ -125,6 +127,7 @@ function FooterWeb() {
                 <>
                   <FooterLink label={t('nav.favourites')} onPress={() => navigate(`/${lang}/favourites`)} />
                   <FooterLink label={t('nav.completed')}  onPress={() => navigate(`/${lang}/completed`)} />
+                  <FooterLink label={t('footer.feedback')} onPress={openFeedback} />
                 </>
             )}
           </View>

@@ -246,6 +246,17 @@ export interface TourWithSlots {
   occupiedStepSlots: Array<{ stepId: string; stepTitle: string; order: number }>;
 }
 
+// App Feedback
+export interface AppFeedback {
+  id: string;
+  title: string;
+  description: string;
+  rating: number;
+  username: string;
+  email: string;
+  createdAt: string;
+}
+
 // Ranking
 export interface RankingEntry {
   position: number;
