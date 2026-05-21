@@ -8,6 +8,7 @@ import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import { PageHead } from '../../components/seo/PageHead';
+import { useActiveLangs } from '../../hooks/useActiveLangs';
 
 const AMBER = '#F59E0B';
 
@@ -51,9 +52,19 @@ const SECTIONS = [
 export default function CookiePolicyScreen() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
+  const activeLangs = useActiveLangs();
   return (
     <View style={styles.root}>
-      <PageHead langcode={langcode ?? 'en'} path="cookie-policy" title={t('legal.cookiePolicy')} />
+      <PageHead
+        langcode={langcode ?? 'en'}
+        path="cookie-policy"
+        title={t('legal.cookiePolicy')}
+        langs={activeLangs}
+        description={t(
+          'seo.cookieDescription',
+          'Learn which cookies StepUp Tours uses and how to manage your preferences.',
+        )}
+      />
       <PageScrollView>
         <PageBanner icon="document-text" iconBgColor="#6366F1" title={t('legal.cookiePolicy')} />
         <View style={styles.inner}>

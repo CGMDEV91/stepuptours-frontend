@@ -5,20 +5,28 @@ import { Platform } from 'react-native';
 import Head from 'expo-router/head';
 import { useTranslation } from 'react-i18next';
 
+import { SUPPORTED_LANGS } from '../../lib/supported-langs';
+
 const SITE = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://stepuptours.com';
-const SUPPORTED_LANGS = ['es', 'en', 'fr', 'de', 'it', 'el'];
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80';
+const OG_IMAGE = `${SITE}/og-default.jpg`;
 
 interface ListingHeadProps {
   langcode: string;
+  /** Active language codes from the language store. Falls back to SUPPORTED_LANGS
+   *  during static prerender (store is empty in Node). After hydration the
+   *  client re-renders with the real list fetched from Drupal. */
+  langs?: readonly string[];
 }
 
-export function ListingHead({ langcode }: ListingHeadProps) {
+export function ListingHead({ langcode, langs }: ListingHeadProps) {
   if (Platform.OS !== 'web') return null;
+  const activeLangs = langs && langs.length > 0 ? langs : SUPPORTED_LANGS;
 
   const { t } = useTranslation();
-  const title = 'StepUp Tours — Discover City Tours';
+  const title = t(
+    'seo.listingTitle',
+    'Free tours & self-guided city walks worldwide | StepUp Tours',
+  );
   const description = t(
     'seo.listingDescription',
     'Explore self-guided city tours worldwide. Walk at your own pace, discover hidden gems, and earn rewards.',
@@ -36,13 +44,13 @@ export function ListingHead({ langcode }: ListingHeadProps) {
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonical} />
       <meta property="og:site_name" content="StepUp Tours" />
-      <meta property="og:image" content={HERO_IMAGE} />
+      <meta property="og:image" content={OG_IMAGE} />
       <meta property="og:image:width" content="1920" />
       <meta property="og:image:height" content="1080" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:image" content={HERO_IMAGE} />
+      <meta name="twitter:image" content={OG_IMAGE} />
 
-      {SUPPORTED_LANGS.map((lang) => (
+      {activeLangs.map((lang) => (
         <link key={lang} rel="alternate" hrefLang={lang} href={`${SITE}/${lang}`} />
       ))}
       <link rel="alternate" hrefLang="x-default" href={`${SITE}/en`} />

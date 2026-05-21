@@ -7,16 +7,22 @@ import { buildTourSlug } from '../../lib/tour-slug';
 import { buildTourJsonLd } from '../../lib/tour-jsonld';
 import type { Tour } from '../../types';
 
+import { SUPPORTED_LANGS } from '../../lib/supported-langs';
+
 const SITE = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://stepuptours.com';
-const SUPPORTED_LANGS = ['es', 'en', 'fr', 'de', 'it', 'el'];
 
 interface TourHeadProps {
   tour: Tour;
   langcode: string;
+  /** Active language codes from the language store. Falls back to SUPPORTED_LANGS
+   *  during static prerender (store is empty in Node). After hydration the
+   *  client re-renders with the real list fetched from Drupal. */
+  langs?: readonly string[];
 }
 
-export function TourHead({ tour, langcode }: TourHeadProps) {
+export function TourHead({ tour, langcode, langs }: TourHeadProps) {
   if (Platform.OS !== 'web') return null;
+  const activeLangs = langs && langs.length > 0 ? langs : SUPPORTED_LANGS;
 
   const slug = buildTourSlug({
     country: tour.country?.name,
@@ -50,7 +56,7 @@ export function TourHead({ tour, langcode }: TourHeadProps) {
       <meta name="twitter:image" content={image} />
 
       {/* hreflang: translated slug for current lang, nid-fallback for others */}
-      {SUPPORTED_LANGS.map((lang) => (
+      {activeLangs.map((lang) => (
         <link
           key={lang}
           rel="alternate"

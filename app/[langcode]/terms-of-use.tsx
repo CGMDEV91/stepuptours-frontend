@@ -8,6 +8,7 @@ import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import { PageHead } from '../../components/seo/PageHead';
+import { useActiveLangs } from '../../hooks/useActiveLangs';
 
 const AMBER = '#F59E0B';
 
@@ -58,9 +59,19 @@ const SECTIONS = [
 export default function TermsOfUseScreen() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
+  const activeLangs = useActiveLangs();
   return (
     <View style={styles.root}>
-      <PageHead langcode={langcode ?? 'en'} path="terms-of-use" title={t('legal.termsOfUse')} />
+      <PageHead
+        langcode={langcode ?? 'en'}
+        path="terms-of-use"
+        title={t('legal.termsOfUse')}
+        langs={activeLangs}
+        description={t(
+          'seo.termsDescription',
+          'Terms of use governing access to and use of the StepUp Tours app and services.',
+        )}
+      />
       <PageScrollView>
         <PageBanner icon="document-lock-outline" iconBgColor="#3B82F6" title={t('legal.termsOfUse')} />
         <View style={styles.inner}>

@@ -9,6 +9,7 @@ import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import { PageHead } from '../../components/seo/PageHead';
+import { useActiveLangs } from '../../hooks/useActiveLangs';
 
 const AMBER = '#F59E0B';
 
@@ -66,6 +67,7 @@ const CATEGORIES = [
 export default function FaqScreen() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
+  const activeLangs = useActiveLangs();
   const [open, setOpen] = useState<Set<number>>(new Set());
 
   const toggle = (i: number) =>
@@ -79,7 +81,16 @@ export default function FaqScreen() {
 
   return (
     <View style={styles.root}>
-      <PageHead langcode={langcode ?? 'en'} path="faq" title={t('legal.faq')} />
+      <PageHead
+        langcode={langcode ?? 'en'}
+        path="faq"
+        title={t('legal.faq')}
+        langs={activeLangs}
+        description={t(
+          'seo.faqDescription',
+          'Frequently asked questions about StepUp Tours: how self-guided city tours work, points, rankings and rewards.',
+        )}
+      />
       <PageScrollView>
         <PageBanner icon="help-circle" iconBgColor="#6366F1" title={t('legal.faq')} />
         <View style={styles.inner}>

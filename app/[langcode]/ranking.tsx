@@ -22,6 +22,7 @@ import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import type { RankingEntry } from '../../types';
 import { PageHead } from '../../components/seo/PageHead';
+import { useActiveLangs } from '../../hooks/useActiveLangs';
 
 const AMBER = '#F59E0B';
 const SILVER = '#9CA3AF';
@@ -151,6 +152,7 @@ export default function RankingScreen() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const activeLangs = useActiveLangs();
 
   const isDesktop = width >= 768;
 
@@ -216,7 +218,16 @@ export default function RankingScreen() {
 
   return (
     <>
-      <PageHead langcode={langcode ?? 'en'} path="ranking" title={t('ranking.title', 'Ranking')} />
+      <PageHead
+        langcode={langcode ?? 'en'}
+        path="ranking"
+        title={t('ranking.title', 'Ranking')}
+        langs={activeLangs}
+        description={t(
+          'seo.rankingDescription',
+          'See the global StepUp Tours ranking. Complete tours, earn points and climb the leaderboard.',
+        )}
+      />
       <PageScrollView
         style={styles.root}
         contentContainerStyle={styles.scrollContent}

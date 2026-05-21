@@ -57,7 +57,10 @@
       "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com/?cb=$\\(date +%s\\)\")",
       "Bash(curl -s -A \"Mozilla/5.0\" \"https://stepuptours.com/_expo/static/js/web/entry-0e0cb6f392b892e827d64d7fc707386c.js\")",
       "Bash(curl -s -A \"Mozilla/5.0\" \"https://www.googletagmanager.com/gtm.js?id=GTM-WKH29VMH\")",
-      "Bash(grep -n \"nav\" \"\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\i18n\\\\\\\\locales\\\\\\\\es.json\" 2>&1 | head -20)"
+      "Bash(grep -n \"nav\" \"\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\Ubuntu\\\\\\\\home\\\\\\\\carlos\\\\\\\\devel\\\\\\\\stepuptours\\\\\\\\stepuptours-frontend\\\\\\\\i18n\\\\\\\\locales\\\\\\\\es.json\" 2>&1 | head -20)",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(npm run *)",
+      "Bash(ls \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\carlos\\\\devel\\\\stepuptours\\\\stepuptours-frontend\")"
     ]
   }
 }

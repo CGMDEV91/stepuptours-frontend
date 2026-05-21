@@ -21,8 +21,29 @@ if (fs.existsSync(envPath)) {
 
 const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://stepuptours.com';
 const DRUPAL_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://dev-step-up-tours.pantheonsite.io';
-const LANGUAGES = ['es', 'en', 'fr', 'de', 'it', 'el'];
+const LANG_FALLBACK = ['es', 'en', 'fr', 'de', 'it', 'el'];
 const PAGE_LIMIT = 100;
+
+async function fetchActiveLanguages(): Promise<string[]> {
+  try {
+    const resp = await axios.get(
+      `${DRUPAL_URL}/jsonapi/configurable_language/configurable_language`,
+      { headers: { Accept: 'application/vnd.api+json' } },
+    );
+    const langs: string[] = (resp.data?.data ?? [])
+      .map(
+        (l: any) =>
+          l.attributes?.drupal_internal__id ??
+          l.attributes?.id ??
+          l.attributes?.langcode,
+      )
+      .filter((code: any) => code && !['und', 'zxx'].includes(code));
+    return langs.length > 0 ? langs : LANG_FALLBACK;
+  } catch {
+    console.warn('Could not fetch languages from Drupal — using fallback list.');
+    return LANG_FALLBACK;
+  }
+}
 
 function slugify(text: string): string {
   return text
@@ -87,6 +108,9 @@ async function fetchToursForLang(langcode: string): Promise<TourEntry[]> {
 }
 
 async function main() {
+  const LANGUAGES = await fetchActiveLanguages();
+  console.log(`Languages: ${LANGUAGES.join(', ')}`);
+
   const urlEntries: string[] = [];
 
   // Static pages

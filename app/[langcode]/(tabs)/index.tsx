@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useToursStore } from '../../../stores/tours.store';
 import { useAuthStore } from '../../../stores/auth.store';
 import { useLanguageStore } from '../../../stores/language.store';
+import { useActiveLangs } from '../../../hooks/useActiveLangs';
 import { TourCard } from '../../../components/tour/TourCard';
 import { ListingHead } from '../../../components/seo/ListingHead';
 import { Ionicons } from '@expo/vector-icons';
@@ -502,6 +503,7 @@ export default function HomePage() {
 
   const { user, openAuthModal } = useAuthStore();
   const currentLanguageId = useLanguageStore((s) => s.currentLanguage?.id);
+  const activeLangs = useActiveLangs();
 
   // ── Fetch coordination ───────────────────────────────────────────────────────
   // isFocusedRef: tracks whether this screen is currently in focus (no re-render).
@@ -650,7 +652,7 @@ export default function HomePage() {
 
   return (
     <>
-    <ListingHead langcode={langcode ?? 'en'} />
+    <ListingHead langcode={langcode ?? 'en'} langs={activeLangs} />
     <View style={styles.root}>
       <PageFlatList
         data={tours}

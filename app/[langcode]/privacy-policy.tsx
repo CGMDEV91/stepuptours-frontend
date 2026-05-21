@@ -8,6 +8,7 @@ import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import { PageHead } from '../../components/seo/PageHead';
+import { useActiveLangs } from '../../hooks/useActiveLangs';
 
 const AMBER = '#F59E0B';
 
@@ -55,9 +56,19 @@ const SECTIONS = [
 export default function PrivacyPolicyScreen() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
+  const activeLangs = useActiveLangs();
   return (
     <View style={styles.root}>
-      <PageHead langcode={langcode ?? 'en'} path="privacy-policy" title={t('legal.privacyPolicy')} />
+      <PageHead
+        langcode={langcode ?? 'en'}
+        path="privacy-policy"
+        title={t('legal.privacyPolicy')}
+        langs={activeLangs}
+        description={t(
+          'seo.privacyDescription',
+          'How StepUp Tours collects, uses and protects your personal data.',
+        )}
+      />
       <PageScrollView>
         <PageBanner icon="shield-checkmark" iconBgColor="#10B981" title={t('legal.privacyPolicy')} />
         <View style={styles.inner}>

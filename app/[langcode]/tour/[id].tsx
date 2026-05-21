@@ -30,14 +30,74 @@ import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
 import { getAnonProgress } from '../../../lib/anon-progress';
 import { track } from '../../../services/analytics.service';
+import { buildTourSlug } from '../../../lib/tour-slug';
+import { useActiveLangs } from '../../../hooks/useActiveLangs';
 
 const AMBER = '#F59E0B';
 const BANNER_HEIGHT = 255;
+
+// Static rendering (web): pre-render one HTML file per published tour, per
+// language. Runs at build time in Node — no browser/native APIs available.
+// Mirrors the slug logic in scripts/generate-sitemap.ts (buildTourSlug).
+export async function generateStaticParams(
+  params: { langcode: string },
+): Promise<Record<string, string>[]> {
+  const DRUPAL_URL =
+    process.env.EXPO_PUBLIC_API_URL ?? 'https://dev-step-up-tours.pantheonsite.io';
+  const prefix = params.langcode === 'en' ? '' : `/${params.langcode}`;
+  const fields =
+    'fields[node--tour]=drupal_internal__nid' +
+    '&include=field_city,field_country' +
+    '&fields[taxonomy_term--cities]=name' +
+    '&fields[taxonomy_term--countries]=name';
+
+  const out: Record<string, string>[] = [];
+  let offset = 0;
+  const LIMIT = 100;
+
+  try {
+    while (true) {
+      const url =
+        `${DRUPAL_URL}${prefix}/jsonapi/node/tour` +
+        `?filter[status]=1&${fields}&page[limit]=${LIMIT}&page[offset]=${offset}`;
+      const resp = await fetch(url, {
+        headers: { Accept: 'application/vnd.api+json' },
+      });
+      if (!resp.ok) break;
+      const json: any = await resp.json();
+      const nodes: any[] = json?.data ?? [];
+      const included: any[] = json?.included ?? [];
+
+      for (const node of nodes) {
+        const nid: number = node.attributes?.drupal_internal__nid;
+        if (!nid) continue;
+        const cityId = node.relationships?.field_city?.data?.id;
+        const countryId = node.relationships?.field_country?.data?.id;
+        const city = included.find((i) => i.id === cityId)?.attributes?.name ?? null;
+        const country =
+          included.find((i) => i.id === countryId)?.attributes?.name ?? null;
+        out.push({
+          ...params,
+          id: buildTourSlug({ country, city, nid }),
+        });
+      }
+
+      offset += LIMIT;
+      if (nodes.length < LIMIT) break;
+    }
+  } catch {
+    // Build-time fetch failure shouldn't abort the whole export.
+    return out;
+  }
+
+  return out;
+}
 
 export default function TourDetailScreen() {
   const { id, langcode } = useLocalSearchParams<{ id: string; langcode: string }>();
   const router = useRouter();
   const { t } = useTranslation();
+  const activeLangs = useActiveLangs();
 
   const { width: screenWidth } = useWindowDimensions();
   const isMobile = screenWidth < 768;
@@ -237,7 +297,7 @@ export default function TourDetailScreen() {
 
   return (
     <>
-    <TourHead tour={tour} langcode={langcode ?? 'en'} />
+    <TourHead tour={tour} langcode={langcode ?? 'en'} langs={activeLangs} />
     <View style={styles.screen}>
       <PageScrollView
         style={styles.scrollView}

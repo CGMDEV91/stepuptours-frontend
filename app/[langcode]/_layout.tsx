@@ -16,6 +16,37 @@ import { trackSiteVisit } from '../../services/analytics.service';
 import { isNative } from '../../lib/platform';
 import { wasIntroShown, markIntroShown } from '../../lib/intro-state';
 import { useLocationPermission } from '../../hooks/useLocationPermission';
+import { SUPPORTED_LANGS } from '../../lib/supported-langs';
+
+// Static rendering (web): pre-render one HTML tree per supported language.
+// Fetches active languages from Drupal at build time so adding a new language
+// in Drupal automatically includes it in the next build — no code changes needed.
+// Falls back to SUPPORTED_LANGS (lib/supported-langs.ts) if Drupal is unreachable.
+
+export async function generateStaticParams(): Promise<Record<string, string>[]> {
+  const DRUPAL_URL =
+    process.env.EXPO_PUBLIC_API_URL ?? 'https://dev-step-up-tours.pantheonsite.io';
+  try {
+    const resp = await fetch(
+      `${DRUPAL_URL}/jsonapi/configurable_language/configurable_language`,
+      { headers: { Accept: 'application/vnd.api+json' } },
+    );
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const json: any = await resp.json();
+    const langs: string[] = (json?.data ?? [])
+      .map(
+        (l: any) =>
+          l.attributes?.drupal_internal__id ??
+          l.attributes?.id ??
+          l.attributes?.langcode,
+      )
+      .filter((code: any) => code && !['und', 'zxx'].includes(code));
+    if (langs.length > 0) return langs.map((langcode) => ({ langcode }));
+  } catch {
+    // Drupal unreachable during build — use fallback list.
+  }
+  return [...SUPPORTED_LANGS].map((langcode) => ({ langcode }));
+}
 
 export default function LangcodeLayout() {
   useLocationPermission();
