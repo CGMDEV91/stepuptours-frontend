@@ -9,8 +9,15 @@
 // se concede al aceptar el CookieBanner (ver lib/consent.ts).
 const GTM_ID = 'GTM-WKH29VMH';
 
+// Hosts donde sí queremos cargar GTM/GA. Cualquier otro (localhost, *.pages.dev
+// de preview, túneles ngrok, etc.) queda excluido para no contaminar las
+// métricas de producción con tráfico de desarrollo.
+const GTM_ALLOWED_HOSTS = new Set(['stepuptours.com', 'www.stepuptours.com']);
+
 export function initGtm(): void {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
+  if (!GTM_ALLOWED_HOSTS.has(window.location.hostname)) return;
 
   const w = window as any;
   if (w.__gtmInit) return;
