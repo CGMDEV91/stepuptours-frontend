@@ -97,3 +97,14 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 **Files:** `services/tours.service.ts`, `lib/drupal-client.ts` (added `drupalGetJsonApiBase`)
 
 ---
+
+## BUG-009 — Map preview draws route from wrong origin (e.g. Madrid) on mobile
+
+**Status:** Fixed
+**Date:** 2026-05-23
+**Symptom:** In a step's "How to get there" map preview, the route was drawn from an arbitrary city (often Madrid in Spain) instead of the user's real location. The "Go to site" button, however, correctly opened native Maps with a route from the user's actual position.
+**Root cause:** The embed URL hardcoded `saddr=My+Location`, a literal string. The legacy `maps.google.com/maps?...&output=embed` endpoint has no access to browser/WebView geolocation, so Google geocoded "My Location" to a default point. Meanwhile `handleGoToSite` used the modern `/maps/dir/?api=1` API which delegates origin resolution to the native Maps app where geolocation works.
+**Fix:** Added `userCoords` state, populated by reusing the existing distance-check effect (no extra geolocation request). Built `directionsUrl` with `saddr=<lat>,<lon>` when coords are available, falling back to a destination-only embed (`q=lat,lon`) when not. Included `mapUri` in the `<GoogleEmbed>` key so the iframe remounts when coords arrive.
+**Files:** `components/tour/StepContent.tsx`
+
+---

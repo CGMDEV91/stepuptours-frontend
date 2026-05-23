@@ -379,7 +379,7 @@ function NavBlock({
                 ) : (
                     <>
                       <GoogleEmbed
-                          key={showingSV ? `sv-${svKey}` : `map-${selectedMode}`}
+                          key={showingSV ? `sv-${svKey}` : `map-${selectedMode}-${mapUri}`}
                           uri={mapUri}
                           height={mapHeight}
                           interactive={showingSV}
@@ -460,6 +460,7 @@ export function StepContent({
   const [navOpen, setNavOpen]                   = useState(true);
   const [waveContainerWidth, setWaveContainerWidth] = useState(0);
   const [isTooFar, setIsTooFar]                 = useState(false);
+  const [userCoords, setUserCoords]             = useState<{ lat: number; lon: number } | null>(null);
   const [isMapLoading, setIsMapLoading]         = useState(true);
   const mapLoadAnim = useRef(new Animated.Value(1)).current;
 
@@ -553,6 +554,7 @@ export function StepContent({
       if (!navigator?.geolocation) return;
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
+          setUserCoords({ lat: coords.latitude, lon: coords.longitude });
           const dist = haversineKm(coords.latitude, coords.longitude, loc.lat, loc.lon);
           setIsTooFar(dist > MAX_ROUTE_DISTANCE_KM);
         },
@@ -570,6 +572,7 @@ export function StepContent({
         if (status !== 'granted') return;
         const pos = await Location.getCurrentPositionAsync({});
         if (cancelled) return;
+        setUserCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
         const dist = haversineKm(pos.coords.latitude, pos.coords.longitude, loc.lat, loc.lon);
         setIsTooFar(dist > MAX_ROUTE_DISTANCE_KM);
       } catch { /* keep map visible */ }
@@ -613,8 +616,11 @@ export function StepContent({
   const streetViewUrl = buildStreetViewUrl(step);
 
   const activeMode    = NAV_MODES.find((m) => m.travelmode === selectedMode);
+  const saddr         = userCoords ? `${userCoords.lat},${userCoords.lon}` : null;
   const directionsUrl = step.location && activeMode
-      ? `https://maps.google.com/maps?saddr=My+Location&daddr=${step.location.lat},${step.location.lon}&dirflg=${activeMode.dirflg}&output=embed`
+      ? (saddr
+          ? `https://maps.google.com/maps?saddr=${saddr}&daddr=${step.location.lat},${step.location.lon}&dirflg=${activeMode.dirflg}&output=embed`
+          : `https://maps.google.com/maps?q=${step.location.lat},${step.location.lon}&z=15&output=embed`)
       : null;
 
   // ── Nav handlers ──────────────────────────────────────────────────────────
