@@ -198,6 +198,11 @@ export async function getTourByNid(nid: number): Promise<Tour> {
   const { data } = await drupalGetRaw('/node/tour', params);
   const list = Array.isArray(data) ? data : data ? [data] : [];
   if (list.length === 0) {
+    // FIXME: el endpoint es lang-aware (/<lang>/jsonapi/), por lo que un tour
+    // sin traducción al idioma actual devuelve lista vacía y se sintetiza un
+    // 404. El guard lo trata como "no existe" y redirige a home en silencio.
+    // Mejor: hacer un fallback a /jsonapi/ sin prefijo y, si existe, cargar
+    // el tour en su idioma original con un aviso de "no traducido".
     const e = new Error(`Tour with nid ${nid} not found`) as Error & { status?: number };
     e.status = 404;
     throw e;

@@ -72,6 +72,7 @@ const DEFAULT_FILTERS: TourFilters = {
 // Monotonic counters: ensure stale async responses never overwrite newer results.
 let _activeFetchId = 0;
 let _activeCitiesFetchId = 0;
+let _activeDetailFetchId = 0;
 
 export const useToursStore = create<ToursState>((set, get) => ({
   tours: [],
@@ -126,7 +127,12 @@ export const useToursStore = create<ToursState>((set, get) => ({
   },
 
   fetchTourDetail: async (idParam, userId) => {
-    set({ isLoadingDetail: true, error: null, notFound: false, currentTour: null, currentSteps: [], currentActivity: null });
+    const fetchId = ++_activeDetailFetchId;
+    // Reset flags síncronamente. Mantener currentTour/Steps/Activity con el
+    // valor previo evita un flash de "sin datos" entre tours y, sobre todo,
+    // permite que el guard distinga (vía match de ruta) si los datos visibles
+    // corresponden a esta página o a la anterior.
+    set({ isLoadingDetail: true, error: null, notFound: false });
     try {
       let tour: Tour;
       let tourUuid: string;
@@ -146,13 +152,18 @@ export const useToursStore = create<ToursState>((set, get) => ({
         userId ? getTourActivity(userId, tourUuid) : Promise.resolve(null),
       ]);
 
+      if (fetchId !== _activeDetailFetchId) return;
       set({ currentTour: tour, currentSteps: steps, currentActivity: activity, isLoadingDetail: false });
     } catch (err: any) {
+      if (fetchId !== _activeDetailFetchId) return;
       const notFound = err?.status === 404;
       set({
         isLoadingDetail: false,
         error: notFound ? null : (err.message ?? 'Error al cargar el tour'),
         notFound,
+        currentTour: null,
+        currentSteps: [],
+        currentActivity: null,
       });
     }
   },

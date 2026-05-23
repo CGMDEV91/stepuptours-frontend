@@ -30,7 +30,7 @@ import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
 import { getAnonProgress } from '../../../lib/anon-progress';
 import { track } from '../../../services/analytics.service';
-import { buildTourSlug } from '../../../lib/tour-slug';
+import { buildTourSlug, extractNidFromSlug } from '../../../lib/tour-slug';
 import { useActiveLangs } from '../../../hooks/useActiveLangs';
 import { useBackendLoadGuard } from '../../../hooks/useBackendLoadGuard';
 
@@ -119,9 +119,16 @@ export default function TourDetailScreen() {
     notFound,
   } = useToursStore();
 
+  // Comparar id de URL con tour cargado evita que el guard considere "datos
+  // listos" cuando lo que ve es el tour de la página anterior (store global).
+  const tourMatchesRoute = !!tour && !!id && (
+    tour.id === id ||
+    tour.drupalInternalId === extractNidFromSlug(id)
+  );
+
   useBackendLoadGuard({
     isLoading: isLoadingDetail,
-    hasData: !!tour,
+    hasData: tourMatchesRoute,
     error: toursError,
     notFound,
     timeoutMs: 5000,

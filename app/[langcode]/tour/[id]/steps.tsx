@@ -35,6 +35,7 @@ import { webFullHeight } from '../../../../lib/web-styles';
 import { track } from '../../../../services/analytics.service';
 import { useAbandonDetector } from '../../../../hooks/useAbandonDetector';
 import { useBackendLoadGuard } from '../../../../hooks/useBackendLoadGuard';
+import { extractNidFromSlug } from '../../../../lib/tour-slug';
 
 const AMBER = '#F59E0B';
 
@@ -57,9 +58,14 @@ export default function TourStepsScreen() {
     notFound,
   } = useToursStore();
 
+  const tourMatchesRoute = !!tour && !!id && (
+    tour.id === id ||
+    tour.drupalInternalId === extractNidFromSlug(id)
+  );
+
   useBackendLoadGuard({
     isLoading: isLoadingDetail,
-    hasData: !!tour,
+    hasData: tourMatchesRoute,
     error: toursError,
     notFound,
     timeoutMs: 5000,
