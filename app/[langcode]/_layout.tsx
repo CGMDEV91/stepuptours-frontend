@@ -13,6 +13,7 @@ import { Navbar } from '../../components/layout/Navbar';
 import { BottomTabBar } from '../../components/layout/BottomTabBar';
 import { IntroSlides } from '../../components/layout/IntroSlides';
 import CookieBanner from '../../components/layout/CookieBanner';
+import { ServerErrorModal } from '../../components/layout/ServerErrorModal';
 import { trackSiteVisit } from '../../services/analytics.service';
 import { isNative } from '../../lib/platform';
 import { wasIntroShown, markIntroShown } from '../../lib/intro-state';
@@ -191,6 +192,7 @@ export default function LangcodeLayout() {
       {!isNative && <CookieBanner />}
       {showIntro && <IntroSlides onDone={handleIntroDone} />}
       {user && <FeedbackButton />}
+      <ServerErrorModal />
     </View>
   );
 }

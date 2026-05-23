@@ -32,6 +32,7 @@ import { getAnonProgress } from '../../../lib/anon-progress';
 import { track } from '../../../services/analytics.service';
 import { buildTourSlug } from '../../../lib/tour-slug';
 import { useActiveLangs } from '../../../hooks/useActiveLangs';
+import { useBackendLoadGuard } from '../../../hooks/useBackendLoadGuard';
 
 const AMBER = '#F59E0B';
 const BANNER_HEIGHT = 255;
@@ -114,7 +115,18 @@ export default function TourDetailScreen() {
     updateActivity,
     userActivities,
     toggleFavorite,
+    error: toursError,
+    notFound,
   } = useToursStore();
+
+  useBackendLoadGuard({
+    isLoading: isLoadingDetail,
+    hasData: !!tour,
+    error: toursError,
+    notFound,
+    timeoutMs: 5000,
+    redirectToHomeOnFail: true,
+  });
 
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [pendingRating, setPendingRating] = useState(0);

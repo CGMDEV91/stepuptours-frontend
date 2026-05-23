@@ -34,6 +34,7 @@ import { CONTENT_MAX_WIDTH } from '../../../../styles/theme';
 import { webFullHeight } from '../../../../lib/web-styles';
 import { track } from '../../../../services/analytics.service';
 import { useAbandonDetector } from '../../../../hooks/useAbandonDetector';
+import { useBackendLoadGuard } from '../../../../hooks/useBackendLoadGuard';
 
 const AMBER = '#F59E0B';
 
@@ -52,7 +53,18 @@ export default function TourStepsScreen() {
     isLoadingDetail,
     fetchTourDetail,
     updateActivity,
+    error: toursError,
+    notFound,
   } = useToursStore();
+
+  useBackendLoadGuard({
+    isLoading: isLoadingDetail,
+    hasData: !!tour,
+    error: toursError,
+    notFound,
+    timeoutMs: 5000,
+    redirectToHomeOnFail: true,
+  });
 
   const [showCompletion, setShowCompletion] = useState(false);
   const [xpAwardedBefore, setXpAwardedBefore] = useState(false);

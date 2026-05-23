@@ -21,6 +21,7 @@ import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
+import { useBackendLoadGuard } from '../../hooks/useBackendLoadGuard';
 
 const AMBER = '#F59E0B';
 
@@ -76,6 +77,14 @@ export default function CompletedScreen() {
   useEffect(() => {
     fetchCompleted();
   }, [fetchCompleted]);
+
+  useBackendLoadGuard({
+    isLoading,
+    hasData: items.length > 0,
+    error,
+    timeoutMs: 5000,
+    redirectToHomeOnFail: true,
+  });
 
   const handleToggleFavourite = useCallback(
     async (item: ActivityWithTour) => {

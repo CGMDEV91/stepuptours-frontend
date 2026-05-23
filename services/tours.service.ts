@@ -197,7 +197,11 @@ export async function getTourByNid(nid: number): Promise<Tour> {
 
   const { data } = await drupalGetRaw('/node/tour', params);
   const list = Array.isArray(data) ? data : data ? [data] : [];
-  if (list.length === 0) throw new Error(`Tour with nid ${nid} not found`);
+  if (list.length === 0) {
+    const e = new Error(`Tour with nid ${nid} not found`) as Error & { status?: number };
+    e.status = 404;
+    throw e;
+  }
 
   return mapDrupalTour(list[0]);
 }

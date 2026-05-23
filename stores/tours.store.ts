@@ -36,6 +36,7 @@ interface ToursState {
   currentSteps: TourStep[];
   currentActivity: TourActivity | null;
   isLoadingDetail: boolean;
+  notFound: boolean;
 
   // Actividades del usuario (keyed by tourId)
   userActivities: Record<string, TourActivity>;
@@ -60,6 +61,7 @@ interface ToursState {
   clearFilters: () => void;
   clearTours: () => void;
   clearError: () => void;
+  clearNotFound: () => void;
 }
 
 const DEFAULT_FILTERS: TourFilters = {
@@ -83,6 +85,7 @@ export const useToursStore = create<ToursState>((set, get) => ({
   currentSteps: [],
   currentActivity: null,
   isLoadingDetail: false,
+  notFound: false,
 
   userActivities: {},
 
@@ -123,7 +126,7 @@ export const useToursStore = create<ToursState>((set, get) => ({
   },
 
   fetchTourDetail: async (idParam, userId) => {
-    set({ isLoadingDetail: true, error: null, currentTour: null, currentSteps: [], currentActivity: null });
+    set({ isLoadingDetail: true, error: null, notFound: false, currentTour: null, currentSteps: [], currentActivity: null });
     try {
       let tour: Tour;
       let tourUuid: string;
@@ -145,7 +148,12 @@ export const useToursStore = create<ToursState>((set, get) => ({
 
       set({ currentTour: tour, currentSteps: steps, currentActivity: activity, isLoadingDetail: false });
     } catch (err: any) {
-      set({ isLoadingDetail: false, error: err.message ?? 'Error al cargar el tour' });
+      const notFound = err?.status === 404;
+      set({
+        isLoadingDetail: false,
+        error: notFound ? null : (err.message ?? 'Error al cargar el tour'),
+        notFound,
+      });
     }
   },
 
@@ -266,4 +274,6 @@ export const useToursStore = create<ToursState>((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  clearNotFound: () => set({ notFound: false }),
 }));

@@ -139,11 +139,18 @@ drupalClientBase.interceptors.response.use((r) => { inactivityTracker.reset(); r
 // ── Error normalizer ─────────────────────────────────────────────────────────
 
 function normalizeError(error: any): Error {
+  const status = error.response?.status;
   const drupalErrors = error.response?.data?.errors;
-  if (drupalErrors?.length) {
-    return new Error(drupalErrors[0].detail ?? drupalErrors[0].title ?? 'Unknown error');
-  }
-  return new Error(error.message ?? 'Network error');
+  const message = drupalErrors?.length
+    ? (drupalErrors[0].detail ?? drupalErrors[0].title ?? 'Unknown error')
+    : (error.message ?? 'Network error');
+  const e = new Error(message) as Error & { status?: number };
+  if (typeof status === 'number') e.status = status;
+  return e;
+}
+
+export function isNotFoundError(err: unknown): boolean {
+  return !!(err && typeof err === 'object' && (err as any).status === 404);
 }
 
 // ── Helpers de construcción de queries ───────────────────────────────────────

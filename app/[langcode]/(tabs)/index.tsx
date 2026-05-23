@@ -23,6 +23,7 @@ import { useToursStore } from '../../../stores/tours.store';
 import { useAuthStore } from '../../../stores/auth.store';
 import { useLanguageStore } from '../../../stores/language.store';
 import { useActiveLangs } from '../../../hooks/useActiveLangs';
+import { useBackendLoadGuard } from '../../../hooks/useBackendLoadGuard';
 import { TourCard } from '../../../components/tour/TourCard';
 import { ListingHead } from '../../../components/seo/ListingHead';
 import { Ionicons } from '@expo/vector-icons';
@@ -495,11 +496,20 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
 
   const {
-    tours, total, isLoading, hasMore, filters,
+    tours, total, isLoading, hasMore, filters, error,
     countries, cities, fetchTours, fetchCountries, fetchCities,
     setFilters, clearFilters, clearTours,
     userActivities, fetchUserActivities, toggleFavorite,
   } = useToursStore();
+
+  useBackendLoadGuard({
+    isLoading,
+    hasData: tours.length > 0,
+    error,
+    timeoutMs: 5000,
+    redirectToHomeOnFail: false,
+    treatEmptyAsFailure: true,
+  });
 
   const { user, openAuthModal } = useAuthStore();
   const currentLanguageId = useLanguageStore((s) => s.currentLanguage?.id);
@@ -823,7 +833,7 @@ export default function HomePage() {
             <View style={styles.emptyState}>
               <Ionicons name="map-outline" size={48} color="#D1D5DB" />
               <Text style={styles.emptyTitle}>{t('home.noTours')}</Text>
-              <TouchableOpacity style={styles.btnPrimary} onPress={() => { clearFilters(); fetchTours(); }}>
+              <TouchableOpacity style={styles.btnPrimary} onPress={() => { setSearch(''); clearFilters(); fetchTours({}); }}>
                 <Text style={styles.btnPrimaryText}>{t('home.allCountries')}</Text>
               </TouchableOpacity>
             </View>

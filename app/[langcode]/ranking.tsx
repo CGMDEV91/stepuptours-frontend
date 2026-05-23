@@ -23,6 +23,7 @@ import { webFullHeight } from '../../lib/web-styles';
 import type { RankingEntry } from '../../types';
 import { PageHead } from '../../components/seo/PageHead';
 import { useActiveLangs } from '../../hooks/useActiveLangs';
+import { useBackendLoadGuard } from '../../hooks/useBackendLoadGuard';
 
 const AMBER = '#F59E0B';
 const SILVER = '#9CA3AF';
@@ -170,6 +171,14 @@ export default function RankingScreen() {
       .finally(() => { if (!cancelled) setIsLoading(false); });
     return () => { cancelled = true; };
   }, []);
+
+  useBackendLoadGuard({
+    isLoading,
+    hasData: entries.length > 0,
+    error,
+    timeoutMs: 5000,
+    redirectToHomeOnFail: true,
+  });
 
   const cardStyle = isDesktop
     ? {
