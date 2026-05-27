@@ -15,6 +15,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,8 @@ import type { Tour } from '../../types';
 
 const AMBER = '#F59E0B';
 const GAP = 16;
+
+type StatusFilter = 'all' | 'published' | 'under_review';
 
 interface MyToursTabProps {
   userId: string;
@@ -68,6 +71,56 @@ function DeleteModal({ visible, tourTitle, onConfirm, onCancel }: DeleteModalPro
   );
 }
 
+// ── Status filter bar ─────────────────────────────────────────────────────────
+
+interface FilterBarProps {
+  active: StatusFilter;
+  counts: { all: number; published: number; under_review: number };
+  onChange: (f: StatusFilter) => void;
+}
+
+function FilterBar({ active, counts, onChange }: FilterBarProps) {
+  const { t } = useTranslation();
+
+  const filters: { id: StatusFilter; labelKey: string }[] = [
+    { id: 'all',          labelKey: 'dashboard.tours.filterAll' },
+    { id: 'published',    labelKey: 'dashboard.tours.filterPublished' },
+    { id: 'under_review', labelKey: 'dashboard.tours.filterUnderReview' },
+  ];
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.filterBar}
+    >
+      {filters.map((f) => {
+        const isActive = f.id === active;
+        const count = counts[f.id];
+        return (
+          <TouchableOpacity
+            key={f.id}
+            style={[styles.filterChip, isActive && styles.filterChipActive]}
+            onPress={() => onChange(f.id)}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+              {t(f.labelKey)}
+            </Text>
+            {count > 0 && (
+              <View style={[styles.filterBadge, isActive && styles.filterBadgeActive]}>
+                <Text style={[styles.filterBadgeText, isActive && styles.filterBadgeTextActive]}>
+                  {count}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function MyToursTab({ userId }: MyToursTabProps) {
@@ -80,13 +133,12 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
 
   // ── Responsive grid ───────────────────────────────────────────────────────
-  // MyToursTab lives inside dashboard's padded container (paddingHorizontal: 16,
-  // maxWidth: 900). We compute available width from there, not full window width.
-  const DASHBOARD_PADDING = 32; // 16px on each side from dashboard container
+  const DASHBOARD_PADDING = 32;
   const DASHBOARD_MAX = 900;
   const availableWidth = Math.min(width, DASHBOARD_MAX) - DASHBOARD_PADDING;
   const cols = availableWidth >= 700 ? 3 : availableWidth >= 480 ? 2 : 1;
@@ -113,12 +165,22 @@ export function MyToursTab({ userId }: MyToursTabProps) {
     loadTours();
   }, [loadTours]);
 
-  // ── Search filtering — client-side ────────────────────────────────────────
-  const filteredTours = search.trim()
-    ? tours.filter((t) =>
-        t.title.toLowerCase().includes(search.trim().toLowerCase())
-      )
+  // ── Filtering ─────────────────────────────────────────────────────────────
+  const afterSearch = search.trim()
+    ? tours.filter((t) => t.title.toLowerCase().includes(search.trim().toLowerCase()))
     : tours;
+
+  const filteredTours = statusFilter === 'all'
+    ? afterSearch
+    : afterSearch.filter((t) =>
+        statusFilter === 'published' ? t.published : !t.published
+      );
+
+  const counts = {
+    all:          afterSearch.length,
+    published:    afterSearch.filter((t) => t.published).length,
+    under_review: afterSearch.filter((t) => !t.published).length,
+  };
 
   // ── Delete flow ───────────────────────────────────────────────────────────
   const handleDeleteRequest = useCallback((tour: Tour) => {
@@ -154,9 +216,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   }, [t]);
 
   const handleEdit = useCallback((tour: Tour) => {
-    router.push(
-      `/${langcode}/dashboard/create-tour?tourId=${tour.id}` as any
-    );
+    router.push(`/${langcode}/dashboard/create-tour?tourId=${tour.id}` as any);
   }, [router, langcode]);
 
   // ── States ────────────────────────────────────────────────────────────────
@@ -180,51 +240,57 @@ export function MyToursTab({ userId }: MyToursTabProps) {
     );
   }
 
-  // ── List header: Create button + Search bar ───────────────────────────────
-  const ListHeader = (
-    <View style={styles.listHeader}>
-      <TouchableOpacity
-        style={styles.createBtn}
-        activeOpacity={0.85}
-        onPress={() => router.push(`/${langcode}/dashboard/create-tour` as any)}
-      >
-        <Ionicons name="add" size={18} color="#FFFFFF" />
-        <Text style={styles.createBtnText}>{t('dashboard.tours.create')}</Text>
-      </TouchableOpacity>
-
-      {/* Search bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={18} color="#9CA3AF" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          value={search}
-          onChangeText={setSearch}
-          placeholder={t('dashboard.tours.searchPlaceholder')}
-          placeholderTextColor="#9CA3AF"
-          returnKeyType="search"
-          clearButtonMode="while-editing"
-        />
-        {search.length > 0 ? (
-          <TouchableOpacity onPress={() => setSearch('')} hitSlop={8}>
-            <Ionicons name="close-circle" size={18} color="#9CA3AF" />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-    </View>
-  );
-
   return (
     <>
       {/* Header: create button + search */}
-      {ListHeader}
+      <View style={styles.listHeader}>
+        <TouchableOpacity
+          style={styles.createBtn}
+          activeOpacity={0.85}
+          onPress={() => router.push(`/${langcode}/dashboard/create-tour` as any)}
+        >
+          <Ionicons name="add" size={18} color="#FFFFFF" />
+          <Text style={styles.createBtnText}>{t('dashboard.tours.create')}</Text>
+        </TouchableOpacity>
 
+        <View style={styles.searchContainer}>
+          <Ionicons name="search-outline" size={18} color="#9CA3AF" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder={t('dashboard.tours.searchPlaceholder')}
+            placeholderTextColor="#9CA3AF"
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
+          {search.length > 0 ? (
+            <TouchableOpacity onPress={() => setSearch('')} hitSlop={8}>
+              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      </View>
+
+      {/* Status filter */}
+      {tours.length > 0 && (
+        <FilterBar
+          active={statusFilter}
+          counts={counts}
+          onChange={setStatusFilter}
+        />
+      )}
+
+      {/* Grid */}
       {filteredTours.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="map-outline" size={56} color="#D1D5DB" />
           <Text style={styles.emptyText}>
-            {search.trim()
-              ? t('dashboard.tours.noResults')
-              : t('dashboard.tours.empty')}
+            {tours.length === 0
+              ? t('dashboard.tours.empty')
+              : search.trim()
+                ? t('dashboard.tours.noResults')
+                : t('dashboard.tours.noResultsFilter')}
           </Text>
         </View>
       ) : (
@@ -300,7 +366,7 @@ const styles = StyleSheet.create({
   listHeader: {
     width: '100%',
     paddingTop: 4,
-    paddingBottom: 20,
+    paddingBottom: 12,
     gap: 12,
   },
 
@@ -351,6 +417,56 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#111827',
     padding: 0,
+  },
+
+  // ── Filter bar ─────────────────────────────────────────────────────────────
+  filterBar: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingBottom: 16,
+    paddingTop: 2,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  filterChipActive: {
+    backgroundColor: '#FFF7ED',
+    borderColor: AMBER,
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  filterChipTextActive: {
+    color: '#D97706',
+  },
+  filterBadge: {
+    backgroundColor: '#E5E7EB',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    minWidth: 20,
+    alignItems: 'center',
+  },
+  filterBadgeActive: {
+    backgroundColor: '#FDE68A',
+  },
+  filterBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#6B7280',
+  },
+  filterBadgeTextActive: {
+    color: '#92400E',
   },
 
   // ── Empty state ────────────────────────────────────────────────────────────

@@ -764,7 +764,6 @@
   "faq.q18": "Ο ηχητικός οδηγός δεν είναι διαθέσιμος, τι συνέβη;",
   "faq.a18": "Ο ηχητικός οδηγός δεν είναι διαθέσιμος στα ελληνικά. Αν χρησιμοποιείτε την εφαρμογή στα ελληνικά, θα δείτε μια ειδοποίηση στην κάρτα σταθμού. Αλλάξτε σε άλλη υποστηριζόμενη γλώσσα για να τον ενεργοποιήσετε.",
   "admin.legal.formatHint": "### Υποτίτλος  •  • Στοιχείο λίστας  •  Κενή γραμμή = αλλαγή παραγράφου",
-
   "business.myBusinesses.title": "Οι Επιχειρήσεις Μου",
   "business.myBusinesses.newBusiness": "Νέα Επιχείρηση",
   "business.myBusinesses.createBusiness": "Δημιουργία Επιχείρησης",
@@ -779,7 +778,6 @@
   "business.myBusinesses.manage": "Διαχείριση",
   "business.myBusinesses.manageTip": "Πατήστε Διαχείριση σε οποιαδήποτε επιχείρηση για να δείτε τις μεμονωμένες προωθήσεις και αναλυτικά της.",
   "business.myBusinesses.loadError": "Δεν ήταν δυνατή η φόρτωση των επιχειρήσεων.",
-
   "business.tabs.analytics": "Αναλυτικά",
   "business.analytics.title": "Αναλυτικά επιχείρησης",
   "business.analytics.preset.7d": "7 ημέρες",
@@ -807,7 +805,6 @@
   "business.analytics.upgradeTitle": "Τα αναλυτικά απαιτούν συνδρομή",
   "business.analytics.upgradeBody": "Αναβαθμίστε σε επί πληρωμή πλάνο για να ξεκλειδώσετε λεπτομερή αναλυτικά για την επιχείρησή σας, συμπεριλαμβανομένων προβολών βήματος, κλικ συνδέσμων και κορυφαίων γύρων.",
   "common.details": "Λεπτομέρειες",
-
   "business.myPromotions.title": "Οι Προωθήσεις Μου",
   "business.myPromotions.loadError": "Δεν ήταν δυνατή η φόρτωση των προωθήσεων.",
   "business.myPromotions.cancelError": "Σφάλμα κατά την ακύρωση της προώθησης. Δοκιμάστε ξανά.",
@@ -844,7 +841,6 @@
   "business.myPromotions.cancelModalBodyNoSub": "Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
   "business.myPromotions.cancelModalKeep": "Να μην ακυρωθεί",
   "business.myPromotions.cancelModalConfirm": "Ναι, ακύρωση",
-
   "business.findTours.advertiseAs": "Διαφήμιση ως:",
   "business.findTours.selectBusiness": "Επιλέξτε επιχείρηση",
   "business.findTours.trialAvailable": "Δωρεάν πλάνο: {{used}}/{{max}} slots χρησιμοποιήθηκαν · 7 ημέρες δοκιμής · χωρίς κάρτα",
@@ -892,7 +888,6 @@
   "business.findTours.perMonth": "/ μήνα",
   "business.findTours.perYear": "/ χρόνο",
   "business.findTours.slotsAvailable": "ελεύθερες θέσεις",
-
   "business.billing.title": "Χρεώσεις",
   "business.billing.infoTitle": "Μοντέλο διαφήμισης ανά slot",
   "business.billing.infoText": "Κάθε διαφημιστικό slot έχει τη δική του ανεξάρτητη συνδρομή. Μπορείτε να προσθέσετε και να ακυρώσετε slots μεμονωμένα από το «Εύρεση Tour».",
@@ -933,11 +928,15 @@
   "business.billing.cancelSlotBody": "Ακύρωση συνδρομής για το slot στο {{name}};\n\nΗ συνδρομή Stripe θα ακυρωθεί και το slot θα λήξει στο τέλος της τρέχουσας περιόδου.",
   "business.billing.cancelSlotKeep": "Διατήρηση",
   "business.billing.cancelSlotConfirm": "Επιβεβαίωση",
-
   "businessDashboard.title": "Πίνακας Επιχείρησης",
   "businessDashboard.subtitle": "Διαχειριστείτε τις επιχειρήσεις σας και προβάλετε τον εαυτό σας σε tours",
   "businessDashboard.tabs.myBusinesses": "Οι Επιχειρήσεις Μου",
   "businessDashboard.tabs.findTours": "Εύρεση Tours",
   "businessDashboard.tabs.myPromotions": "Οι Προωθήσεις Μου",
-  "businessDashboard.tabs.billing": "Τιμολόγηση"
+  "businessDashboard.tabs.billing": "Τιμολόγηση",
+  "dashboard.tours.underReview": "Υπό αναθεώρηση",
+  "dashboard.tours.filterAll": "Όλα",
+  "dashboard.tours.filterPublished": "Δημοσιευμένα",
+  "dashboard.tours.filterUnderReview": "Υπό αναθεώρηση",
+  "dashboard.tours.noResultsFilter": "Κανένα tour δεν ταιριάζει με αυτό το φίλτρο"
 }

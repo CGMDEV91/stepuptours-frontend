@@ -764,7 +764,6 @@
   "faq.q18": "Der Audioguide ist nicht verfügbar, was ist passiert?",
   "faq.a18": "Der Audioguide ist derzeit nicht auf Griechisch verfügbar. Wenn Sie die App auf Griechisch verwenden, sehen Sie einen Hinweis auf der Stationskarte. Wechseln Sie zu einer anderen unterstützten Sprache, um den Audioguide zu aktivieren.",
   "admin.legal.formatHint": "### Unterüberschrift  •  • Listenelement  •  Leerzeile = Absatzumbruch",
-
   "business.myBusinesses.title": "Meine Unternehmen",
   "business.myBusinesses.newBusiness": "Neues Unternehmen",
   "business.myBusinesses.createBusiness": "Unternehmen erstellen",
@@ -779,7 +778,6 @@
   "business.myBusinesses.manage": "Verwalten",
   "business.myBusinesses.manageTip": "Klicken Sie auf Verwalten, um die individuellen Aktionen und Analysen eines Unternehmens einzusehen.",
   "business.myBusinesses.loadError": "Unternehmen konnten nicht geladen werden.",
-
   "business.tabs.analytics": "Analytik",
   "business.analytics.title": "Geschäftsanalytik",
   "business.analytics.preset.7d": "7 Tage",
@@ -807,7 +805,6 @@
   "business.analytics.upgradeTitle": "Analysen erfordern ein Abonnement",
   "business.analytics.upgradeBody": "Wechseln Sie zu einem kostenpflichtigen Tarif, um detaillierte Analysen für Ihr Unternehmen freizuschalten – einschließlich Schrittaufrufe, Link-Klicks und Top-Touren.",
   "common.details": "Details",
-
   "business.myPromotions.title": "Meine Promotionen",
   "business.myPromotions.loadError": "Promotionen konnten nicht geladen werden.",
   "business.myPromotions.cancelError": "Fehler beim Stornieren der Promotion. Bitte versuchen Sie es erneut.",
@@ -844,7 +841,6 @@
   "business.myPromotions.cancelModalBodyNoSub": "Diese Aktion kann nicht rückgängig gemacht werden.",
   "business.myPromotions.cancelModalKeep": "Nicht stornieren",
   "business.myPromotions.cancelModalConfirm": "Ja, stornieren",
-
   "business.findTours.advertiseAs": "Bewerben als:",
   "business.findTours.selectBusiness": "Unternehmen auswählen",
   "business.findTours.trialAvailable": "Kostenloser Plan: {{used}}/{{max}} Slots verwendet · 7 Tage Testphase · keine Karte erforderlich",
@@ -892,7 +888,6 @@
   "business.findTours.perMonth": "/ Monat",
   "business.findTours.perYear": "/ Jahr",
   "business.findTours.slotsAvailable": "freie Slots",
-
   "business.billing.title": "Abrechnung",
   "business.billing.infoTitle": "Slot-basiertes Werbemodell",
   "business.billing.infoText": "Jeder Werbeslot hat sein eigenes unabhängiges Abonnement. Sie können Slots einzeln über \"Touren finden\" hinzufügen und stornieren.",
@@ -933,11 +928,15 @@
   "business.billing.cancelSlotBody": "Abonnement für den Slot in {{name}} stornieren?\n\nDas Stripe-Abonnement wird gekündigt und der Slot läuft am Ende des aktuellen Zeitraums ab.",
   "business.billing.cancelSlotKeep": "Behalten",
   "business.billing.cancelSlotConfirm": "Bestätigen",
-
   "businessDashboard.title": "Unternehmens-Dashboard",
   "businessDashboard.subtitle": "Verwalten Sie Ihre Unternehmen und bewerben Sie sich auf Touren",
   "businessDashboard.tabs.myBusinesses": "Meine Unternehmen",
   "businessDashboard.tabs.findTours": "Touren finden",
   "businessDashboard.tabs.myPromotions": "Meine Aktionen",
-  "businessDashboard.tabs.billing": "Abrechnung"
+  "businessDashboard.tabs.billing": "Abrechnung",
+  "dashboard.tours.underReview": "In Überprüfung",
+  "dashboard.tours.filterAll": "Alle",
+  "dashboard.tours.filterPublished": "Veröffentlicht",
+  "dashboard.tours.filterUnderReview": "In Überprüfung",
+  "dashboard.tours.noResultsFilter": "Keine Touren entsprechen diesem Filter"
 }

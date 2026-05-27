@@ -719,12 +719,9 @@
   "admin.legal.titlePh": "Título de la sección...",
   "admin.legal.contentPh": "Contenido de la sección...\n\nUsa ### Subencabezado para subencabezados\nUsa • para elementos de lista\nLínea en blanco = nuevo párrafo",
   "admin.legal.formatHint": "### Subencabezado  •  • Elemento de lista  •  Línea en blanco = salto de párrafo",
-
   "footer.faq": "FAQ",
   "legal.faq": "Preguntas Frecuentes",
-
   "faq.intro": "Encuentra respuestas a las preguntas más comunes sobre StepUp Tours, rutas turísticas autoguiadas con narración de audio, navegación paso a paso y una experiencia gamificada que puedes disfrutar a tu ritmo.",
-
   "faq.cat1": "Primeros pasos",
   "faq.q1": "¿Qué es StepUp Tours?",
   "faq.a1": "StepUp Tours es una aplicación de visitas turísticas autoguiadas que te permite explorar ciudades a tu ritmo. Cada ruta está formada por una serie de paradas repartidas por la ciudad. Al llegar a cada parada, desbloqueas una descripción narrada por nuestra guía de audio con IA, una vista de calle y puntos de interés cercanos. Completa todas las paradas obligatorias para finalizar la ruta y ganar puntos XP.",
@@ -732,7 +729,6 @@
   "faq.a2": "No se necesita cuenta para explorar y ver las rutas. Sin embargo, necesitas una cuenta gratuita para completar pasos, ganar XP, guardar favoritos, valorar rutas y apoyar a los guías con una donación. El registro tarda menos de un minuto.",
   "faq.q3": "¿En qué idiomas está disponible?",
   "faq.a3": "La app está disponible en inglés, español, francés, alemán, italiano y griego. El contenido y la guía de audio están disponibles en todos los idiomas, excepto en griego, donde la guía de audio aún no está disponible. Puedes cambiar de idioma en cualquier momento desde tu perfil.",
-
   "faq.cat2": "Cómo funcionan las rutas",
   "faq.q4": "¿Cómo inicio una ruta?",
   "faq.a4": "Explora el catálogo de rutas en la pantalla principal, toca una ruta para ver sus detalles y luego toca \"Iniciar ruta\". No hay horario fijo, no hay reserva y no hay guía que esperar, tú decides cuándo y cómo.",
@@ -744,13 +740,11 @@
   "faq.a7": "Cuando estés en la ubicación del paso, la app detecta tu posición y muestra: «¿Estás en [nombre]?». Toca «Sí, estoy aquí» para desbloquear el contenido. Cuando estés listo, toca el botón verde «Marcar como completado».",
   "faq.q8": "¿Qué ocurre cuando completo todos los pasos?",
   "faq.a8": "Aparece una pantalla de felicitación con los XP ganados. Se te invita a valorar la ruta del 1 al 5 y, opcionalmente, a dejar una donación para el guía. Ambas son completamente opcionales.",
-
   "faq.cat3": "Guía de audio",
   "faq.q9": "¿Qué es la guía de audio?",
   "faq.a9": "Cada paso incluye una narración de audio generada por IA con la descripción de la ubicación. Toca el botón de reproducción para escuchar mientras exploras. Puedes pausar, detener y reanudar en cualquier momento. Disponible en todos los idiomas excepto griego.",
   "faq.q10": "¿Puedo ajustar la velocidad de reproducción?",
   "faq.a10": "Sí. El reproductor ofrece cinco velocidades: 0,75×, 1× (normal), 1,25×, 1,5× y 2×. Toca el botón de velocidad para cambiar.",
-
   "faq.cat4": "Puntos y clasificación",
   "faq.q11": "¿Cómo gano puntos XP?",
   "faq.a11": "Ganas 20 XP la primera vez que completas una ruta. Los pasos opcionales pueden otorgar XP adicional. Los puntos se acumulan en tu perfil.",
@@ -758,7 +752,6 @@
   "faq.a12": "La clasificación global muestra a todos los usuarios ordenados por XP total. Tu posición se actualiza automáticamente tras cada ruta completada. Toca «Clasificación» en el menú de navegación.",
   "faq.q13": "¿Qué son los favoritos?",
   "faq.a13": "Los usuarios con sesión iniciada pueden marcar rutas tocando el icono de corazón. Los favoritos se guardan en tu cuenta y son accesibles desde la pestaña Favoritos.",
-
   "faq.cat5": "Donaciones",
   "faq.q14": "¿Son obligatorias las donaciones?",
   "faq.a14": "No, las donaciones son completamente voluntarias. Puedes cerrar el aviso en cualquier momento sin penalización. Nunca te cobraremos sin tu consentimiento explícito.",
@@ -766,13 +759,11 @@
   "faq.a15": "Tu donación va directamente al creador de la ruta. Se deduce una pequeña comisión de plataforma. La distribución exacta se muestra de forma transparente antes de confirmar el pago.",
   "faq.q16": "¿Cuál es el importe mínimo de donación?",
   "faq.a16": "El importe mínimo de donación es de 1 €. No hay máximo.",
-
   "faq.cat6": "Técnico",
   "faq.q17": "¿Necesito conexión a internet?",
   "faq.a17": "Sí. Se necesita conexión a internet para cargar el contenido, transmitir la guía de audio, mostrar la vista de calle y guardar tu progreso. Recomendamos Wi-Fi o datos móviles durante toda la ruta.",
   "faq.q18": "La guía de audio no está disponible, ¿qué ha pasado?",
   "faq.a18": "La guía de audio no está disponible en griego. Si usas la app en griego, verás un aviso en la tarjeta del paso. Cambia a otro idioma compatible para activarla.",
-
   "business.myBusinesses.title": "Mis Negocios",
   "business.myBusinesses.newBusiness": "Nuevo Negocio",
   "business.myBusinesses.createBusiness": "Crear Negocio",
@@ -787,7 +778,6 @@
   "business.myBusinesses.manage": "Gestionar",
   "business.myBusinesses.manageTip": "Pulsa Gestionar en cualquier negocio para ver sus promociones y analíticas individuales.",
   "business.myBusinesses.loadError": "No se pudieron cargar los negocios.",
-
   "business.tabs.analytics": "Analíticas",
   "business.analytics.title": "Analíticas del negocio",
   "business.analytics.preset.7d": "7 días",
@@ -815,7 +805,6 @@
   "business.analytics.upgradeTitle": "Las analíticas requieren una suscripción",
   "business.analytics.upgradeBody": "Actualiza a un plan de pago para desbloquear analíticas detalladas de tu negocio, incluyendo visitas en pasos, clics en enlaces y tours destacados.",
   "common.details": "Detalles",
-
   "business.myPromotions.title": "Mis Promociones",
   "business.myPromotions.loadError": "No se pudieron cargar las promociones.",
   "business.myPromotions.cancelError": "Error al cancelar la promoción. Inténtalo de nuevo.",
@@ -852,7 +841,6 @@
   "business.myPromotions.cancelModalBodyNoSub": "Esta acción no se puede deshacer.",
   "business.myPromotions.cancelModalKeep": "No cancelar",
   "business.myPromotions.cancelModalConfirm": "Sí, cancelar",
-
   "business.findTours.advertiseAs": "Publicitar como:",
   "business.findTours.selectBusiness": "Selecciona un negocio",
   "business.findTours.trialAvailable": "Plan gratuito: {{used}}/{{max}} slots usados · 7 días de prueba · sin tarjeta",
@@ -900,7 +888,6 @@
   "business.findTours.perMonth": "/ mes",
   "business.findTours.perYear": "/ año",
   "business.findTours.slotsAvailable": "espacios libres",
-
   "business.billing.title": "Facturación",
   "business.billing.infoTitle": "Modelo de publicidad por slot",
   "business.billing.infoText": "Cada slot publicitario tiene su propia suscripción independiente. Puedes añadir y cancelar slots individualmente desde \"Buscar Tours\".",
@@ -941,17 +928,14 @@
   "business.billing.cancelSlotBody": "¿Cancelar la suscripción del slot en {{name}}?\n\nLa suscripción Stripe se cancelará y el slot expirará al final del período actual.",
   "business.billing.cancelSlotKeep": "Mantener",
   "business.billing.cancelSlotConfirm": "Confirmar",
-
   "businessDashboard.title": "Panel de Empresa",
   "businessDashboard.subtitle": "Gestiona tus negocios y promociónate en tours",
   "businessDashboard.tabs.myBusinesses": "Mis Negocios",
   "businessDashboard.tabs.findTours": "Buscar Tours",
   "businessDashboard.tabs.myPromotions": "Mis Promociones",
   "businessDashboard.tabs.billing": "Facturación",
-
   "common.close": "Cerrar",
   "common.loadMore": "Cargar más",
-
   "admin.tabs.feedback": "Feedback",
   "admin.feedback.title": "Feedback de usuarios",
   "admin.feedback.empty": "Aún no hay envíos de feedback.",
@@ -963,7 +947,6 @@
   "admin.feedback.col.email": "Email",
   "admin.feedback.col.rating": "Valoración",
   "admin.feedback.col.date": "Fecha",
-
   "feedback.title": "Enviar feedback",
   "feedback.fabLabel": "FEEDBACK",
   "feedback.dismiss": "Ocultar botón de feedback",
@@ -977,5 +960,10 @@
   "feedback.successMessage": "¡Gracias! Tu feedback ha sido recibido.",
   "feedback.errorTitle": "Por favor, escribe un título.",
   "feedback.errorRating": "Por favor, selecciona una valoración.",
-  "feedback.errorSubmit": "Algo salió mal. Inténtalo de nuevo."
+  "feedback.errorSubmit": "Algo salió mal. Inténtalo de nuevo.",
+  "dashboard.tours.underReview": "En revisión",
+  "dashboard.tours.filterAll": "Todos",
+  "dashboard.tours.filterPublished": "Publicados",
+  "dashboard.tours.filterUnderReview": "En revisión",
+  "dashboard.tours.noResultsFilter": "No hay tours con este filtro"
 }

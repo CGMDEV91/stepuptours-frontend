@@ -142,11 +142,11 @@ export function TourCard({
           </View>
         ) : null}
 
-        {/* Published / Draft pill — owner mode only */}
+        {/* Published / Under review pill — owner mode only */}
         {isOwner ? (
-          <View style={[styles.statusPill, tour.published ? styles.statusPublished : styles.statusDraft]}>
-            <Text style={[styles.statusPillText, tour.published ? styles.statusPublishedText : styles.statusDraftText]}>
-              {tour.published ? t('dashboard.tours.published') : t('dashboard.tours.draft')}
+          <View style={[styles.statusPill, tour.published ? styles.statusPublished : styles.statusUnderReview]}>
+            <Text style={[styles.statusPillText, tour.published ? styles.statusPublishedText : styles.statusUnderReviewText]}>
+              {tour.published ? t('dashboard.tours.published') : t('dashboard.tours.underReview')}
             </Text>
           </View>
         ) : null}
@@ -359,8 +359,8 @@ const styles = StyleSheet.create({
   statusPublished: {
     backgroundColor: '#D1FAE5',
   },
-  statusDraft: {
-    backgroundColor: 'rgba(243,244,246,0.92)',
+  statusUnderReview: {
+    backgroundColor: 'rgba(254,243,199,0.95)',
   },
   statusPillText: {
     fontSize: 10,
@@ -370,8 +370,8 @@ const styles = StyleSheet.create({
   statusPublishedText: {
     color: '#065F46',
   },
-  statusDraftText: {
-    color: '#6B7280',
+  statusUnderReviewText: {
+    color: '#92400E',
   },
   editButton: {
     flexDirection: 'row',

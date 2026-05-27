@@ -764,7 +764,6 @@
   "faq.q18": "Le guide audio n'est pas disponible, que s'est-il passé ?",
   "faq.a18": "Le guide audio n'est pas encore disponible en grec. Si vous utilisez l'application en grec, vous verrez un avis sur la fiche de l'étape. Passez à une autre langue prise en charge pour l'activer.",
   "admin.legal.formatHint": "### Sous-titre  •  • Élément de liste  •  Ligne vide = saut de paragraphe",
-
   "business.myBusinesses.title": "Mes Entreprises",
   "business.myBusinesses.newBusiness": "Nouvelle Entreprise",
   "business.myBusinesses.createBusiness": "Créer une Entreprise",
@@ -779,7 +778,6 @@
   "business.myBusinesses.manage": "Gérer",
   "business.myBusinesses.manageTip": "Appuyez sur Gérer pour consulter les promotions et les analytiques propres à chaque commerce.",
   "business.myBusinesses.loadError": "Impossible de charger les entreprises.",
-
   "business.tabs.analytics": "Analytiques",
   "business.analytics.title": "Analytiques du commerce",
   "business.analytics.preset.7d": "7 jours",
@@ -807,7 +805,6 @@
   "business.analytics.upgradeTitle": "Les analytiques nécessitent un abonnement",
   "business.analytics.upgradeBody": "Passez à un plan payant pour débloquer les analytiques détaillées de votre commerce, notamment les vues d'étapes, les clics sur les liens et les meilleures visites.",
   "common.details": "Détails",
-
   "business.myPromotions.title": "Mes Promotions",
   "business.myPromotions.loadError": "Impossible de charger les promotions.",
   "business.myPromotions.cancelError": "Erreur lors de l'annulation de la promotion. Réessayez.",
@@ -844,7 +841,6 @@
   "business.myPromotions.cancelModalBodyNoSub": "Cette action est irréversible.",
   "business.myPromotions.cancelModalKeep": "Ne pas annuler",
   "business.myPromotions.cancelModalConfirm": "Oui, annuler",
-
   "business.findTours.advertiseAs": "Annoncer en tant que :",
   "business.findTours.selectBusiness": "Sélectionner une entreprise",
   "business.findTours.trialAvailable": "Plan gratuit : {{used}}/{{max}} slots utilisés · 7 jours d'essai · sans carte",
@@ -892,7 +888,6 @@
   "business.findTours.perMonth": "/ mois",
   "business.findTours.perYear": "/ an",
   "business.findTours.slotsAvailable": "créneaux libres",
-
   "business.billing.title": "Facturation",
   "business.billing.infoTitle": "Modèle publicitaire par slot",
   "business.billing.infoText": "Chaque slot publicitaire possède son propre abonnement indépendant. Vous pouvez ajouter et annuler des slots individuellement depuis \"Trouver des Tours\".",
@@ -933,11 +928,15 @@
   "business.billing.cancelSlotBody": "Annuler l'abonnement du slot dans {{name}} ?\n\nL'abonnement Stripe sera annulé et le slot expirera à la fin de la période en cours.",
   "business.billing.cancelSlotKeep": "Conserver",
   "business.billing.cancelSlotConfirm": "Confirmer",
-
   "businessDashboard.title": "Tableau de bord entreprise",
   "businessDashboard.subtitle": "Gérez vos entreprises et faites-vous connaître sur les tours",
   "businessDashboard.tabs.myBusinesses": "Mes Entreprises",
   "businessDashboard.tabs.findTours": "Trouver des Tours",
   "businessDashboard.tabs.myPromotions": "Mes Promotions",
-  "businessDashboard.tabs.billing": "Facturation"
+  "businessDashboard.tabs.billing": "Facturation",
+  "dashboard.tours.underReview": "En cours de révision",
+  "dashboard.tours.filterAll": "Tous",
+  "dashboard.tours.filterPublished": "Publiés",
+  "dashboard.tours.filterUnderReview": "En révision",
+  "dashboard.tours.noResultsFilter": "Aucun tour ne correspond à ce filtre"
 }

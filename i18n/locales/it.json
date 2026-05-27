@@ -764,7 +764,6 @@
   "faq.q18": "La guida audio non è disponibile, cosa è successo?",
   "faq.a18": "La guida audio non è attualmente disponibile in greco. Se usi l'app in greco, vedrai un avviso sulla scheda della tappa. Passa a un'altra lingua supportata per attivarla.",
   "admin.legal.formatHint": "### Sottotitolo  •  • Elemento elenco  •  Riga vuota = interruzione di paragrafo",
-
   "business.myBusinesses.title": "Le Mie Attività",
   "business.myBusinesses.newBusiness": "Nuova Attività",
   "business.myBusinesses.createBusiness": "Crea Attività",
@@ -779,7 +778,6 @@
   "business.myBusinesses.manage": "Gestisci",
   "business.myBusinesses.manageTip": "Tocca Gestisci su qualsiasi attività per vedere le promozioni e le analitiche individuali.",
   "business.myBusinesses.loadError": "Impossibile caricare le attività.",
-
   "business.tabs.analytics": "Analitiche",
   "business.analytics.title": "Analitiche aziendali",
   "business.analytics.preset.7d": "7 giorni",
@@ -807,7 +805,6 @@
   "business.analytics.upgradeTitle": "Le analitiche richiedono un abbonamento",
   "business.analytics.upgradeBody": "Passa a un piano a pagamento per sbloccare analitiche dettagliate per la tua attività, incluse visualizzazioni passi, clic sui link e tour principali.",
   "common.details": "Dettagli",
-
   "business.myPromotions.title": "Le Mie Promozioni",
   "business.myPromotions.loadError": "Impossibile caricare le promozioni.",
   "business.myPromotions.cancelError": "Errore durante l'annullamento della promozione. Riprova.",
@@ -844,7 +841,6 @@
   "business.myPromotions.cancelModalBodyNoSub": "Questa azione non può essere annullata.",
   "business.myPromotions.cancelModalKeep": "Non annullare",
   "business.myPromotions.cancelModalConfirm": "Sì, annulla",
-
   "business.findTours.advertiseAs": "Pubblicizza come:",
   "business.findTours.selectBusiness": "Seleziona un'attività",
   "business.findTours.trialAvailable": "Piano gratuito: {{used}}/{{max}} slot usati · 7 giorni di prova · senza carta",
@@ -892,7 +888,6 @@
   "business.findTours.perMonth": "/ mese",
   "business.findTours.perYear": "/ anno",
   "business.findTours.slotsAvailable": "slot liberi",
-
   "business.billing.title": "Fatturazione",
   "business.billing.infoTitle": "Modello pubblicitario per slot",
   "business.billing.infoText": "Ogni slot pubblicitario ha il proprio abbonamento indipendente. Puoi aggiungere e annullare slot singolarmente da \"Trova Tour\".",
@@ -933,11 +928,15 @@
   "business.billing.cancelSlotBody": "Annullare l'abbonamento dello slot in {{name}}?\n\nL'abbonamento Stripe verrà annullato e lo slot scadrà alla fine del periodo corrente.",
   "business.billing.cancelSlotKeep": "Mantieni",
   "business.billing.cancelSlotConfirm": "Conferma",
-
   "businessDashboard.title": "Dashboard Aziendale",
   "businessDashboard.subtitle": "Gestisci le tue attività e promuoviti sui tour",
   "businessDashboard.tabs.myBusinesses": "Le Mie Attività",
   "businessDashboard.tabs.findTours": "Cerca Tour",
   "businessDashboard.tabs.myPromotions": "Le Mie Promozioni",
-  "businessDashboard.tabs.billing": "Fatturazione"
+  "businessDashboard.tabs.billing": "Fatturazione",
+  "dashboard.tours.underReview": "In revisione",
+  "dashboard.tours.filterAll": "Tutti",
+  "dashboard.tours.filterPublished": "Pubblicati",
+  "dashboard.tours.filterUnderReview": "In revisione",
+  "dashboard.tours.noResultsFilter": "Nessun tour corrisponde a questo filtro"
 }
