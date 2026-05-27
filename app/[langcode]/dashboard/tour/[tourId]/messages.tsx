@@ -237,7 +237,6 @@ export default function TourMessagesScreen() {
             title={t('messages.title')}
             subtitle={tour.title}
             showBack
-            onBack={() => router.back()}
           />
 
           {/* Thread tabs */}

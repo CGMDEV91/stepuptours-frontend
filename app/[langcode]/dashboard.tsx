@@ -16,6 +16,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
+import { isAdmin as isAdminRole, isBusiness as isBusinessRole, isGuide as isGuideRole } from '../../lib/roles';
 import { MyToursTab } from '../../components/dashboard/MyToursTab';
 import { SubscriptionTab } from '../../components/dashboard/SubscriptionTab';
 import { PaymentDataTab } from '../../components/dashboard/PaymentDataTab';
@@ -65,11 +66,9 @@ export default function DashboardScreen() {
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
 
-  // Compatibilidad temporal: 'professional' → 'guide' durante la transición de roles
-  const isGuide =
-    user?.roles?.includes('guide') || user?.roles?.includes('professional');
-  const isBusiness = user?.roles?.includes('business');
-  const isAdmin = user?.roles?.includes('administrator');
+  const isGuide = isGuideRole(user);
+  const isBusiness = isBusinessRole(user);
+  const isAdmin = isAdminRole(user);
 
   const initialTab: TabId = tabParam && isValidTab(tabParam) ? tabParam : 'subscription';
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);

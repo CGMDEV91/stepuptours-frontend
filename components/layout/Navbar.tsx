@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
+import { isAdmin, isBusiness, isGuide } from '../../lib/roles';
 import { LanguageSelector } from './LanguageSelector';
 
 interface NavbarProps {
@@ -134,7 +135,9 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
 
   // ── Authenticated: avatar + dropdown ──────────────────
   const initials = user ? getInitials(user.publicName) : '';
-  const roles = user?.roles ?? [];
+  const userIsAdmin = isAdmin(user);
+  const userIsGuide = isGuide(user);
+  const userIsBusiness = isBusiness(user);
 
   const userAvatar = (
     <View style={styles.row}>
@@ -184,7 +187,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         <Ionicons name="trophy-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
         <Text style={styles.dropdownItemText}>{t('nav.ranking')}</Text>
       </TouchableOpacity>
-      {roles.includes('administrator') && (
+      {userIsAdmin && (
         <TouchableOpacity
           onPress={() => handleNavigate(`/${lang}/admin`)}
           activeOpacity={0.7}
@@ -194,7 +197,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           <Text style={styles.dropdownItemText}>{t('nav.administration')}</Text>
         </TouchableOpacity>
       )}
-      {(roles.includes('guide') || roles.includes('professional')) && (
+      {userIsGuide && (
         <TouchableOpacity
           onPress={() => handleNavigate(`/${lang}/dashboard`)}
           activeOpacity={0.7}
@@ -204,7 +207,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           <Text style={styles.dropdownItemText}>{t('nav.dashboard')}</Text>
         </TouchableOpacity>
       )}
-      {roles.includes('business') && (
+      {userIsBusiness && (
         <TouchableOpacity
           onPress={() => handleNavigate(`/${lang}/business-dashboard`)}
           activeOpacity={0.7}
@@ -214,10 +217,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           <Text style={styles.dropdownItemText}>{t('nav.dashboard')}</Text>
         </TouchableOpacity>
       )}
-      {!roles.includes('guide') &&
-        !roles.includes('professional') &&
-        !roles.includes('business') &&
-        !roles.includes('administrator') && (
+      {!userIsGuide && !userIsBusiness && !userIsAdmin && (
           <TouchableOpacity
             onPress={() => handleNavigate(`/${lang}/donations`)}
             activeOpacity={0.7}
