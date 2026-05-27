@@ -2,6 +2,7 @@
 // Dashboard service — agnostic of Drupal internals
 // All Drupal-specific mapping happens in drupal-client.ts
 
+import axios from 'axios';
 import {
   drupalGet,
   drupalPost,
@@ -20,7 +21,17 @@ import {
   mapDrupalSubscriptionPayment,
   getApiLanguage,
 } from '../lib/drupal-client';
+import { useAuthStore } from '../stores/auth.store';
 import type { Tour, TourStep, Donation, ProfessionalProfile, Subscription, SubscriptionPlan, SubscriptionPayment } from '../types';
+
+const DRUPAL_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
+
+function getDashboardAuthHeader(): Record<string, string> {
+  const session = useAuthStore.getState().session;
+  if (!session?.token) return {};
+  const prefix = (session as any).tokenType === 'bearer' ? 'Bearer' : 'Basic';
+  return { Authorization: `${prefix} ${session.token}` };
+}
 
 // ── Tours ─────────────────────────────────────────────────────────────────────
 
@@ -155,6 +166,12 @@ export async function createTour(data: {
         // Set node language: use the explicitly-provided langcode if given,
         // otherwise fall back to the current UI language.
         langcode: data.langcode ?? getApiLanguage(),
+        // NOTA: NO se envía `status`. Los guías no tienen permiso
+        // `administer node published status`, así que JSON:API rechazaría
+        // cualquier valor explícito. La regla "tour de guía nace en borrador"
+        // se aplica en el backend vía hook_node_presave
+        // (stepuptours_computed_fields.module — sección 5b), que fuerza
+        // status=0 cuando el autor no es admin.
       },
       relationships,
     },
@@ -546,4 +563,25 @@ export async function getDonationsForAuthor(
 
   const total = allDonations.reduce((sum, d) => sum + d.amount, 0);
   return { donations: allDonations, total };
+}
+
+// ── Tours quota ───────────────────────────────────────────────────────────────
+
+export interface ToursQuota {
+  used: number;
+  max: number;       // -1 = unlimited
+  planType: string;
+  billing: string;
+}
+
+/**
+ * GET /api/me/tours/quota
+ * Returns the monthly tour creation quota for the authenticated guide.
+ */
+export async function getToursQuota(): Promise<ToursQuota> {
+  const { data } = await axios.get<ToursQuota>(
+    `${DRUPAL_BASE}/api/me/tours/quota`,
+    { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+  return data;
 }

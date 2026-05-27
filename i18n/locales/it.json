@@ -951,5 +951,8 @@
   "translations.requestModalCta": "Invia richiesta",
   "translations.notice24to48h": "Le traduzioni sono solitamente pronte entro 24-48 ore.",
   "translations.requestBtn": "Traduzioni",
-  "preview.bannerText": "Anteprima privata — i progressi non vengono salvati"
+  "preview.bannerText": "Anteprima privata — i progressi non vengono salvati",
+  "dashboard.toursQuota": "{{used}} / {{max}} tour creati questo mese",
+  "dashboard.toursQuotaUnlimited": "{{used}} tour creati questo mese (piano illimitato)",
+  "dashboard.toursQuotaLimitReached": "Limite mensile raggiunto"
 }

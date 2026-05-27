@@ -951,5 +951,8 @@
   "translations.requestModalCta": "Αποστολή αιτήματος",
   "translations.notice24to48h": "Οι μεταφράσεις είναι συνήθως έτοιμες εντός 24-48 ωρών.",
   "translations.requestBtn": "Μεταφράσεις",
-  "preview.bannerText": "Ιδιωτική προεπισκόπηση — η πρόοδος δεν αποθηκεύεται"
+  "preview.bannerText": "Ιδιωτική προεπισκόπηση — η πρόοδος δεν αποθηκεύεται",
+  "dashboard.toursQuota": "{{used}} / {{max}} tours δημιουργήθηκαν αυτόν τον μήνα",
+  "dashboard.toursQuotaUnlimited": "{{used}} tours δημιουργήθηκαν αυτόν τον μήνα (απεριόριστο πλάνο)",
+  "dashboard.toursQuotaLimitReached": "Επιτεύχθηκε μηνιαίο όριο"
 }

@@ -20,7 +20,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { getToursByAuthor, deleteTour } from '../../services/dashboard.service';
+import { getToursByAuthor, deleteTour, getToursQuota, type ToursQuota } from '../../services/dashboard.service';
 import { getUnreadCountByTour } from '../../services/comments.service';
 import { TourCard } from '../tour/TourCard';
 import { RequestTranslationsModal } from './RequestTranslationsModal';
@@ -124,6 +124,42 @@ function FilterBar({ active, counts, onChange }: FilterBarProps) {
   );
 }
 
+// ── Quota bar ─────────────────────────────────────────────────────────────────
+
+interface QuotaBarProps {
+  quota: ToursQuota;
+}
+
+function QuotaBar({ quota }: QuotaBarProps) {
+  const { t } = useTranslation();
+
+  const isUnlimited = quota.max === -1;
+  const pct = isUnlimited ? 0 : Math.min(1, quota.used / quota.max);
+  const atLimit = !isUnlimited && quota.used >= quota.max;
+
+  const barColor = atLimit ? '#EF4444' : pct >= 0.8 ? '#F59E0B' : '#10B981';
+
+  return (
+    <View style={styles.quotaBar}>
+      <View style={styles.quotaTextRow}>
+        <Text style={styles.quotaLabel}>
+          {isUnlimited
+            ? t('dashboard.toursQuotaUnlimited', { used: quota.used })
+            : t('dashboard.toursQuota', { used: quota.used, max: quota.max })}
+        </Text>
+        {atLimit && (
+          <Text style={styles.quotaLimitReached}>{t('dashboard.toursQuotaLimitReached')}</Text>
+        )}
+      </View>
+      {!isUnlimited && (
+        <View style={styles.quotaTrack}>
+          <View style={[styles.quotaFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: barColor }]} />
+        </View>
+      )}
+    </View>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function MyToursTab({ userId }: MyToursTabProps) {
@@ -141,6 +177,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
   const [unreadByTour, setUnreadByTour] = useState<Record<string, number>>({});
   const [translModal, setTranslModal] = useState<Tour | null>(null);
+  const [quota, setQuota] = useState<ToursQuota | null>(null);
   const user = useAuthStore((s) => s.user);
 
   // ── Responsive grid ───────────────────────────────────────────────────────
@@ -176,6 +213,13 @@ export function MyToursTab({ userId }: MyToursTabProps) {
       .then(setUnreadByTour)
       .catch(() => {});
   }, [userId]);
+
+  // Load monthly tour quota (non-blocking).
+  useEffect(() => {
+    getToursQuota()
+      .then(setQuota)
+      .catch(() => {});
+  }, []);
 
   // ── Filtering ─────────────────────────────────────────────────────────────
   const afterSearch = search.trim()
@@ -254,6 +298,9 @@ export function MyToursTab({ userId }: MyToursTabProps) {
 
   return (
     <>
+      {/* Monthly quota indicator */}
+      {quota && <QuotaBar quota={quota} />}
+
       {/* Header: create button + search */}
       <View style={styles.listHeader}>
         <TouchableOpacity
@@ -671,5 +718,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+
+  // ── Quota bar ────────────────────────────────────────────────────────────────
+  quotaBar: {
+    marginBottom: 12,
+    padding: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    gap: 8,
+  },
+  quotaTextRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  quotaLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  quotaLimitReached: {
+    fontSize: 11,
+    color: '#EF4444',
+    fontWeight: '700',
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  quotaTrack: {
+    height: 6,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  quotaFill: {
+    height: 6,
+    borderRadius: 3,
   },
 });

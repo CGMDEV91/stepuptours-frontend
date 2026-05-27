@@ -951,5 +951,8 @@
   "translations.requestModalCta": "Envoyer la demande",
   "translations.notice24to48h": "Les traductions sont généralement prêtes en 24-48 heures.",
   "translations.requestBtn": "Traductions",
-  "preview.bannerText": "Aperçu privé — la progression n'est pas sauvegardée"
+  "preview.bannerText": "Aperçu privé — la progression n'est pas sauvegardée",
+  "dashboard.toursQuota": "{{used}} / {{max}} tours créés ce mois-ci",
+  "dashboard.toursQuotaUnlimited": "{{used}} tours créés ce mois-ci (plan illimité)",
+  "dashboard.toursQuotaLimitReached": "Limite mensuelle atteinte"
 }
