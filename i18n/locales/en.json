@@ -965,5 +965,12 @@
   "dashboard.tours.filterAll": "All",
   "dashboard.tours.filterPublished": "Published",
   "dashboard.tours.filterUnderReview": "Under review",
-  "dashboard.tours.noResultsFilter": "No tours match this filter"
+  "dashboard.tours.noResultsFilter": "No tours match this filter",
+  "messages.title": "Tour Messages",
+  "messages.threadReview": "Review",
+  "messages.threadTranslReq": "Translation Request",
+  "messages.threadTranslRev": "Translation Review",
+  "messages.empty": "No messages yet in this thread.",
+  "messages.placeholder": "Write a message…",
+  "messages.buttonLabel": "Messages"
 }

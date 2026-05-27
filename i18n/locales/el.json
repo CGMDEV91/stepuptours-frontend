@@ -938,5 +938,12 @@
   "dashboard.tours.filterAll": "Όλα",
   "dashboard.tours.filterPublished": "Δημοσιευμένα",
   "dashboard.tours.filterUnderReview": "Υπό αναθεώρηση",
-  "dashboard.tours.noResultsFilter": "Κανένα tour δεν ταιριάζει με αυτό το φίλτρο"
+  "dashboard.tours.noResultsFilter": "Κανένα tour δεν ταιριάζει με αυτό το φίλτρο",
+  "messages.title": "Μηνύματα Tour",
+  "messages.threadReview": "Αξιολόγηση",
+  "messages.threadTranslReq": "Αίτηση μετάφρασης",
+  "messages.threadTranslRev": "Έλεγχος μετάφρασης",
+  "messages.empty": "Δεν υπάρχουν μηνύματα σε αυτό το νήμα.",
+  "messages.placeholder": "Γράψτε ένα μήνυμα…",
+  "messages.buttonLabel": "Μηνύματα"
 }

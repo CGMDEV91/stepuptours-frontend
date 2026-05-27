@@ -21,6 +21,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { getToursByAuthor, deleteTour } from '../../services/dashboard.service';
+import { getUnreadCountByTour } from '../../services/comments.service';
 import { TourCard } from '../tour/TourCard';
 import type { Tour } from '../../types';
 
@@ -136,6 +137,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
+  const [unreadByTour, setUnreadByTour] = useState<Record<string, number>>({});
 
   // ── Responsive grid ───────────────────────────────────────────────────────
   const DASHBOARD_PADDING = 32;
@@ -161,9 +163,15 @@ export function MyToursTab({ userId }: MyToursTabProps) {
     }
   }, [userId]);
 
+  useEffect(() => { loadTours(); }, [loadTours]);
+
+  // Load unread message counts (non-blocking, userId = UUID in this app).
   useEffect(() => {
-    loadTours();
-  }, [loadTours]);
+    if (!userId) return;
+    getUnreadCountByTour(userId)
+      .then(setUnreadByTour)
+      .catch(() => {});
+  }, [userId]);
 
   // ── Filtering ─────────────────────────────────────────────────────────────
   const afterSearch = search.trim()
@@ -295,23 +303,42 @@ export function MyToursTab({ userId }: MyToursTabProps) {
         </View>
       ) : (
         <View style={styles.grid}>
-          {filteredTours.map((item) => (
-            <View key={item.id} style={{ width: cardWidth, position: 'relative' }}>
-              <TourCard
-                tour={item}
-                cardWidth={cardWidth}
-                langcode={langcode ?? 'en'}
-                isOwner={true}
-                onEdit={() => handleEdit(item)}
-                onDelete={() => handleDeleteRequest(item)}
-              />
-              {deletingId === item.id ? (
-                <View style={[StyleSheet.absoluteFill, styles.deletingOverlay]}>
-                  <ActivityIndicator size="small" color={AMBER} />
-                </View>
-              ) : null}
-            </View>
-          ))}
+          {filteredTours.map((item) => {
+            const unread = unreadByTour[item.id] ?? 0;
+            return (
+              <View key={item.id} style={{ width: cardWidth, position: 'relative' }}>
+                <TourCard
+                  tour={item}
+                  cardWidth={cardWidth}
+                  langcode={langcode ?? 'en'}
+                  isOwner={true}
+                  onEdit={() => handleEdit(item)}
+                  onDelete={() => handleDeleteRequest(item)}
+                />
+                {/* Messages button + unread badge */}
+                <TouchableOpacity
+                  style={styles.messagesBtn}
+                  onPress={() => router.push(`/${langcode}/dashboard/tour/${item.id}/messages` as any)}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons name="chatbubble-outline" size={14} color={unread > 0 ? '#FFFFFF' : '#6B7280'} />
+                  <Text style={[styles.messagesBtnText, unread > 0 && styles.messagesBtnTextUnread]}>
+                    {t('messages.buttonLabel')}
+                  </Text>
+                  {unread > 0 && (
+                    <View style={styles.unreadBadge}>
+                      <Text style={styles.unreadBadgeText}>{unread}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+                {deletingId === item.id ? (
+                  <View style={[StyleSheet.absoluteFill, styles.deletingOverlay]}>
+                    <ActivityIndicator size="small" color={AMBER} />
+                  </View>
+                ) : null}
+              </View>
+            );
+          })}
         </View>
       )}
 
@@ -483,6 +510,41 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontWeight: '500',
     textAlign: 'center',
+  },
+
+  // ── Messages button ────────────────────────────────────────────────────────
+  messagesBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    alignSelf: 'flex-start',
+  },
+  messagesBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  messagesBtnTextUnread: {
+    color: '#D97706',
+  },
+  unreadBadge: {
+    backgroundColor: '#EF4444',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  unreadBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 
   // ── Deleting overlay ───────────────────────────────────────────────────────

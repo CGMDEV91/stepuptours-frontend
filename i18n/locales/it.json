@@ -938,5 +938,12 @@
   "dashboard.tours.filterAll": "Tutti",
   "dashboard.tours.filterPublished": "Pubblicati",
   "dashboard.tours.filterUnderReview": "In revisione",
-  "dashboard.tours.noResultsFilter": "Nessun tour corrisponde a questo filtro"
+  "dashboard.tours.noResultsFilter": "Nessun tour corrisponde a questo filtro",
+  "messages.title": "Messaggi del Tour",
+  "messages.threadReview": "Revisione",
+  "messages.threadTranslReq": "Richiesta di traduzione",
+  "messages.threadTranslRev": "Revisione della traduzione",
+  "messages.empty": "Nessun messaggio in questo thread.",
+  "messages.placeholder": "Scrivi un messaggio…",
+  "messages.buttonLabel": "Messaggi"
 }

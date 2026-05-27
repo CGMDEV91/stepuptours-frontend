@@ -938,5 +938,12 @@
   "dashboard.tours.filterAll": "Alle",
   "dashboard.tours.filterPublished": "Veröffentlicht",
   "dashboard.tours.filterUnderReview": "In Überprüfung",
-  "dashboard.tours.noResultsFilter": "Keine Touren entsprechen diesem Filter"
+  "dashboard.tours.noResultsFilter": "Keine Touren entsprechen diesem Filter",
+  "messages.title": "Tour-Nachrichten",
+  "messages.threadReview": "Überprüfung",
+  "messages.threadTranslReq": "Übersetzungsanfrage",
+  "messages.threadTranslRev": "Übersetzungsüberprüfung",
+  "messages.empty": "Noch keine Nachrichten in diesem Thread.",
+  "messages.placeholder": "Nachricht schreiben…",
+  "messages.buttonLabel": "Nachrichten"
 }
