@@ -945,5 +945,11 @@
   "messages.threadTranslRev": "Έλεγχος μετάφρασης",
   "messages.empty": "Δεν υπάρχουν μηνύματα σε αυτό το νήμα.",
   "messages.placeholder": "Γράψτε ένα μήνυμα…",
-  "messages.buttonLabel": "Μηνύματα"
+  "messages.buttonLabel": "Μηνύματα",
+  "translations.requestModalTitle": "Αίτηση Μεταφράσεων",
+  "translations.requestModalIntro": "Επιλέξτε τις γλώσσες στις οποίες θέλετε να μεταφραστεί αυτό το tour. Η ομάδα του StepUp Tours θα επεξεργαστεί το αίτημά σας εντός 24-48 ωρών.",
+  "translations.requestModalCta": "Αποστολή αιτήματος",
+  "translations.notice24to48h": "Οι μεταφράσεις είναι συνήθως έτοιμες εντός 24-48 ωρών.",
+  "translations.requestBtn": "Μεταφράσεις",
+  "preview.bannerText": "Ιδιωτική προεπισκόπηση — η πρόοδος δεν αποθηκεύεται"
 }

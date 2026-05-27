@@ -972,5 +972,11 @@
   "messages.threadTranslRev": "Translation Review",
   "messages.empty": "No messages yet in this thread.",
   "messages.placeholder": "Write a message…",
-  "messages.buttonLabel": "Messages"
+  "messages.buttonLabel": "Messages",
+  "translations.requestModalTitle": "Request Translations",
+  "translations.requestModalIntro": "Select the languages you want this tour translated into. The StepUp Tours team will process your request within 24–48 hours.",
+  "translations.requestModalCta": "Send Request",
+  "translations.notice24to48h": "Translations are usually ready within 24–48 hours.",
+  "translations.requestBtn": "Translations",
+  "preview.bannerText": "Private preview — progress is not saved"
 }

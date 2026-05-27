@@ -292,6 +292,21 @@ export async function drupalGetJsonApiBase(
   return response.data?.data ?? [];
 }
 
+/**
+ * Like drupalGetJsonApiBase but returns the full JSON:API response envelope
+ * { data: [], included: [], meta: {} }. Use when you need `included` resources.
+ */
+export async function drupalGetJsonApiBaseRaw(
+  endpoint: string,
+): Promise<{ data: any[]; included: any[]; meta?: any }> {
+  const response = await drupalClientBase.get(endpoint);
+  return {
+    data:     response.data?.data     ?? [],
+    included: response.data?.included ?? [],
+    meta:     response.data?.meta,
+  };
+}
+
 export async function drupalPost<T>(endpoint: string, body: object): Promise<T> {
   const response = await drupalClient.post(endpoint, body);
   return deserializer.deserialize(response.data) as T;

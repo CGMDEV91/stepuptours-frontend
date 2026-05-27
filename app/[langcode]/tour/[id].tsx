@@ -95,7 +95,8 @@ export async function generateStaticParams(
 }
 
 export default function TourDetailScreen() {
-  const { id, langcode } = useLocalSearchParams<{ id: string; langcode: string }>();
+  const { id, langcode, preview } = useLocalSearchParams<{ id: string; langcode: string; preview?: string }>();
+  const isPreview = preview === '1';
   const router = useRouter();
   const { t } = useTranslation();
   const activeLangs = useActiveLangs();
@@ -146,12 +147,12 @@ export default function TourDetailScreen() {
     }
   }, [id, user?.id]);
 
-  // Track tour view once the tour is loaded
+  // Track tour view once the tour is loaded (skipped in preview mode)
   useEffect(() => {
-    if (tour && langcode) {
+    if (tour && langcode && !isPreview) {
       void track('tour_view', { langcode, tourId: tour.id });
     }
-  }, [tour?.id, langcode]);
+  }, [tour?.id, langcode, isPreview]);
 
   // Load anon session progress to show "Continue" label on the CTA.
   // Runs only for anonymous users once the tour UUID is available.
@@ -190,20 +191,24 @@ export default function TourDetailScreen() {
       return;
     }
     if (tourUuid) {
-      void track('tour_favorite', {
-        langcode: langcode ?? 'en',
-        tourId: tourUuid,
-        valueInt: isFavorite ? 0 : 1,
-      });
+      if (!isPreview) {
+        void track('tour_favorite', {
+          langcode: langcode ?? 'en',
+          tourId: tourUuid,
+          valueInt: isFavorite ? 0 : 1,
+        });
+      }
       toggleFavorite(user.id, tourUuid);
     }
-  }, [user, tourUuid, isFavorite, langcode, openAuthModal, toggleFavorite]);
+  }, [user, tourUuid, isFavorite, langcode, isPreview, openAuthModal, toggleFavorite]);
 
   const handleShare = async () => {
     const siteUrl =
       process.env.EXPO_PUBLIC_SITE_URL ??
       (typeof window !== 'undefined' ? window.location.origin : 'https://stepuptours.com');
-    void track('tour_share', { langcode: langcode ?? 'en', tourId: tourUuid });
+    if (!isPreview) {
+      void track('tour_share', { langcode: langcode ?? 'en', tourId: tourUuid });
+    }
     try {
       await Share.share({
         message: `${tour?.title} - StepUp Tours`,
@@ -318,6 +323,13 @@ export default function TourDetailScreen() {
     <>
     <TourHead tour={tour} langcode={langcode ?? 'en'} langs={activeLangs} />
     <View style={styles.screen}>
+      {/* Preview mode banner */}
+      {isPreview && (
+        <View style={styles.previewBanner}>
+          <Ionicons name="eye-outline" size={16} color="#92400E" />
+          <Text style={styles.previewBannerText}>{t('preview.bannerText')}</Text>
+        </View>
+      )}
       <PageScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -490,6 +502,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  previewBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#FEF3C7',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FDE68A',
+  },
+  previewBannerText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#92400E',
   },
   scrollView: {
     flex: 1,

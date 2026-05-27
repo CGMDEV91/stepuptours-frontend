@@ -11,7 +11,7 @@
 //   POST /jsonapi/comment/{type}
 //   PATCH /jsonapi/comment/{type}/{uuid}   (mark read / resolve)
 
-import { drupalGetJsonApiBase, drupalPost, drupalPatch } from '../lib/drupal-client';
+import { drupalGetJsonApiBaseRaw, drupalPost, drupalPatch } from '../lib/drupal-client';
 import { useLanguageStore } from '../stores/language.store';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ export async function getTourComments(
     'page[limit]':          '100',
   });
 
-  const response = await drupalGetJsonApiBase(`/comment/${threadType}?${params}`);
+  const response = await drupalGetJsonApiBaseRaw(`/comment/${threadType}?${params}`);
   const items: any[]    = response.data ?? [];
   const included: any[] = response.included ?? [];
 
@@ -183,7 +183,7 @@ export async function getUnreadCountByTour(
           'include':                      'uid,entity_id',
           'page[limit]':                  '200',
         });
-        const response = await drupalGetJsonApiBase(`/comment/${threadType}?${params}`);
+        const response = await drupalGetJsonApiBaseRaw(`/comment/${threadType}?${params}`);
         const items: any[]    = response.data ?? [];
         const included: any[] = response.included ?? [];
         items.forEach((item: any) => {

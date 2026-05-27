@@ -945,5 +945,11 @@
   "messages.threadTranslRev": "Révision de traduction",
   "messages.empty": "Aucun message dans ce fil.",
   "messages.placeholder": "Écrire un message…",
-  "messages.buttonLabel": "Messages"
+  "messages.buttonLabel": "Messages",
+  "translations.requestModalTitle": "Demander des Traductions",
+  "translations.requestModalIntro": "Sélectionnez les langues dans lesquelles vous souhaitez traduire ce tour. Notre équipe traitera votre demande dans les 24-48 heures.",
+  "translations.requestModalCta": "Envoyer la demande",
+  "translations.notice24to48h": "Les traductions sont généralement prêtes en 24-48 heures.",
+  "translations.requestBtn": "Traductions",
+  "preview.bannerText": "Aperçu privé — la progression n'est pas sauvegardée"
 }

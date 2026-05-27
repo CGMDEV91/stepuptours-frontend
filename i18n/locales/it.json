@@ -945,5 +945,11 @@
   "messages.threadTranslRev": "Revisione della traduzione",
   "messages.empty": "Nessun messaggio in questo thread.",
   "messages.placeholder": "Scrivi un messaggio…",
-  "messages.buttonLabel": "Messaggi"
+  "messages.buttonLabel": "Messaggi",
+  "translations.requestModalTitle": "Richiedere Traduzioni",
+  "translations.requestModalIntro": "Seleziona le lingue in cui vuoi tradurre questo tour. Il team di StepUp Tours elaborerà la tua richiesta entro 24-48 ore.",
+  "translations.requestModalCta": "Invia richiesta",
+  "translations.notice24to48h": "Le traduzioni sono solitamente pronte entro 24-48 ore.",
+  "translations.requestBtn": "Traduzioni",
+  "preview.bannerText": "Anteprima privata — i progressi non vengono salvati"
 }

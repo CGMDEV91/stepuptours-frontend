@@ -23,6 +23,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { getToursByAuthor, deleteTour } from '../../services/dashboard.service';
 import { getUnreadCountByTour } from '../../services/comments.service';
 import { TourCard } from '../tour/TourCard';
+import { RequestTranslationsModal } from './RequestTranslationsModal';
+import { useAuthStore } from '../../stores/auth.store';
 import type { Tour } from '../../types';
 
 const AMBER = '#F59E0B';
@@ -138,6 +140,8 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
   const [unreadByTour, setUnreadByTour] = useState<Record<string, number>>({});
+  const [translModal, setTranslModal] = useState<Tour | null>(null);
+  const user = useAuthStore((s) => s.user);
 
   // ── Responsive grid ───────────────────────────────────────────────────────
   const DASHBOARD_PADDING = 32;
@@ -315,22 +319,37 @@ export function MyToursTab({ userId }: MyToursTabProps) {
                   onEdit={() => handleEdit(item)}
                   onDelete={() => handleDeleteRequest(item)}
                 />
-                {/* Messages button + unread badge */}
-                <TouchableOpacity
-                  style={styles.messagesBtn}
-                  onPress={() => router.push(`/${langcode}/dashboard/tour/${item.id}/messages` as any)}
-                  activeOpacity={0.85}
-                >
-                  <Ionicons name="chatbubble-outline" size={14} color={unread > 0 ? '#FFFFFF' : '#6B7280'} />
-                  <Text style={[styles.messagesBtnText, unread > 0 && styles.messagesBtnTextUnread]}>
-                    {t('messages.buttonLabel')}
-                  </Text>
-                  {unread > 0 && (
-                    <View style={styles.unreadBadge}>
-                      <Text style={styles.unreadBadgeText}>{unread}</Text>
-                    </View>
+                {/* Action buttons row */}
+                <View style={styles.cardActions}>
+                  {/* Messages button + unread badge */}
+                  <TouchableOpacity
+                    style={[styles.actionBtn, unread > 0 && styles.actionBtnUnread]}
+                    onPress={() => router.push(`/${langcode}/dashboard/tour/${item.id}/messages` as any)}
+                    activeOpacity={0.85}
+                  >
+                    <Ionicons name="chatbubble-outline" size={13} color={unread > 0 ? '#D97706' : '#6B7280'} />
+                    <Text style={[styles.actionBtnText, unread > 0 && styles.actionBtnTextUnread]}>
+                      {t('messages.buttonLabel')}
+                    </Text>
+                    {unread > 0 && (
+                      <View style={styles.unreadBadge}>
+                        <Text style={styles.unreadBadgeText}>{unread}</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+
+                  {/* Request translations — only for published tours */}
+                  {item.published && (
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => setTranslModal(item)}
+                      activeOpacity={0.85}
+                    >
+                      <Ionicons name="language-outline" size={13} color="#6B7280" />
+                      <Text style={styles.actionBtnText}>{t('translations.requestBtn')}</Text>
+                    </TouchableOpacity>
                   )}
-                </TouchableOpacity>
+                </View>
                 {deletingId === item.id ? (
                   <View style={[StyleSheet.absoluteFill, styles.deletingOverlay]}>
                     <ActivityIndicator size="small" color={AMBER} />
@@ -349,6 +368,16 @@ export function MyToursTab({ userId }: MyToursTabProps) {
         onConfirm={() => pendingDelete && confirmDelete(pendingDelete.id)}
         onCancel={() => setPendingDelete(null)}
       />
+
+      {/* Request translations modal */}
+      {translModal && user && (
+        <RequestTranslationsModal
+          visible={translModal !== null}
+          tour={translModal}
+          guidePublicName={user.publicName}
+          onClose={() => setTranslModal(null)}
+        />
+      )}
     </>
   );
 }
@@ -512,24 +541,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // ── Messages button ────────────────────────────────────────────────────────
-  messagesBtn: {
+  // ── Card action buttons ────────────────────────────────────────────────────
+  cardActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 6,
+  },
+  actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    marginTop: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 20,
     backgroundColor: '#F3F4F6',
-    alignSelf: 'flex-start',
   },
-  messagesBtnText: {
+  actionBtnUnread: {
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  actionBtnText: {
     fontSize: 12,
     fontWeight: '600',
     color: '#6B7280',
   },
-  messagesBtnTextUnread: {
+  actionBtnTextUnread: {
     color: '#D97706',
   },
   unreadBadge: {

@@ -40,7 +40,8 @@ import { extractNidFromSlug } from '../../../../lib/tour-slug';
 const AMBER = '#F59E0B';
 
 export default function TourStepsScreen() {
-  const { id, langcode } = useLocalSearchParams<{ id: string; langcode: string }>();
+  const { id, langcode, preview } = useLocalSearchParams<{ id: string; langcode: string; preview?: string }>();
+  const isPreview = preview === '1';
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -103,12 +104,12 @@ export default function TourStepsScreen() {
     getAnonProgress(tour.id).then(setAnonStepsCompleted).catch(() => {});
   }, [isAuthLoading, user, tour?.id]);
 
-  // Track tour start once tour is loaded
+  // Track tour start once tour is loaded (skipped in preview mode)
   useEffect(() => {
-    if (tour && langcode) {
+    if (tour && langcode && !isPreview) {
       void track('tour_start', { langcode, tourId: tour.id });
     }
-  }, [tour?.id, langcode]);
+  }, [tour?.id, langcode, isPreview]);
 
   // Fetch guide user when tour data is available
   useEffect(() => {
@@ -168,6 +169,13 @@ export default function TourStepsScreen() {
       const newCompleted = [...stepsCompleted, stepId];
       const isLastStep = newCompleted.length >= totalSteps;
 
+      // In preview mode: only update local state, never persist to backend.
+      if (isPreview) {
+        setAnonStepsCompleted(newCompleted);
+        if (isLastStep) setShowCompletion(true);
+        return;
+      }
+
       if (user) {
         await updateActivity(user.id, tour.id, {
           stepsCompleted: newCompleted,
@@ -183,12 +191,12 @@ export default function TourStepsScreen() {
         setShowCompletion(true);
       }
     },
-    [user, tour, stepsCompleted, totalSteps, updateActivity],
+    [user, tour, stepsCompleted, totalSteps, isPreview, updateActivity],
   );
 
   const handleRestart = useCallback(async () => {
     if (!tour) return;
-    if (user) {
+    if (user && !isPreview) {
       await updateActivity(user.id, tour.id, {
         stepsCompleted: [],
         isCompleted: false,
@@ -267,6 +275,13 @@ export default function TourStepsScreen() {
 
   return (
     <View style={styles.screen}>
+      {/* Preview mode banner */}
+      {isPreview && (
+        <View style={styles.previewBanner}>
+          <Ionicons name="eye-outline" size={14} color="#92400E" />
+          <Text style={styles.previewBannerText}>{t('preview.bannerText')}</Text>
+        </View>
+      )}
       {/* Header — full-width bar with absolute back button (matches PageBanner pattern) */}
       <View style={styles.headerOuter}>
         <View style={styles.backButtonAbs}>
@@ -363,6 +378,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     ...webFullHeight,
+  },
+  previewBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#FEF3C7',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FDE68A',
+  },
+  previewBannerText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#92400E',
   },
   loadingContainer: {
     flex: 1,
