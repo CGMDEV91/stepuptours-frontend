@@ -55,7 +55,7 @@ export default function PayoutsScreen() {
     }
   }, []);
 
-  useFocusEffect(loadStatus);
+  useFocusEffect(useCallback(() => { void loadStatus(); }, [loadStatus]));
 
   const handleStartOnboarding = async () => {
     setWorking(true);
@@ -91,7 +91,11 @@ export default function PayoutsScreen() {
 
   return (
     <View style={[styles.root, webFullHeight]}>
-      <PageBanner />
+      <PageBanner
+        icon="cash-outline"
+        iconBgColor={AMBER}
+        title={t('payouts.title', 'Payouts')}
+      />
       <PageScrollView>
         <View style={[styles.content, { paddingHorizontal: contentPad }]}>
           <View style={styles.inner}>

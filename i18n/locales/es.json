@@ -1021,5 +1021,11 @@
   "translationsSection.manageBtn": "Gestionar",
   "dashboard.tours.unpublishWarning": "Una vez despublicado, para volver a publicarlo debes solicitarlo a través del chat de revisión de traducciones.",
   "messages.threadSupport": "Soporte",
-  "translationsSection.editBtn": "Editar"
+  "translationsSection.editBtn": "Editar",
+  "createTour.editTitle": "Editar tour",
+  "createTour.editSubtitle": "Actualiza los datos de tu tour",
+  "createTour.translationMode.title": "Editando traducción",
+  "createTour.translationMode.description": "Estás editando una traducción de este tour. Solo puedes modificar el título, descripción, duración e imagen de portada. Para añadir, eliminar o reordenar paradas, cambia al idioma original ({{lang}}).",
+  "createTour.translationMode.stepsReadOnly": "solo lectura",
+  "createTour.translationMode.stepsMissing": "Algunas paradas aún no están traducidas a este idioma y se muestran en el idioma original. Contacta con soporte para solicitar la traducción de las paradas."
 }

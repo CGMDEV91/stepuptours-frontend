@@ -994,5 +994,10 @@
   "translationsSection.manageBtn": "Gestisci",
   "dashboard.tours.unpublishWarning": "Una volta rimosso, per ripubblicarlo devi richiederlo tramite la chat di revisione delle traduzioni.",
   "messages.threadSupport": "Assistenza",
-  "translationsSection.editBtn": "Modifica"
+  "translationsSection.editBtn": "Modifica",
+  "createTour.editTitle": "Modifica tour",
+  "createTour.editSubtitle": "Aggiorna i dettagli del tuo tour",
+  "createTour.translationMode.title": "Modifica traduzione",
+  "createTour.translationMode.description": "Stai modificando una traduzione di questo tour. Puoi aggiornare solo il titolo, la descrizione, la durata e l'immagine di copertina. Per aggiungere, rimuovere o riordinare le tappe, passa alla lingua originale ({{lang}}).",
+  "createTour.translationMode.stepsReadOnly": "sola lettura"
 }

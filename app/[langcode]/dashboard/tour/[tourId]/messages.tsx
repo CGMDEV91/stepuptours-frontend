@@ -53,8 +53,8 @@ function Bubble({ comment, isOwn }: { comment: TourComment; isOwn: boolean }) {
   // Backend-automated messages ship an i18n key + JSON params (the message
   // text is NOT pre-translated on the server). Human-typed comments leave
   // messageKey null and we render comment.body verbatim.
-  const text = comment.messageKey
-    ? t(comment.messageKey, comment.messageParams ?? {})
+  const text: string = comment.messageKey
+    ? (t(comment.messageKey, comment.messageParams ?? {}) as string)
     : comment.body;
 
   return (

@@ -131,9 +131,9 @@ function OverviewTab({ business, onSaved }: { business: Business; onSaved: (b: B
 
       <Text style={overviewStyles.label}>Logo</Text>
       <ImagePickerField
-        existingImageUrl={existingLogoUrl}
-        imageUri={imageUri}
-        onImagePicked={(uri, filename) => { setImageUri(uri); setImageFilename(filename); }}
+        currentImageUrl={imageUri ?? existingLogoUrl}
+        onImageSelected={(uri, filename) => { setImageUri(uri); setImageFilename(filename); }}
+        onImageCleared={() => { setImageUri(null); setImageFilename(''); }}
       />
 
       {saveError && (

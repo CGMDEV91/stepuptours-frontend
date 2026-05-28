@@ -994,5 +994,10 @@
   "translationsSection.manageBtn": "Verwalten",
   "dashboard.tours.unpublishWarning": "Nach dem Zurückziehen musst du die Wiederveröffentlichung über den Chat für Übersetzungsüberprüfungen beantragen.",
   "messages.threadSupport": "Unterstützung",
-  "translationsSection.editBtn": "Bearbeiten"
+  "translationsSection.editBtn": "Bearbeiten",
+  "createTour.editTitle": "Tour bearbeiten",
+  "createTour.editSubtitle": "Aktualisiere die Details deiner Tour",
+  "createTour.translationMode.title": "Übersetzung bearbeiten",
+  "createTour.translationMode.description": "Du bearbeitest eine Übersetzung dieser Tour. Hier können nur Titel, Beschreibung, Dauer und Titelbild aktualisiert werden. Um Stationen hinzuzufügen, zu entfernen oder neu anzuordnen, wechsle zur Originalsprache ({{lang}}).",
+  "createTour.translationMode.stepsReadOnly": "schreibgeschützt"
 }

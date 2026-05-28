@@ -269,17 +269,22 @@ export function MyToursTab({ userId }: MyToursTabProps) {
     setPendingDelete(null);
     setDeletingId(tourId);
     try {
-      await deleteTour(tourId);
+      // Delete via the tour's source langcode so JSON:API removes the whole
+      // entity instead of attempting an unsupported translation delete.
+      const langcode = tours.find((t) => t.id === tourId)?.langcode;
+      await deleteTour(tourId, langcode);
       setTours((prev) => prev.filter((t) => t.id !== tourId));
     } catch (err: any) {
       Alert.alert(t('common.error'), err.message ?? 'Failed to delete tour');
     } finally {
       setDeletingId(null);
     }
-  }, [t]);
+  }, [t, tours]);
 
   const handleEdit = useCallback((tour: Tour) => {
-    router.push(`/${langcode}/dashboard/create-tour?tourId=${tour.id}` as any);
+    router.push(
+        `/${langcode}/dashboard/create-tour?tourId=${tour.id}&contentLang=${tour.langcode}` as any
+    );
   }, [router, langcode]);
 
   // ── States ────────────────────────────────────────────────────────────────

@@ -530,128 +530,6 @@ function SubscriptionCheckout(props: SubscriptionCheckoutProps) {
   );
 }
 
-// ── Stripe Checkout form (web only) ──────────────────────────────────────────
-
-interface StripeCheckoutFormProps {
-  plan: SubscriptionPlan;
-  checkoutSessionId: string;
-  onSuccess: () => void;
-  onCancel: () => void;
-}
-
-function StripeCheckoutForm({ plan, checkoutSessionId, onSuccess, onCancel }: StripeCheckoutFormProps) {
-  const { t }      = useTranslation();
-  const checkoutState = useCheckout();
-  const [processing, setProcessing] = useState(false);
-  const [error, setError]           = useState('');
-
-  if (checkoutState.type === 'loading') {
-    return (
-      <View style={checkoutStyles.wrap}>
-        <ActivityIndicator color={AMBER} style={{ marginVertical: 20 }} />
-      </View>
-    );
-  }
-
-  if (checkoutState.type === 'error') {
-    return (
-      <View style={checkoutStyles.wrap}>
-        <Text style={checkoutStyles.errorText}>{checkoutState.error.message}</Text>
-        <TouchableOpacity style={checkoutStyles.cancelLink} onPress={onCancel}>
-          <Text style={checkoutStyles.cancelLinkText}>{t('subscription.cancelCheckout')}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  const { checkout } = checkoutState;
-
-  const handlePay = async () => {
-    setProcessing(true);
-    setError('');
-
-    try {
-      // checkout.confirm() handles everything:
-      // - Collects payment details from the embedded PaymentElement
-      // - Confirms the payment with Stripe
-      // - For 3DS/redirect methods, redirects to return_url automatically
-      // - For card payments, resolves inline
-      const result = await checkout.confirm();
-
-      if (result.type === 'error') {
-        setError(result.error.message ?? t('subscription.paymentError'));
-        setProcessing(false);
-        return;
-      }
-
-      // Payment succeeded — verify via session-status endpoint.
-      // The webhook will create the Drupal node asynchronously.
-      // We just need to confirm the session is 'complete' for the UI.
-      const status = await getCheckoutSessionStatus(checkoutSessionId);
-      if (status.status === 'complete') {
-        onSuccess();
-      } else {
-        setError(t('subscription.paymentError'));
-      }
-    } catch (err: any) {
-      setError(err?.message ?? t('subscription.paymentError'));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  return (
-    <View style={checkoutStyles.wrap}>
-      <View style={checkoutStyles.header}>
-        <Ionicons name="lock-closed-outline" size={14} color="#6B7280" />
-        <Text style={checkoutStyles.headerText}>{t('subscription.securePayment')}</Text>
-      </View>
-
-      <View style={checkoutStyles.summary}>
-        <Text style={checkoutStyles.summaryPlan}>{plan.title}</Text>
-        <Text style={checkoutStyles.summaryPrice}>
-          {plan.price.toFixed(2)} € / {cyclePriceUnit(plan.billingCycle, t)}
-        </Text>
-      </View>
-
-      {/* PaymentElement renders all Stripe-supported payment methods.
-          It is controlled by the CheckoutProvider context — no
-          explicit stripe/elements props needed here. */}
-      <View style={checkoutStyles.cardWrap}>
-        <PaymentElement
-          options={{
-            layout: 'tabs',
-          }}
-        />
-      </View>
-
-      {error ? <Text style={checkoutStyles.errorText}>{error}</Text> : null}
-
-      <TouchableOpacity
-        style={[checkoutStyles.payBtn, processing && checkoutStyles.payBtnDisabled]}
-        onPress={handlePay}
-        disabled={processing}
-        activeOpacity={0.85}
-      >
-        {processing ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
-        ) : (
-          <>
-            <Ionicons name="lock-closed" size={14} color="#FFFFFF" />
-            <Text style={checkoutStyles.payBtnText}>
-              {t('subscription.payNow', { price: plan.price.toFixed(2) })}
-            </Text>
-          </>
-        )}
-      </TouchableOpacity>
-
-      <TouchableOpacity style={checkoutStyles.cancelLink} onPress={onCancel}>
-        <Text style={checkoutStyles.cancelLinkText}>{t('subscription.cancelCheckout')}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
 function NativeCheckoutPlaceholder({ onCancel }: { onCancel: () => void }) {
   const { t } = useTranslation();
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
@@ -756,7 +634,7 @@ function PaymentHistorySection({ userId }: { userId: string }) {
               <Text style={[styles.tableCell, { flex: 1.1, textAlign: 'right', color: '#16A34A', fontWeight: '600' }]}>
                 {p.amount.toFixed(2)} €
               </Text>
-              <View style={[styles.tableCell, { flex: 0.9, alignItems: 'flex-end' }]}>
+              <View style={{ flex: 0.9, alignItems: 'flex-end' }}>
                 <StatusBadge status={p.status} />
               </View>
             </View>

@@ -21,7 +21,7 @@ import {
   Alert,
   useWindowDimensions,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Flag } from '../ui/Flag';
@@ -37,36 +37,44 @@ import { langCodeToCountryCode } from '../../services/language.service';
 import type { Tour } from '../../types';
 import { buildTourSlug } from '../../lib/tour-slug';
 
-const AMBER  = '#F59E0B';
-const GREEN  = '#16A34A';
-const RED    = '#EF4444';
+const AMBER      = '#F59E0B';
+const GREEN      = '#16A34A';
+const RED        = '#EF4444';
 const DARK_AMBER = '#92400E';
 
 interface ManageTranslationsModalProps {
   visible:   boolean;
   tour:      Tour | null;
-  /** Called after a publish/unpublish action that may change tour list status */
   onChanged: () => void;
   onClose:   () => void;
 }
 
 export function ManageTranslationsModal({
-  visible,
-  tour,
-  onChanged,
-  onClose,
-}: ManageTranslationsModalProps) {
-  const { t }    = useTranslation();
-  const router   = useRouter();
-  const { width } = useWindowDimensions();
-  const isMobile  = Platform.OS !== 'web' || width < 600;
+                                          visible,
+                                          tour,
+                                          onChanged,
+                                          onClose,
+                                        }: ManageTranslationsModalProps) {
+  const { t }      = useTranslation();
+  const router     = useRouter();
+  const pathname   = usePathname();
+  const { width }  = useWindowDimensions();
+  const isMobile   = Platform.OS !== 'web' || width < 600;
 
-  const [rows, setRows]           = useState<TourTranslationInfo[]>([]);
+  /**
+   * uiLang: the language currently shown in the interface.
+   * Extracted from the first segment of the pathname, e.g. "/es/dashboard" → "es".
+   * This is the prefix we keep when navigating to the edit form so the UI
+   * language does NOT change when the guide edits a translation.
+   */
+  const uiLang = pathname.split('/').filter(Boolean)[0] ?? 'en';
+
+  const [rows, setRows]             = useState<TourTranslationInfo[]>([]);
   const [sourceLang, setSourceLang] = useState<string>('');
-  const [loading, setLoading]     = useState(false);
-  const [busyLang, setBusyLang]   = useState<string | null>(null);
-  const [busyTour, setBusyTour]   = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const [loading, setLoading]       = useState(false);
+  const [busyLang, setBusyLang]     = useState<string | null>(null);
+  const [busyTour, setBusyTour]     = useState(false);
+  const [error, setError]           = useState<string | null>(null);
 
   // ── Load translations when modal opens ────────────────────────────────────
   const refresh = useCallback(() => {
@@ -74,12 +82,12 @@ export function ManageTranslationsModal({
     setLoading(true);
     setError(null);
     listTourTranslations(tour.drupalInternalId)
-      .then((res) => {
-        setSourceLang(res.sourceLang);
-        setRows(res.translations);
-      })
-      .catch((e) => setError(e?.message ?? t('common.error')))
-      .finally(() => setLoading(false));
+        .then((res) => {
+          setSourceLang(res.sourceLang);
+          setRows(res.translations);
+        })
+        .catch((e) => setError(e?.message ?? t('common.error')))
+        .finally(() => setLoading(false));
   }, [tour?.drupalInternalId, t]);
 
   useEffect(() => {
@@ -93,12 +101,12 @@ export function ManageTranslationsModal({
       if (window.confirm(warning)) onConfirm();
     } else {
       Alert.alert(
-        t('dashboard.tours.unpublishTitle'),
-        warning,
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          { text: t('dashboard.tours.unpublishBtn'), style: 'destructive', onPress: onConfirm },
-        ],
+          t('dashboard.tours.unpublishTitle'),
+          warning,
+          [
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('dashboard.tours.unpublishBtn'), style: 'destructive', onPress: onConfirm },
+          ],
       );
     }
   };
@@ -172,170 +180,200 @@ export function ManageTranslationsModal({
   const previewUrl = (lc: string) => {
     if (!tour) return '#';
     const slug = tour.drupalInternalId
-      ? buildTourSlug({ country: tour.country?.name, city: tour.city?.name, nid: tour.drupalInternalId })
-      : tour.id;
+        ? buildTourSlug({ country: tour.country?.name, city: tour.city?.name, nid: tour.drupalInternalId })
+        : tour.id;
     return `/${lc}/tour/${slug}?preview=1`;
+  };
+
+  /**
+   * Build the edit URL for a translation row.
+   *
+   * KEY DECISION: we always keep the UI language prefix (uiLang) in the URL
+   * so the interface language does not change when the guide opens the editor.
+   * The content to load is indicated via the `contentLang` query param.
+   *
+   * When contentLang === sourceLang (or not present) create-tour.tsx loads the
+   * source-language node as before. When contentLang differs, it loads the
+   * translated version of the node fields (title, description, image) so the
+   * guide can edit the translation without affecting the source content.
+   *
+   * Examples:
+   *   UI = "es", editing source ("es") → /es/dashboard/create-tour?tourId=X
+   *   UI = "es", editing French ("fr") → /es/dashboard/create-tour?tourId=X&contentLang=fr
+   *   UI = "fr", editing source ("es") → /fr/dashboard/create-tour?tourId=X&contentLang=es
+   */
+  const editUrl = (row: TourTranslationInfo): string => {
+    const base = `/${uiLang}/dashboard/create-tour?tourId=${tour!.id}`;
+    // Always pass contentLang so create-tour knows which translation to load.
+    // For the source language we still pass it so the form can reliably detect
+    // isTranslationMode = false (contentLang === sourceLang).
+    return `${base}&contentLang=${row.langcode}`;
   };
 
   if (!tour) return null;
 
   const tourPublished = rows.length > 0
-    ? (rows.find((r) => r.langcode === sourceLang)?.published ?? tour.published)
-    : tour.published;
+      ? (rows.find((r) => r.langcode === sourceLang)?.published ?? tour.published)
+      : tour.published;
 
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
-      <Pressable style={[styles.backdrop, isMobile && styles.backdropMobile]} onPress={onClose}>
-        <Pressable style={[styles.box, isMobile && styles.boxMobile]} onPress={() => {}}>
+      <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
+        <Pressable style={[styles.backdrop, isMobile && styles.backdropMobile]} onPress={onClose}>
+          <Pressable style={[styles.box, isMobile && styles.boxMobile]} onPress={() => {}}>
 
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.iconBg}>
-              <Ionicons name="globe-outline" size={22} color={AMBER} />
+            {/* Header */}
+            <View style={styles.header}>
+              <View style={styles.iconBg}>
+                <Ionicons name="globe-outline" size={22} color={AMBER} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.title}>{t('translationsSection.title')}</Text>
+                <Text style={styles.subtitle} numberOfLines={2}>{tour.title}</Text>
+              </View>
+              <TouchableOpacity onPress={onClose} hitSlop={8}>
+                <Ionicons name="close" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.title}>{t('translationsSection.title')}</Text>
-              <Text style={styles.subtitle} numberOfLines={2}>{tour.title}</Text>
-            </View>
-            <TouchableOpacity onPress={onClose} hitSlop={8}>
-              <Ionicons name="close" size={20} color="#9CA3AF" />
-            </TouchableOpacity>
-          </View>
 
-          {/* Content */}
-          {loading ? (
-            <View style={styles.loadingBox}>
-              <ActivityIndicator size="small" color={AMBER} />
-            </View>
-          ) : (
-            <ScrollView style={isMobile ? { flex: 1 } : { maxHeight: 340 }} showsVerticalScrollIndicator={false}>
-              {rows.length === 0 ? (
-                <Text style={styles.emptyText}>{t('translationsSection.empty')}</Text>
-              ) : (
-                <View style={styles.rowList}>
-                  {rows.map((row) => {
-                    const isSource = row.langcode === sourceLang;
-                    const isBusy   = busyLang === row.langcode;
-                    return (
-                      <View key={row.langcode} style={styles.translRow}>
-                        {/* Left: flag + name + pill */}
-                        <View style={styles.translLeft}>
-                          <Flag code={langCodeToCountryCode(row.langcode)} size={20} />
-                          <Text style={styles.langName} numberOfLines={1}>{row.langName}</Text>
-                          <StatusPill status={isSource ? 'source' : row.published ? 'approved' : 'pending'} />
-                        </View>
-                        {/* Right: actions */}
-                        <View style={styles.translActions}>
-                          {/* Edit translation — opens create-tour form in edit mode for this langcode */}
-                          <TouchableOpacity
-                            style={styles.iconBtn}
-                            onPress={() => {
-                              onClose();
-                              router.push(`/${row.langcode}/dashboard/create-tour?tourId=${tour.id}` as any);
-                            }}
-                            activeOpacity={0.8}
-                          >
-                            <Ionicons name="create-outline" size={15} color="#374151" />
-                          </TouchableOpacity>
-
-                          {/* Preview (all langs incl. source) */}
-                          <TouchableOpacity
-                            style={styles.iconBtn}
-                            onPress={() => { onClose(); router.push(previewUrl(row.langcode) as any); }}
-                            activeOpacity={0.8}
-                          >
-                            <Ionicons name="eye-outline" size={15} color="#374151" />
-                          </TouchableOpacity>
-
-                          {/* Approve (non-source, unpublished) */}
-                          {!isSource && !row.published && (
-                            <TouchableOpacity
-                              style={[styles.actionBtn, styles.btnApprove, isBusy && styles.btnDisabled]}
-                              onPress={() => handleApprove(row.langcode)}
-                              disabled={isBusy}
-                              activeOpacity={0.85}
-                            >
-                              {isBusy
-                                ? <ActivityIndicator size="small" color="#FFF" />
-                                : <>
-                                    <Ionicons name="checkmark-circle-outline" size={13} color="#FFF" />
-                                    <Text style={styles.btnApproveText}>{t('translationsSection.approve')}</Text>
-                                  </>
-                              }
-                            </TouchableOpacity>
-                          )}
-
-                          {/* Unpublish (non-source, published) */}
-                          {!isSource && row.published && (
-                            <TouchableOpacity
-                              style={[styles.actionBtn, styles.btnUnpublish, isBusy && styles.btnDisabled]}
-                              onPress={() => handleUnpublishTranslation(row.langcode)}
-                              disabled={isBusy}
-                              activeOpacity={0.85}
-                            >
-                              {isBusy
-                                ? <ActivityIndicator size="small" color={DARK_AMBER} />
-                                : <>
-                                    <Ionicons name="eye-off-outline" size={13} color={DARK_AMBER} />
-                                    <Text style={styles.btnUnpublishText}>{t('translationsSection.unpublish')}</Text>
-                                  </>
-                              }
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
-                    );
-                  })}
+            {/* Content */}
+            {loading ? (
+                <View style={styles.loadingBox}>
+                  <ActivityIndicator size="small" color={AMBER} />
                 </View>
-              )}
-            </ScrollView>
-          )}
-
-          {/* Error */}
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-          {/* Tour-level publish control (separator + button) */}
-          <View style={styles.divider} />
-          <View style={styles.tourActions}>
-            {tourPublished ? (
-              <TouchableOpacity
-                style={[styles.tourBtn, styles.tourBtnUnpublish, busyTour && styles.btnDisabled]}
-                onPress={handleUnpublishTour}
-                disabled={busyTour}
-                activeOpacity={0.85}
-              >
-                {busyTour
-                  ? <ActivityIndicator size="small" color={RED} />
-                  : <>
-                      <Ionicons name="eye-off-outline" size={15} color={RED} />
-                      <Text style={styles.tourBtnUnpublishText}>{t('dashboard.tours.unpublishBtn')}</Text>
-                    </>
-                }
-              </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                style={[styles.tourBtn, styles.tourBtnRepublish, busyTour && styles.btnDisabled]}
-                onPress={handleRepublishTour}
-                disabled={busyTour}
-                activeOpacity={0.85}
-              >
-                {busyTour
-                  ? <ActivityIndicator size="small" color="#FFF" />
-                  : <>
-                      <Ionicons name="eye-outline" size={15} color="#FFF" />
-                      <Text style={styles.tourBtnRepublishText}>{t('dashboard.tours.republishBtn')}</Text>
-                    </>
-                }
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity style={styles.tourBtnClose} onPress={onClose} activeOpacity={0.8}>
-              <Text style={styles.tourBtnCloseText}>{t('common.close')}</Text>
-            </TouchableOpacity>
-          </View>
+                <ScrollView style={isMobile ? { flex: 1 } : { maxHeight: 340 }} showsVerticalScrollIndicator={false}>
+                  {rows.length === 0 ? (
+                      <Text style={styles.emptyText}>{t('translationsSection.empty')}</Text>
+                  ) : (
+                      <View style={styles.rowList}>
+                        {rows.map((row) => {
+                          const isSource = row.langcode === sourceLang;
+                          const isBusy   = busyLang === row.langcode;
+                          return (
+                              <View key={row.langcode} style={styles.translRow}>
+                                {/* Left: flag + name + pill */}
+                                <View style={styles.translLeft}>
+                                  <Flag code={langCodeToCountryCode(row.langcode)} size={20} />
+                                  <Text style={styles.langName} numberOfLines={1}>{row.langName}</Text>
+                                  <StatusPill status={isSource ? 'source' : row.published ? 'approved' : 'pending'} />
+                                </View>
+                                {/* Right: actions */}
+                                <View style={styles.translActions}>
+                                  {/*
+                           * Edit button — navigates to the create-tour form keeping
+                           * the current UI language prefix. The content language
+                           * is passed as a query param (contentLang) so the form
+                           * loads the correct translation without changing the UI.
+                           */}
+                                  <TouchableOpacity
+                                      style={styles.iconBtn}
+                                      onPress={() => {
+                                        onClose();
+                                        router.push(editUrl(row) as any);
+                                      }}
+                                      activeOpacity={0.8}
+                                  >
+                                    <Ionicons name="create-outline" size={15} color="#374151" />
+                                  </TouchableOpacity>
 
+                                  {/* Preview (all langs incl. source) */}
+                                  <TouchableOpacity
+                                      style={styles.iconBtn}
+                                      onPress={() => { onClose(); router.push(previewUrl(row.langcode) as any); }}
+                                      activeOpacity={0.8}
+                                  >
+                                    <Ionicons name="eye-outline" size={15} color="#374151" />
+                                  </TouchableOpacity>
+
+                                  {/* Approve (non-source, unpublished) */}
+                                  {!isSource && !row.published && (
+                                      <TouchableOpacity
+                                          style={[styles.actionBtn, styles.btnApprove, isBusy && styles.btnDisabled]}
+                                          onPress={() => handleApprove(row.langcode)}
+                                          disabled={isBusy}
+                                          activeOpacity={0.85}
+                                      >
+                                        {isBusy
+                                            ? <ActivityIndicator size="small" color="#FFF" />
+                                            : <>
+                                              <Ionicons name="checkmark-circle-outline" size={13} color="#FFF" />
+                                              <Text style={styles.btnApproveText}>{t('translationsSection.approve')}</Text>
+                                            </>
+                                        }
+                                      </TouchableOpacity>
+                                  )}
+
+                                  {/* Unpublish (non-source, published) */}
+                                  {!isSource && row.published && (
+                                      <TouchableOpacity
+                                          style={[styles.actionBtn, styles.btnUnpublish, isBusy && styles.btnDisabled]}
+                                          onPress={() => handleUnpublishTranslation(row.langcode)}
+                                          disabled={isBusy}
+                                          activeOpacity={0.85}
+                                      >
+                                        {isBusy
+                                            ? <ActivityIndicator size="small" color={DARK_AMBER} />
+                                            : <>
+                                              <Ionicons name="eye-off-outline" size={13} color={DARK_AMBER} />
+                                              <Text style={styles.btnUnpublishText}>{t('translationsSection.unpublish')}</Text>
+                                            </>
+                                        }
+                                      </TouchableOpacity>
+                                  )}
+                                </View>
+                              </View>
+                          );
+                        })}
+                      </View>
+                  )}
+                </ScrollView>
+            )}
+
+            {/* Error */}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            {/* Tour-level publish control */}
+            <View style={styles.divider} />
+            <View style={styles.tourActions}>
+              {tourPublished ? (
+                  <TouchableOpacity
+                      style={[styles.tourBtn, styles.tourBtnUnpublish, busyTour && styles.btnDisabled]}
+                      onPress={handleUnpublishTour}
+                      disabled={busyTour}
+                      activeOpacity={0.85}
+                  >
+                    {busyTour
+                        ? <ActivityIndicator size="small" color={RED} />
+                        : <>
+                          <Ionicons name="eye-off-outline" size={15} color={RED} />
+                          <Text style={styles.tourBtnUnpublishText}>{t('dashboard.tours.unpublishBtn')}</Text>
+                        </>
+                    }
+                  </TouchableOpacity>
+              ) : (
+                  <TouchableOpacity
+                      style={[styles.tourBtn, styles.tourBtnRepublish, busyTour && styles.btnDisabled]}
+                      onPress={handleRepublishTour}
+                      disabled={busyTour}
+                      activeOpacity={0.85}
+                  >
+                    {busyTour
+                        ? <ActivityIndicator size="small" color="#FFF" />
+                        : <>
+                          <Ionicons name="eye-outline" size={15} color="#FFF" />
+                          <Text style={styles.tourBtnRepublishText}>{t('dashboard.tours.republishBtn')}</Text>
+                        </>
+                    }
+                  </TouchableOpacity>
+              )}
+              <TouchableOpacity style={styles.tourBtnClose} onPress={onClose} activeOpacity={0.8}>
+                <Text style={styles.tourBtnCloseText}>{t('common.close')}</Text>
+              </TouchableOpacity>
+            </View>
+
+          </Pressable>
         </Pressable>
-      </Pressable>
-    </Modal>
+      </Modal>
   );
 }
 
@@ -349,9 +387,9 @@ function StatusPill({ status }: { status: 'source' | 'approved' | 'pending' }) {
     pending:  { bg: '#FEF3C7', fg: '#92400E', key: 'translationsSection.statusPending' },
   }[status];
   return (
-    <View style={[pillStyles.pill, { backgroundColor: map.bg }]}>
-      <Text style={[pillStyles.text, { color: map.fg }]}>{t(map.key)}</Text>
-    </View>
+      <View style={[pillStyles.pill, { backgroundColor: map.bg }]}>
+        <Text style={[pillStyles.text, { color: map.fg }]}>{t(map.key)}</Text>
+      </View>
   );
 }
 
@@ -379,8 +417,8 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     gap: 16,
     ...(Platform.OS === 'web'
-      ? { boxShadow: '0 8px 32px rgba(0,0,0,0.18)' } as any
-      : {
+        ? { boxShadow: '0 8px 32px rgba(0,0,0,0.18)' } as any
+        : {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 8 },
           shadowOpacity: 0.18,
@@ -397,7 +435,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0,
   },
 
-  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -434,7 +471,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
 
-  // Translation row list
   rowList: {
     gap: 10,
     paddingVertical: 4,
@@ -471,7 +507,6 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
 
-  // Buttons in rows
   iconBtn: {
     width: 30,
     height: 30,
@@ -502,7 +537,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Tour-level controls
   divider: {
     height: 1,
     backgroundColor: '#F3F4F6',

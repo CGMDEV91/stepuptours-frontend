@@ -994,5 +994,10 @@
   "translationsSection.manageBtn": "Gérer",
   "dashboard.tours.unpublishWarning": "Une fois dépublié, pour republier vous devez en faire la demande via le chat de révision des traductions.",
   "messages.threadSupport": "Assistance",
-  "translationsSection.editBtn": "Modifier"
+  "translationsSection.editBtn": "Modifier",
+  "createTour.editTitle": "Modifier le tour",
+  "createTour.editSubtitle": "Mettez à jour les informations de votre tour",
+  "createTour.translationMode.title": "Modification d'une traduction",
+  "createTour.translationMode.description": "Vous modifiez une traduction de ce tour. Seuls le titre, la description, la durée et l'image de couverture peuvent être mis à jour ici. Pour ajouter, supprimer ou réorganiser les étapes, passez à la langue d'origine ({{lang}}).",
+  "createTour.translationMode.stepsReadOnly": "lecture seule"
 }

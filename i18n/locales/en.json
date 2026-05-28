@@ -1021,5 +1021,11 @@
   "translationsSection.manageBtn": "Manage",
   "dashboard.tours.unpublishWarning": "Once unpublished, to re-publish you must request it via the Translation Reviews chat.",
   "messages.threadSupport": "Support",
-  "translationsSection.editBtn": "Edit"
+  "translationsSection.editBtn": "Edit",
+  "createTour.editTitle": "Edit Tour",
+  "createTour.editSubtitle": "Update your tour details",
+  "createTour.translationMode.title": "Editing translation",
+  "createTour.translationMode.description": "You are editing a translation of this tour. Only the title, description, duration and cover image can be updated here. To add, remove or reorder stops, switch to the original language ({{lang}}).",
+  "createTour.translationMode.stepsReadOnly": "read-only",
+  "createTour.translationMode.stepsMissing": "Some stops are not yet translated into this language and are shown in the original language. Please contact support to request a translation of the stops."
 }

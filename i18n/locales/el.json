@@ -994,5 +994,10 @@
   "translationsSection.manageBtn": "Διαχείριση",
   "dashboard.tours.unpublishWarning": "Μόλις αποσυρθεί, για να το επαναδημοσιεύσετε πρέπει να το ζητήσετε μέσω της συνομιλίας αναθεώρησης μεταφράσεων.",
   "messages.threadSupport": "Υποστήριξη",
-  "translationsSection.editBtn": "Επεξεργασία"
+  "translationsSection.editBtn": "Επεξεργασία",
+  "createTour.editTitle": "Επεξεργασία περιήγησης",
+  "createTour.editSubtitle": "Ενημερώστε τις λεπτομέρειες της περιήγησής σας",
+  "createTour.translationMode.title": "Επεξεργασία μετάφρασης",
+  "createTour.translationMode.description": "Επεξεργάζεστε μια μετάφραση αυτής της περιήγησης. Εδώ μπορείτε να ενημερώσετε μόνο τον τίτλο, την περιγραφή, τη διάρκεια και την εικόνα εξωφύλλου. Για να προσθέσετε, να αφαιρέσετε ή να αναδιατάξετε στάσεις, μεταβείτε στην αρχική γλώσσα ({{lang}}).",
+  "createTour.translationMode.stepsReadOnly": "μόνο ανάγνωση"
 }

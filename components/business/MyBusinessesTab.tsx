@@ -112,7 +112,7 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
           </View>
           {businesses.map((b) => (
             <View key={b.id} style={styles.tableRow}>
-              <View style={[styles.tableCell, { flex: 2, flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
+              <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 {b.logo ? (
                   <Image source={{ uri: b.logo }} style={styles.logoThumb} />
                 ) : (
@@ -125,12 +125,12 @@ export function MyBusinessesTab({ userId }: MyBusinessesTabProps) {
               <Text style={[styles.tableCell, { flex: 1.5, color: '#6B7280' }]} numberOfLines={1}>
                 {b.category?.name ?? '—'}
               </Text>
-              <View style={[styles.tableCell, { flex: 1 }]}>
+              <View style={{ flex: 1 }}>
                 <View style={styles.statusBadge}>
                   <Text style={styles.statusText}>{t('business.myBusinesses.statusActive')}</Text>
                 </View>
               </View>
-              <View style={[styles.tableCell, { flex: 1 }]}>
+              <View style={{ flex: 1 }}>
                 <TouchableOpacity
                   style={styles.adminBtn}
                   onPress={() => handleAdminister(b.id)}

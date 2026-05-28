@@ -25,13 +25,21 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.si
 const JSON_API_PREFIX = '/jsonapi';
 const deserializer = new Jsona();
 
+// ── Idioma por defecto del sitio Drupal ───────────────────────────────────────
+// Drupal NO añade prefijo de idioma a la URL para el idioma predeterminado del
+// sitio. Ajusta esta constante si tu sitio Drupal tiene 'es' (u otro) como
+// idioma predeterminado. Puedes sobreescribirla vía EXPO_PUBLIC_DEFAULT_LANG.
+// Consulta: Drupal admin → Configuration → Regional → Languages → Default.
+const DRUPAL_DEFAULT_LANG: string =
+    process.env.EXPO_PUBLIC_DEFAULT_LANG ?? 'en';
+
 // ── Langcode para peticiones traducidas ────────────────────────────────────
 function getInitialLangcode(): string {
   if (typeof window !== 'undefined' && window.location?.pathname) {
     const segment = window.location.pathname.split('/')[1];
     if (segment && /^[a-z]{2}(-[a-z]{2})?$/.test(segment)) return segment;
   }
-  return 'en';
+  return DRUPAL_DEFAULT_LANG;
 }
 let currentLangcode = getInitialLangcode();
 
@@ -43,8 +51,20 @@ export function getApiLanguage(): string {
   return currentLangcode;
 }
 
+/**
+ * Devuelve true si el langcode dado es el idioma predeterminado de Drupal.
+ * El idioma predeterminado NO lleva prefijo en la URL (/jsonapi en lugar de /es/jsonapi).
+ */
+function isDefaultLang(langcode: string): boolean {
+  return langcode === DRUPAL_DEFAULT_LANG;
+}
+
+/**
+ * Construye la baseURL para el cliente Axios según el langcode.
+ * El idioma predeterminado de Drupal nunca lleva prefijo.
+ */
 function buildBaseURL(langcode: string): string {
-  if (langcode && langcode !== 'en') {
+  if (langcode && !isDefaultLang(langcode)) {
     return `${BASE_URL}/${langcode}${JSON_API_PREFIX}`;
   }
   return `${BASE_URL}${JSON_API_PREFIX}`;
@@ -63,7 +83,7 @@ if (BASE_URL.includes('ngrok')) {
   });
 }
 
-const ngrokHeaders = BASE_URL.includes('ngrok') ? { 'ngrok-skip-browser-warning': '1' } : {};
+const ngrokHeaders: Record<string, string> = BASE_URL.includes('ngrok') ? { 'ngrok-skip-browser-warning': '1' } : {};
 
 /**
  * Headers to attach to expo-image `source.headers` when behind a ngrok tunnel.
@@ -110,18 +130,18 @@ async function applyAuth(config: InternalAxiosRequestConfig): Promise<InternalAx
 // ── Interceptor de request (lang-aware) ──────────────────────────────────────
 
 drupalClient.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    config.baseURL = buildBaseURL(currentLangcode);
-    return applyAuth(config);
-  },
-  (error) => Promise.reject(error)
+    async (config: InternalAxiosRequestConfig) => {
+      config.baseURL = buildBaseURL(currentLangcode);
+      return applyAuth(config);
+    },
+    (error) => Promise.reject(error)
 );
 
 // ── Interceptor de request (base, no lang prefix) ────────────────────────────
 
 drupalClientBase.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => applyAuth(config),
-  (error) => Promise.reject(error)
+    (config: InternalAxiosRequestConfig) => applyAuth(config),
+    (error) => Promise.reject(error)
 );
 
 // ── Interceptor de response ───────────────────────────────────────────────────
@@ -142,8 +162,8 @@ function normalizeError(error: any): Error {
   const status = error.response?.status;
   const drupalErrors = error.response?.data?.errors;
   const message = drupalErrors?.length
-    ? (drupalErrors[0].detail ?? drupalErrors[0].title ?? 'Unknown error')
-    : (error.message ?? 'Network error');
+      ? (drupalErrors[0].detail ?? drupalErrors[0].title ?? 'Unknown error')
+      : (error.message ?? 'Network error');
   const e = new Error(message) as Error & { status?: number };
   if (typeof status === 'number') e.status = status;
   return e;
@@ -161,15 +181,15 @@ export function buildInclude(relations: string[]): string {
 
 export function buildFields(fields: Record<string, string[]>): string {
   return Object.entries(fields)
-    .map(([type, fieldList]) => `fields[${type}]=${fieldList.join(',')}`)
-    .join('&');
+      .map(([type, fieldList]) => `fields[${type}]=${fieldList.join(',')}`)
+      .join('&');
 }
 
 export function buildFilters(filters: Record<string, any>): string {
   return Object.entries(filters)
-    .filter(([, v]) => v !== undefined && v !== null && v !== '')
-    .map(([key, value]) => `filter[${key}]=${encodeURIComponent(value)}`)
-    .join('&');
+      .filter(([, v]) => v !== undefined && v !== null && v !== '')
+      .map(([key, value]) => `filter[${key}]=${encodeURIComponent(value)}`)
+      .join('&');
 }
 
 export function buildPage(page: number, limit: number): string {
@@ -206,8 +226,8 @@ export type ImageStyleMap = Record<string, string>;
 // Devuelve la URL de la derivada de imagen pedida para un tour, con fallback al
 // original si la derivada no está disponible (p.ej. backend sin desplegar aún).
 export function pickTourImage(
-  tour: { image: string | null; imageStyles: Record<string, string> | null },
-  style: 'thumbnail' | 'medium' | 'large' | 'wide',
+    tour: { image: string | null; imageStyles: Record<string, string> | null },
+    style: 'thumbnail' | 'medium' | 'large' | 'wide',
 ): string | null {
   return tour.imageStyles?.[style] ?? tour.image;
 }
@@ -242,9 +262,9 @@ export function buildGeoFieldValue(lat: number, lon: number): object {
 // ── Métodos HTTP ──────────────────────────────────────────────────────────────
 
 export async function drupalGet<T>(
-  endpoint: string,
-  params?: string,
-  config?: AxiosRequestConfig
+    endpoint: string,
+    params?: string,
+    config?: AxiosRequestConfig
 ): Promise<T> {
   const url = params ? `${endpoint}?${params}` : endpoint;
   const response = await drupalClient.get(url, config);
@@ -252,9 +272,9 @@ export async function drupalGet<T>(
 }
 
 export async function drupalGetRaw(
-  endpoint: string,
-  params?: string,
-  config?: AxiosRequestConfig
+    endpoint: string,
+    params?: string,
+    config?: AxiosRequestConfig
 ) {
   const url = params ? `${endpoint}?${params}` : endpoint;
   const response = await drupalClient.get(url, config);
@@ -270,8 +290,8 @@ export async function drupalGetRaw(
  * Use when Jsona fails to resolve relationships (e.g. entity refs without includes).
  */
 export async function drupalGetJsonApi(
-  endpoint: string,
-  params?: string,
+    endpoint: string,
+    params?: string,
 ): Promise<any[]> {
   const url = params ? `${endpoint}?${params}` : endpoint;
   const response = await drupalClient.get(url);
@@ -284,8 +304,8 @@ export async function drupalGetJsonApi(
  * a translation exists — e.g. counting tour steps.
  */
 export async function drupalGetJsonApiBase(
-  endpoint: string,
-  params?: string,
+    endpoint: string,
+    params?: string,
 ): Promise<any[]> {
   const url = params ? `${endpoint}?${params}` : endpoint;
   const response = await drupalClientBase.get(url);
@@ -297,9 +317,39 @@ export async function drupalGetJsonApiBase(
  * { data: [], included: [], meta: {} }. Use when you need `included` resources.
  */
 export async function drupalGetJsonApiBaseRaw(
-  endpoint: string,
+    endpoint: string,
 ): Promise<{ data: any[]; included: any[]; meta?: any }> {
   const response = await drupalClientBase.get(endpoint);
+  return {
+    data:     response.data?.data     ?? [],
+    included: response.data?.included ?? [],
+    meta:     response.data?.meta,
+  };
+}
+
+/**
+ * GET a JSON:API endpoint rendered in a SPECIFIC content language, returning the
+ * raw envelope { data, included } without Jsona deserialization.
+ *
+ * Unlike the lang-aware drupalClient (which follows `currentLangcode`, i.e. the
+ * UI language), this builds the URL from the explicit `lang` argument and never
+ * mutates the UI language. The default site language carries no URL prefix:
+ *   ✅  /jsonapi/node/tour/{uuid}        ← idioma default (ej. 'en')
+ *   ✅  /es/jsonapi/node/tour/{uuid}     ← traducción al español
+ *
+ * Use this to load a node/steps in their source or translation language for the
+ * edit form while keeping the interface language untouched.
+ */
+export async function drupalGetJsonApiInLangRaw(
+    endpoint: string,
+    lang: string,
+    params?: string,
+): Promise<{ data: any[]; included: any[]; meta?: any }> {
+  const baseURL = lang && !isDefaultLang(lang)
+      ? `${BASE_URL}/${lang}${JSON_API_PREFIX}`
+      : `${BASE_URL}${JSON_API_PREFIX}`;
+  const url = params ? `${endpoint}?${params}` : endpoint;
+  const response = await drupalClientBase.get(url, { baseURL });
   return {
     data:     response.data?.data     ?? [],
     included: response.data?.included ?? [],
@@ -318,23 +368,57 @@ export async function drupalPatch<T>(endpoint: string, body: object): Promise<T>
 }
 
 /**
- * PATCH targeting the entity's original-language URL.
- * When `langcode` is provided, the request is sent with the explicit language
- * prefix so Drupal edits the correct translation. This is required for all
- * languages including 'en' — without the prefix, Drupal defaults to the site's
- * default language context (ES) and rejects a PATCH for a non-default translation.
+ * PATCH targeting the correct language URL.
+ *
+ * Drupal sólo acepta prefijo de idioma en la URL para idiomas NO predeterminados.
+ * El idioma predeterminado del sitio (DRUPAL_DEFAULT_LANG) se sirve sin prefijo:
+ *   ✅  /jsonapi/node/tour/{uuid}          ← idioma default (ej. 'en')
+ *   ✅  /es/jsonapi/node/tour/{uuid}       ← traducción al español
+ *   ❌  /en/jsonapi/node/tour/{uuid}       ← 404 si 'en' es el default
+ *
+ * Cuando `langcode` no se proporciona, se usa la baseURL sin prefijo del
+ * drupalClientBase (equivalente al idioma predeterminado).
+ *
+ * Para editar/despublicar una traducción específica, pasa el langcode
+ * de esa traducción (ej. 'es'). Para editar el nodo original en el idioma
+ * predeterminado, pasa 'en' (o déjalo sin valor).
  */
-export async function drupalPatchBase<T>(endpoint: string, body: object, langcode?: string): Promise<T> {
+export async function drupalPatchBase<T>(
+    endpoint: string,
+    body: object,
+    langcode?: string,
+): Promise<T> {
   const config: any = {};
-  if (langcode) {
+
+  if (langcode && !isDefaultLang(langcode)) {
+    // Idioma no predeterminado → añadir prefijo de idioma en la URL.
     config.baseURL = `${BASE_URL}/${langcode}${JSON_API_PREFIX}`;
   }
+  // Si no se pasa langcode, o es el idioma predeterminado, drupalClientBase ya
+  // usa BASE_URL + JSON_API_PREFIX (sin prefijo) → correcto.
+
   const response = await drupalClientBase.patch(endpoint, body, config);
   return deserializer.deserialize(response.data) as T;
 }
 
 export async function drupalDelete(endpoint: string): Promise<void> {
   await drupalClient.delete(endpoint);
+}
+
+/**
+ * DELETE targeting the correct language URL.
+ * Mismo razonamiento que drupalPatchBase: el idioma predeterminado no lleva
+ * prefijo; el resto sí. Útil para eliminar traducciones individuales.
+ */
+export async function drupalDeleteBase(
+    endpoint: string,
+    langcode?: string,
+): Promise<void> {
+  const config: any = {};
+  if (langcode && !isDefaultLang(langcode)) {
+    config.baseURL = `${BASE_URL}/${langcode}${JSON_API_PREFIX}`;
+  }
+  await drupalClientBase.delete(endpoint, config);
 }
 
 // ── File upload ───────────────────────────────────────────────────────────────
@@ -349,10 +433,10 @@ export async function drupalDelete(endpoint: string): Promise<void> {
  * @param filename Original filename with extension (e.g. 'photo.jpg')
  */
 export async function uploadDrupalFile(
-  bundle: string,
-  field: string,
-  uri: string,
-  filename: string
+    bundle: string,
+    field: string,
+    uri: string,
+    filename: string
 ): Promise<string> {
   // Fetch the file as a Blob — works on both web and native
   const fileResponse = await fetch(uri);
@@ -364,8 +448,8 @@ export async function uploadDrupalFile(
   // Build auth header from the current session
   const session = await appSession.getSession();
   const authHeader = session?.token
-    ? `${session.tokenType === 'bearer' ? 'Bearer' : 'Basic'} ${session.token}`
-    : undefined;
+      ? `${session.tokenType === 'bearer' ? 'Bearer' : 'Basic'} ${session.token}`
+      : undefined;
 
   const uploadUrl = `${BASE_URL}/jsonapi/node/${bundle}/${field}`;
 
@@ -391,38 +475,38 @@ export async function uploadDrupalFile(
 
 export function mapDrupalUser(raw: any): User {
   const roles: string[] = Array.isArray(raw.roles)
-    ? raw.roles.map((r: any) => {
-      if (typeof r === 'string') return r;
-      const fromResourceMeta = r.resourceIdObjMeta?.drupal_internal__target_id;
-      if (fromResourceMeta) return fromResourceMeta;
-      const fromMeta = r.meta?.drupal_internal__target_id ?? r.meta?.drupal_internal__id;
-      if (fromMeta) return fromMeta;
-      return r.id ?? r;
-    })
-    : (raw.relationships?.roles?.data ?? []).map(
-      (r: any) =>
-        r.meta?.drupal_internal__target_id ??
-        r.meta?.drupal_internal__id ??
-        r.id
-    );
+      ? raw.roles.map((r: any) => {
+        if (typeof r === 'string') return r;
+        const fromResourceMeta = r.resourceIdObjMeta?.drupal_internal__target_id;
+        if (fromResourceMeta) return fromResourceMeta;
+        const fromMeta = r.meta?.drupal_internal__target_id ?? r.meta?.drupal_internal__id;
+        if (fromMeta) return fromMeta;
+        return r.id ?? r;
+      })
+      : (raw.relationships?.roles?.data ?? []).map(
+          (r: any) =>
+              r.meta?.drupal_internal__target_id ??
+              r.meta?.drupal_internal__id ??
+              r.id
+      );
 
   const country = raw.field_country
-    ? {
-      id: raw.field_country.id,
-      name: raw.field_country.name ?? raw.field_country.attributes?.name ?? null,
-    }
-    : null;
+      ? {
+        id: raw.field_country.id,
+        name: raw.field_country.name ?? raw.field_country.attributes?.name ?? null,
+      }
+      : null;
 
   return {
     id: raw.id,
     username: raw.name ?? '',
     email: raw.mail ?? '',
     publicName: raw.field_public_name ?? raw.name ?? '',
-    preferredLanguage: raw.preferred_langcode ?? raw.langcode ?? 'en',
+    preferredLanguage: raw.preferred_langcode ?? raw.langcode ?? DRUPAL_DEFAULT_LANG,
     country,
     avatar: resolveImageUrl(raw.user_picture),
     experiencePoints: raw.field_experience_points ?? 0,
-    roles,
+    roles: roles as User['roles'],
     createdAt: raw.created ?? '',
   };
 }
@@ -444,8 +528,8 @@ export function mapDrupalTour(raw: any): Tour {
     city: raw.field_city ? { id: raw.field_city.id, name: raw.field_city.name } : null,
     country: raw.field_country ? { id: raw.field_country.id, name: raw.field_country.name } : null,
     location: raw.field_location
-      ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
-      : null,
+        ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
+        : null,
     featuredBusinesses: [
       raw.field_featured_business_1 ? mapDrupalBusiness(raw.field_featured_business_1) : null,
       raw.field_featured_business_2 ? mapDrupalBusiness(raw.field_featured_business_2) : null,
@@ -453,13 +537,13 @@ export function mapDrupalTour(raw: any): Tour {
     ],
     authorId: raw.uid?.id ?? raw.uid ?? '',
     authorPublicName:
-      raw.uid?.field_public_name ?? raw.uid?.display_name ?? raw.uid?.name ?? undefined,
+        raw.uid?.field_public_name ?? raw.uid?.display_name ?? raw.uid?.name ?? undefined,
     authorIsAdmin: typeof raw.author_is_admin === 'boolean'
-      ? raw.author_is_admin
-      : deriveAuthorIsAdmin(raw.uid),
+        ? raw.author_is_admin
+        : deriveAuthorIsAdmin(raw.uid),
     availableLangs: normalizeAvailableLangs(raw),
     published: raw.status ?? false,
-    langcode: raw.langcode ?? 'en',
+    langcode: raw.langcode ?? DRUPAL_DEFAULT_LANG,
   };
 }
 
@@ -471,8 +555,8 @@ function normalizeAvailableLangs(raw: any): string[] {
   let langs: string[] = [];
   if (Array.isArray(v)) {
     langs = v
-      .map((item: any) => (typeof item === 'string' ? item : item?.value))
-      .filter((x: any): x is string => typeof x === 'string' && x.length > 0);
+        .map((item: any) => (typeof item === 'string' ? item : item?.value))
+        .filter((x: any): x is string => typeof x === 'string' && x.length > 0);
   } else if (typeof v === 'string' && v.length > 0) {
     langs = [v];
   }
@@ -491,7 +575,7 @@ function deriveAuthorIsAdmin(uid: any): boolean {
   const roles: any = uid.roles;
   if (Array.isArray(roles)) {
     return roles.some((r: any) =>
-      r === 'administrator' || r?.id === 'administrator' || r?.target_id === 'administrator',
+        r === 'administrator' || r?.id === 'administrator' || r?.target_id === 'administrator',
     );
   }
   return false;
@@ -502,15 +586,15 @@ export function mapDrupalTourStep(raw: any): TourStep {
     id: raw.id,
     title: raw.title ?? '',
     description: raw.field_description?.value ?? raw.field_description ?? '',
-    contentLangcode: raw.langcode ?? 'en',
+    contentLangcode: raw.langcode ?? DRUPAL_DEFAULT_LANG,
     order: raw.field_order ?? 0,
     location: raw.field_location
-      ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
-      : null,
+        ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
+        : null,
     totalCompleted: raw.field_total_completed ?? 0,
     featuredBusiness: raw.field_featured_business
-      ? mapDrupalBusiness(raw.field_featured_business)
-      : null,
+        ? mapDrupalBusiness(raw.field_featured_business)
+        : null,
     embedSrc: raw.field_url    ?? null,
     panoid:   raw.field_panoid ?? null,
     heading:  raw.field_heading != null ? parseFloat(raw.field_heading) : null,
@@ -528,12 +612,12 @@ export function mapDrupalBusiness(raw: any): Business {
     website: raw.field_website?.uri ?? null,
     phone: raw.field_phone ?? null,
     location: raw.field_location
-      ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
-      : null,
+        ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
+        : null,
     category: raw.field_category
-      ? { id: raw.field_category.id, name: raw.field_category.name }
-      : null,
-    langcode: raw.langcode ?? 'en',
+        ? { id: raw.field_category.id, name: raw.field_category.name }
+        : null,
+    langcode: raw.langcode ?? DRUPAL_DEFAULT_LANG,
   };
 }
 
@@ -602,11 +686,11 @@ export function mapDrupalSubscriptionPayment(raw: any): SubscriptionPayment {
   };
 }
 
-function normalizeBillingCycle(raw: string | undefined | null): string {
+function normalizeBillingCycle(raw: string | undefined | null): SubscriptionPlan['billingCycle'] {
   if (!raw) return 'monthly';
   // Drupal stores the annual cycle as 'anually' (typo) — normalise to 'annual'.
   if (raw === 'anually') return 'annual';
-  return raw;
+  return raw as SubscriptionPlan['billingCycle'];
 }
 
 export function mapDrupalSubscriptionPlan(raw: any): SubscriptionPlan {
@@ -752,7 +836,11 @@ export async function createBusinessNode(data: BusinessInput): Promise<Business>
   return mapDrupalBusiness(raw);
 }
 
-export async function updateBusinessNode(id: string, data: Partial<BusinessInput>, langcode?: string): Promise<Business> {
+export async function updateBusinessNode(
+    id: string,
+    data: Partial<BusinessInput>,
+    langcode?: string,
+): Promise<Business> {
   const attributes: Record<string, any> = {};
   if (data.name !== undefined) attributes.title = data.name;
   if (data.description !== undefined) {
@@ -766,23 +854,23 @@ export async function updateBusinessNode(id: string, data: Partial<BusinessInput
   // both are undefined (means the user cleared the fields — send null to Drupal).
   if ('lat' in data || 'lon' in data) {
     const hasCoords =
-      data.lat !== undefined &&
-      data.lon !== undefined &&
-      !isNaN(data.lat) &&
-      !isNaN(data.lon);
+        data.lat !== undefined &&
+        data.lon !== undefined &&
+        !isNaN(data.lat) &&
+        !isNaN(data.lon);
     attributes.field_location = hasCoords ? buildGeoFieldValue(data.lat!, data.lon!) : null;
   }
 
   const relationships: Record<string, any> = {};
   if (data.categoryId !== undefined) {
     relationships.field_category = data.categoryId
-      ? { data: { type: 'taxonomy_term--business_category', id: data.categoryId } }
-      : { data: null };
+        ? { data: { type: 'taxonomy_term--business_category', id: data.categoryId } }
+        : { data: null };
   }
   if (data.logoId !== undefined) {
     relationships.field_logo = data.logoId
-      ? { data: { type: 'file--file', id: data.logoId } }
-      : { data: null };
+        ? { data: { type: 'file--file', id: data.logoId } }
+        : { data: null };
   }
 
   // Always edit the original-language node — pass the entity's langcode so the
@@ -817,7 +905,7 @@ export function mapDrupalProfessionalProfile(raw: any): ProfessionalProfile {
     fullName: raw.field_full_name ?? '',
     taxId: raw.field_tax_id ?? '',
     address: addr
-      ? {
+        ? {
           addressLine1: addr.address_line1 ?? '',
           addressLine2: addr.address_line2 ?? '',
           locality: addr.locality ?? '',
@@ -825,7 +913,7 @@ export function mapDrupalProfessionalProfile(raw: any): ProfessionalProfile {
           countryCode: addr.country_code ?? '',
           administrativeArea: addr.administrative_area ?? '',
         }
-      : null,
+        : null,
     accountHolder: raw.field_account_holder ?? '',
     iban: raw.field_bank_iban ?? '',
     bic: raw.field_bank_bic ?? '',

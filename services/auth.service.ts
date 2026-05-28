@@ -146,7 +146,7 @@ export async function restoreSession(): Promise<AuthSession | null> {
       ...session,
       user: {
         ...freshUser,
-        roles: freshRoles,
+        roles: freshRoles as AuthSession['user']['roles'],
       },
     };
 
