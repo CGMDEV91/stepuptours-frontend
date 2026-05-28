@@ -13,7 +13,6 @@
 
 import axios from 'axios';
 import { drupalGetJsonApiBaseRaw, drupalPost, drupalPatch } from '../lib/drupal-client';
-import { useLanguageStore } from '../stores/language.store';
 import { useAuthStore } from '../stores/auth.store';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -40,6 +39,38 @@ export interface TourComment {
   createdAt: string;       // ISO 8601
   resolved: boolean;
   readByAuthor: boolean;
+  /** Optional i18n message key for backend-automated messages.
+   *  When present, the frontend should render `t(messageKey, messageParams)`
+   *  instead of `body`. Falls back to body for human-written messages. */
+  messageKey?: string | null;
+  messageParams?: Record<string, any> | null;
+}
+
+/** Extracts the i18n key + params from a JSON:API attributes object. */
+function extractI18nMessage(attrs: any): { key: string | null; params: Record<string, any> | null } {
+  // field_msg_key may come as a flat string or an array of { value }.
+  const keyRaw = attrs?.field_msg_key;
+  const key: string | null = typeof keyRaw === 'string' && keyRaw.length > 0
+    ? keyRaw
+    : (Array.isArray(keyRaw) && keyRaw[0]?.value) ? String(keyRaw[0].value) : null;
+
+  // field_msg_params is text_long → { value, format } or a plain string.
+  const paramsRaw = attrs?.field_msg_params;
+  let paramsStr: string | null = null;
+  if (typeof paramsRaw === 'string') {
+    paramsStr = paramsRaw;
+  } else if (paramsRaw?.value) {
+    paramsStr = String(paramsRaw.value);
+  } else if (Array.isArray(paramsRaw) && paramsRaw[0]?.value) {
+    paramsStr = String(paramsRaw[0].value);
+  }
+
+  let params: Record<string, any> | null = null;
+  if (paramsStr) {
+    try { params = JSON.parse(paramsStr); } catch { params = null; }
+  }
+
+  return { key, params };
 }
 
 // ── Mapping ────────────────────────────────────────────────────────────────────
@@ -59,6 +90,8 @@ function mapComment(raw: any, included: any[], threadType: ThreadType): TourComm
     attrs.name ??
     'Unknown';
 
+  const { key: messageKey, params: messageParams } = extractI18nMessage(attrs);
+
   return {
     id:               raw.id,
     tourId:           rels.entity_id?.data?.id ?? '',
@@ -69,6 +102,8 @@ function mapComment(raw: any, included: any[], threadType: ThreadType): TourComm
     createdAt:        attrs.created ?? '',
     resolved:         attrs.field_resolved ?? false,
     readByAuthor:     attrs.field_read_by_author ?? false,
+    messageKey,
+    messageParams,
   };
 }
 
@@ -109,15 +144,19 @@ export async function postTourComment(
   body: string,
 ): Promise<TourComment> {
   const fieldName = THREAD_FIELD[threadType];
-  // currentLanguage is a Language object ({ id, name, ... }); JSON:API expects
-  // the langcode as a plain string, so take its `id`.
-  const langcode  = useLanguageStore.getState().currentLanguage?.id ?? 'en';
 
   // NOTE: do NOT include a `comment_type` relationship — the bundle is already
   // conveyed by `type: comment--{threadType}`. Passing it with the machine name
   // as `id` makes JSON:API look up a comment_type resource by that UUID and
   // fail ("resource ... could not be found"). `entity_type` must be set so
   // Drupal knows the commented entity is a node.
+  //
+  // We DO NOT send `langcode` either — drupalClient already targets
+  // /<currentLangcode>/jsonapi/ so Drupal derives it from the URL prefix.
+  // Sending it from the frontend invited a class of bug where the full
+  // Language object ({id,name,direction,isDefault}) leaked into the payload
+  // and Drupal rejected it with "properties … do not exist on the langcode
+  // field of type language".
   const payload = {
     data: {
       type: `comment--${threadType}`,
@@ -126,7 +165,6 @@ export async function postTourComment(
         comment_body: { value: body, format: 'plain_text' },
         field_name:   fieldName,
         entity_type:  'node',
-        langcode,
       },
       relationships: {
         entity_id: {
@@ -136,8 +174,26 @@ export async function postTourComment(
     },
   };
 
+  // `drupalPost` deserialises with Jsona, so the result is a *flat* object
+  // (no `.data` / `.attributes` envelope) — different from `getTourComments`
+  // which uses `drupalGetJsonApiBaseRaw` and gets the raw JSON:API shape.
+  // Map the flat resource directly here.
   const raw: any = await drupalPost(`/comment/${threadType}`, payload);
-  return mapComment(raw.data, [], threadType);
+
+  return {
+    id:               raw?.id ?? '',
+    tourId:           raw?.entity_id?.id ?? tourUuid,
+    threadType,
+    body:             raw?.comment_body?.value ?? body,
+    authorId:         raw?.uid?.id ?? '',
+    authorPublicName: raw?.uid?.display_name ?? raw?.uid?.name ?? raw?.name ?? '',
+    createdAt:        raw?.created ?? new Date().toISOString(),
+    resolved:         raw?.field_resolved ?? false,
+    readByAuthor:     raw?.field_read_by_author ?? false,
+    // Human-posted comments never carry an auto i18n key.
+    messageKey:       null,
+    messageParams:    null,
+  };
 }
 
 /**
@@ -164,6 +220,55 @@ export async function resolveComment(commentId: string, threadType: ThreadType):
       attributes: { field_resolved: true },
     },
   });
+}
+
+// ── Unread counters per thread for a given tour ──────────────────────────────
+
+/**
+ * Returns `{ tour_review: N, tour_translation_request: N, tour_translation_review: N }`
+ * — the number of unread comments addressed to the guide (i.e. not authored by
+ * the guide themself) for each of the 3 threads of one specific tour.
+ */
+export async function getUnreadCountByThread(
+  guideUserId: string,
+  tourUuid: string,
+): Promise<Record<ThreadType, number>> {
+  const threadTypes: ThreadType[] = [
+    'tour_review',
+    'tour_translation_request',
+    'tour_translation_review',
+  ];
+  const out: Record<ThreadType, number> = {
+    tour_review:              0,
+    tour_translation_request: 0,
+    tour_translation_review:  0,
+  };
+
+  await Promise.all(
+    threadTypes.map(async (threadType) => {
+      try {
+        const params = new URLSearchParams({
+          'filter[entity_id.id]':         tourUuid,
+          'filter[field_read_by_author]': '0',
+          'include':                      'uid',
+          'page[limit]':                  '100',
+        });
+        const response = await drupalGetJsonApiBaseRaw(`/comment/${threadType}?${params}`);
+        const items: any[]    = response.data ?? [];
+        const included: any[] = response.included ?? [];
+        items.forEach((item: any) => {
+          const c = mapComment(item, included, threadType);
+          if (c.authorId !== guideUserId) {
+            out[threadType] += 1;
+          }
+        });
+      } catch {
+        /* silent */
+      }
+    }),
+  );
+
+  return out;
 }
 
 // ── Admin inbox ───────────────────────────────────────────────────────────────

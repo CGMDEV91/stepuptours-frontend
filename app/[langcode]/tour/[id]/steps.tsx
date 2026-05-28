@@ -25,6 +25,7 @@ import { getUserById } from '../../../../services/user.service';
 import type { User } from '../../../../types';
 import { StepTimeline } from '../../../../components/tour/StepTimeline';
 import { CompletionPopup } from '../../../../components/tour/CompletionPopup';
+import { PreviewBanner } from '../../../../components/tour/PreviewBanner';
 import { TourOnboardingModal, ONBOARDING_STORAGE_KEY } from '../../../../components/tour/TourOnboardingModal';
 import { AnonInfoModal } from '../../../../components/tour/AnonInfoModal';
 import { getAnonProgress, setAnonProgress, clearAnonProgress, getAnonInfoDismissed } from '../../../../lib/anon-progress';
@@ -275,12 +276,13 @@ export default function TourStepsScreen() {
 
   return (
     <View style={styles.screen}>
-      {/* Preview mode banner */}
+      {/* Preview mode banner + owner CTAs for translation approval */}
       {isPreview && (
-        <View style={styles.previewBanner}>
-          <Ionicons name="eye-outline" size={14} color="#92400E" />
-          <Text style={styles.previewBannerText}>{t('preview.bannerText')}</Text>
-        </View>
+        <PreviewBanner
+          tour={tour}
+          langcode={langcode ?? 'en'}
+          isOwner={!!user && tour.authorId === user.id}
+        />
       )}
       {/* Header — full-width bar with absolute back button (matches PageBanner pattern) */}
       <View style={styles.headerOuter}>

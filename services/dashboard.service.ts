@@ -585,3 +585,69 @@ export async function getToursQuota(): Promise<ToursQuota> {
   );
   return data;
 }
+
+// ── Guide-side translation & tour publishing controls ────────────────────────
+
+export interface TourTranslationInfo {
+  langcode:  string;
+  langName:  string;
+  title:     string;
+  published: boolean;
+}
+
+export interface TranslationsListResponse {
+  /** Canonical source language of the tour node (e.g. "es").
+   *  Use this — not tour.langcode — to identify the "Original" row,
+   *  because tour.langcode reflects the active UI language prefix. */
+  sourceLang:   string;
+  translations: TourTranslationInfo[];
+}
+
+/** GET /api/me/tour/{nid}/translations */
+export async function listTourTranslations(nid: number): Promise<TranslationsListResponse> {
+  const { data } = await axios.get<TranslationsListResponse>(
+    `${DRUPAL_BASE}/api/me/tour/${nid}/translations`,
+    { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+  // Backward-compat: if server returns old flat array, wrap it
+  if (Array.isArray(data)) {
+    return { sourceLang: 'en', translations: data as unknown as TourTranslationInfo[] };
+  }
+  return data;
+}
+
+/** POST /api/me/tour/{nid}/translation/{langcode}/approve — guide approves. */
+export async function approveTranslation(nid: number, langcode: string): Promise<void> {
+  await axios.post(
+    `${DRUPAL_BASE}/api/me/tour/${nid}/translation/${langcode}/approve`,
+    {},
+    { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/** POST /api/me/tour/{nid}/translation/{langcode}/unpublish */
+export async function unpublishTranslation(nid: number, langcode: string): Promise<void> {
+  await axios.post(
+    `${DRUPAL_BASE}/api/me/tour/${nid}/translation/${langcode}/unpublish`,
+    {},
+    { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/** POST /api/me/tour/{nid}/unpublish — guide unpublishes the whole tour. */
+export async function unpublishTour(nid: number): Promise<void> {
+  await axios.post(
+    `${DRUPAL_BASE}/api/me/tour/${nid}/unpublish`,
+    {},
+    { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/** POST /api/me/tour/{nid}/republish — guide republishes the source-language tour. */
+export async function republishTour(nid: number): Promise<void> {
+  await axios.post(
+    `${DRUPAL_BASE}/api/me/tour/${nid}/republish`,
+    {},
+    { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}

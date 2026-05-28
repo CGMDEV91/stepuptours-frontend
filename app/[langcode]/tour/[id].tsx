@@ -20,6 +20,7 @@ import { useToursStore } from '../../../stores/tours.store';
 import { useAuthStore } from '../../../stores/auth.store';
 import { StarRating } from '../../../components/tour/StarRating';
 import { BusinessCard } from '../../../components/tour/BusinessCard';
+import { PreviewBanner } from '../../../components/tour/PreviewBanner';
 import { HtmlText } from '../../../components/ui/HtmlText';
 import BackButton from '../../../components/layout/BackButton';
 import Footer from '../../../components/layout/Footer';
@@ -323,12 +324,13 @@ export default function TourDetailScreen() {
     <>
     <TourHead tour={tour} langcode={langcode ?? 'en'} langs={activeLangs} />
     <View style={styles.screen}>
-      {/* Preview mode banner */}
+      {/* Preview mode banner + owner CTAs for translation approval */}
       {isPreview && (
-        <View style={styles.previewBanner}>
-          <Ionicons name="eye-outline" size={16} color="#92400E" />
-          <Text style={styles.previewBannerText}>{t('preview.bannerText')}</Text>
-        </View>
+        <PreviewBanner
+          tour={tour}
+          langcode={langcode ?? 'en'}
+          isOwner={!!user && tour.authorId === user.id}
+        />
       )}
       {/* Untranslated content banner */}
       {tour.isUntranslated && !isPreview && (

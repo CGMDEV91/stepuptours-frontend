@@ -20,10 +20,16 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { getToursByAuthor, deleteTour, getToursQuota, type ToursQuota } from '../../services/dashboard.service';
+import {
+  getToursByAuthor,
+  deleteTour,
+  getToursQuota,
+  type ToursQuota,
+} from '../../services/dashboard.service';
 import { getUnreadCountByTour } from '../../services/comments.service';
 import { TourCard } from '../tour/TourCard';
 import { RequestTranslationsModal } from './RequestTranslationsModal';
+import { ManageTranslationsModal } from './ManageTranslationsModal';
 import { useAuthStore } from '../../stores/auth.store';
 import type { Tour } from '../../types';
 
@@ -177,6 +183,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
   const [unreadByTour, setUnreadByTour] = useState<Record<string, number>>({});
   const [translModal, setTranslModal] = useState<Tour | null>(null);
+  const [manageTranslModal, setManageTranslModal] = useState<Tour | null>(null);
   const [quota, setQuota] = useState<ToursQuota | null>(null);
   const user = useAuthStore((s) => s.user);
 
@@ -396,7 +403,18 @@ export function MyToursTab({ userId }: MyToursTabProps) {
                       <Text style={styles.actionBtnText}>{t('translations.requestBtn')}</Text>
                     </TouchableOpacity>
                   )}
+
+                  {/* Manage translations (approve / unpublish / tour publish controls) */}
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => setManageTranslModal(item)}
+                    activeOpacity={0.85}
+                  >
+                    <Ionicons name="settings-outline" size={13} color="#6B7280" />
+                    <Text style={styles.actionBtnText}>{t('translationsSection.manageBtn')}</Text>
+                  </TouchableOpacity>
                 </View>
+
                 {deletingId === item.id ? (
                   <View style={[StyleSheet.absoluteFill, styles.deletingOverlay]}>
                     <ActivityIndicator size="small" color={AMBER} />
@@ -425,6 +443,14 @@ export function MyToursTab({ userId }: MyToursTabProps) {
           onClose={() => setTranslModal(null)}
         />
       )}
+
+      {/* Manage translations modal */}
+      <ManageTranslationsModal
+        visible={manageTranslModal !== null}
+        tour={manageTranslModal}
+        onChanged={loadTours}
+        onClose={() => setManageTranslModal(null)}
+      />
     </>
   );
 }
@@ -616,6 +642,14 @@ const styles = StyleSheet.create({
   },
   actionBtnTextUnread: {
     color: '#D97706',
+  },
+  actionBtnDanger: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  actionBtnTextDanger: {
+    color: '#B91C1C',
   },
   unreadBadge: {
     backgroundColor: '#EF4444',

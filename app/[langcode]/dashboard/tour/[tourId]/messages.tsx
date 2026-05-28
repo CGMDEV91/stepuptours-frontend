@@ -24,6 +24,7 @@ import {
   getTourComments,
   postTourComment,
   markCommentRead,
+  getUnreadCountByThread,
   type TourComment,
   type ThreadType,
 } from '../../../../../services/comments.service';
@@ -44,9 +45,17 @@ const THREADS: { id: ThreadType; labelKey: string; icon: string }[] = [
 // ── Bubble component ──────────────────────────────────────────────────────────
 
 function Bubble({ comment, isOwn }: { comment: TourComment; isOwn: boolean }) {
+  const { t } = useTranslation();
   const date = comment.createdAt
     ? new Date(comment.createdAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
     : '';
+
+  // Backend-automated messages ship an i18n key + JSON params (the message
+  // text is NOT pre-translated on the server). Human-typed comments leave
+  // messageKey null and we render comment.body verbatim.
+  const text = comment.messageKey
+    ? t(comment.messageKey, comment.messageParams ?? {})
+    : comment.body;
 
   return (
     <View style={[styles.bubble, isOwn ? styles.bubbleOwn : styles.bubbleOther]}>
@@ -54,7 +63,7 @@ function Bubble({ comment, isOwn }: { comment: TourComment; isOwn: boolean }) {
         <Text style={styles.bubbleAuthor}>{comment.authorPublicName}</Text>
       )}
       <Text style={[styles.bubbleText, isOwn && styles.bubbleTextOwn]}>
-        {comment.body}
+        {text}
       </Text>
       <Text style={[styles.bubbleTime, isOwn && styles.bubbleTimeOwn]}>{date}</Text>
     </View>
@@ -71,9 +80,12 @@ interface ThreadTabProps {
   /** True when the viewer is the guide (tour owner). Admins should not flip
    *  field_read_by_author since that field tracks the guide's read state. */
   shouldMarkRead: boolean;
+  /** Called by ThreadTab after it auto-marks unread comments as read so the
+   *  parent can refresh per-thread badge counters. */
+  onMessagesRead?: () => void;
 }
 
-function ThreadTab({ tourUuid, tourNid, threadType, currentUserId, shouldMarkRead }: ThreadTabProps) {
+function ThreadTab({ tourUuid, tourNid, threadType, currentUserId, shouldMarkRead, onMessagesRead }: ThreadTabProps) {
   const { t } = useTranslation();
   const [comments, setComments]     = useState<TourComment[]>([]);
   const [loading, setLoading]       = useState(true);
@@ -92,14 +104,17 @@ function ThreadTab({ tourUuid, tourNid, threadType, currentUserId, shouldMarkRea
         const unread = data.filter(
           (c) => !c.readByAuthor && c.authorId !== currentUserId,
         );
-        await Promise.all(unread.map((c) => markCommentRead(c.id, threadType).catch(() => {})));
+        if (unread.length > 0) {
+          await Promise.all(unread.map((c) => markCommentRead(c.id, threadType).catch(() => {})));
+          onMessagesRead?.();
+        }
       }
     } catch {
       // keep empty
     } finally {
       setLoading(false);
     }
-  }, [tourUuid, threadType, currentUserId, shouldMarkRead]);
+  }, [tourUuid, threadType, currentUserId, shouldMarkRead, onMessagesRead]);
 
   useEffect(() => { loadComments(); }, [loadComments]);
 
@@ -201,6 +216,11 @@ export default function TourMessagesScreen() {
   const [tour, setTour]         = useState<Tour | null>(null);
   const [tourLoading, setTourLoading] = useState(true);
   const [activeThread, setActiveThread] = useState<ThreadType>('tour_review');
+  const [unreadByThread, setUnreadByThread] = useState<Record<ThreadType, number>>({
+    tour_review:              0,
+    tour_translation_request: 0,
+    tour_translation_review:  0,
+  });
 
   // Load tour to get UUID and verify ownership.
   useEffect(() => {
@@ -220,6 +240,26 @@ export default function TourMessagesScreen() {
       router.replace(`/${langcode}` as any);
     }
   }, [isAuthLoading, tourLoading, user, tour, isAdmin, langcode]);
+
+  // Fetch unread counts per thread (guides only — admin shouldn't see badges
+  // for the guide's read state).
+  const refreshUnread = useCallback(() => {
+    if (!user || !tour || isAdmin) return;
+    getUnreadCountByThread(user.id, tour.id)
+      .then(setUnreadByThread)
+      .catch(() => {});
+  }, [user, tour, isAdmin]);
+
+  useEffect(() => { refreshUnread(); }, [refreshUnread]);
+
+  // When the guide opens a thread, mark its badge as 0 optimistically. The
+  // real markCommentRead calls happen inside ThreadTab.loadComments.
+  const handleSelectThread = useCallback((th: ThreadType) => {
+    setActiveThread(th);
+    if (!isAdmin) {
+      setUnreadByThread((prev) => ({ ...prev, [th]: 0 }));
+    }
+  }, [isAdmin]);
 
   if (isAuthLoading || tourLoading) {
     return (
@@ -251,17 +291,23 @@ export default function TourMessagesScreen() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBarContent}>
               {THREADS.map((th) => {
                 const isActive = th.id === activeThread;
+                const unread   = unreadByThread[th.id] ?? 0;
                 return (
                   <TouchableOpacity
                     key={th.id}
                     style={[styles.tabPill, isActive && styles.tabPillActive]}
-                    onPress={() => setActiveThread(th.id)}
+                    onPress={() => handleSelectThread(th.id)}
                     activeOpacity={0.8}
                   >
                     <Ionicons name={th.icon as any} size={14} color={isActive ? '#FFFFFF' : '#6B7280'} />
                     <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
                       {t(th.labelKey)}
                     </Text>
+                    {unread > 0 && (
+                      <View style={styles.unreadBadge}>
+                        <Text style={styles.unreadBadgeText}>{unread > 9 ? '9+' : unread}</Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -280,6 +326,7 @@ export default function TourMessagesScreen() {
               threadType={activeThread}
               currentUserId={user.id}
               shouldMarkRead={isOwner && !isAdmin}
+              onMessagesRead={refreshUnread}
             />
           </View>
         </View>
@@ -318,10 +365,33 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 20,
     backgroundColor: '#F3F4F6',
+    position: 'relative',
   },
   tabPillActive: { backgroundColor: AMBER },
   tabLabel: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
   tabLabelActive: { color: '#FFFFFF' },
+
+  // Unread badge sitting on top-right of the pill
+  unreadBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 5,
+    borderRadius: 9,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  unreadBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
+    lineHeight: 12,
+  },
 
   // Layout
   contentMobile: { flex: 1, paddingHorizontal: 0 },
@@ -332,12 +402,18 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 
-  // Thread
-  threadContainer: { flex: 1, minHeight: 400 },
+  // Thread — WhatsApp-style light background.
+  threadContainer: {
+    flex: 1,
+    minHeight: 480,
+    backgroundColor: '#ECE5DD', // WhatsApp default light wallpaper colour
+  },
   messageList: { flex: 1 },
   messageListContent: {
-    padding: 16,
-    gap: 12,
+    paddingHorizontal: 18,
+    paddingTop: 24,
+    paddingBottom: 24,
+    gap: 14,
     flexGrow: 1,
   },
 
@@ -355,29 +431,37 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Bubbles
+  // Bubbles (WhatsApp visual language)
   bubble: {
     maxWidth: '78%',
-    borderRadius: 14,
-    padding: 12,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     gap: 4,
+    ...(Platform.OS === 'web'
+      ? { boxShadow: '0 1px 1px rgba(0,0,0,0.08)' } as any
+      : {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.08,
+          shadowRadius: 1,
+          elevation: 1,
+        }),
   },
   bubbleOwn: {
     alignSelf: 'flex-end',
-    backgroundColor: AMBER,
-    borderBottomRightRadius: 4,
+    backgroundColor: '#DCF8C6', // WhatsApp's outgoing bubble green
+    borderBottomRightRadius: 2,
   },
   bubbleOther: {
     alignSelf: 'flex-start',
     backgroundColor: '#FFFFFF',
-    borderBottomLeftRadius: 4,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderBottomLeftRadius: 2,
   },
   bubbleAuthor: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#6B7280',
+    color: '#0F766E',
     marginBottom: 2,
   },
   bubbleText: {
@@ -385,13 +469,13 @@ const styles = StyleSheet.create({
     color: '#111827',
     lineHeight: 20,
   },
-  bubbleTextOwn: { color: '#FFFFFF' },
+  bubbleTextOwn: { color: '#111827' },
   bubbleTime: {
     fontSize: 10,
-    color: '#9CA3AF',
+    color: '#6B7280',
     alignSelf: 'flex-end',
   },
-  bubbleTimeOwn: { color: 'rgba(255,255,255,0.75)' },
+  bubbleTimeOwn: { color: '#65676B' },
 
   // Input
   inputRow: {

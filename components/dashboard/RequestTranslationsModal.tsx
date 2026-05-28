@@ -68,14 +68,24 @@ export function RequestTranslationsModal({
     setSending(true);
     setError(null);
 
-    const langList = targets
-      .map((c) => `${c.toUpperCase()}`)
-      .join(', ');
+    // Map language codes to human-readable names from the chip list itself
+    // (e.g. ["es","fr"] → ["Español","Français"]). Fall back to UPPERCASE code
+    // if the code isn't in the catalogue.
+    const labelFor = (code: string) =>
+      TARGET_LANGUAGES.find((l) => l.code === code)?.label ?? code.toUpperCase();
 
-    const body =
-      `Guide ${guidePublicName} requests translations for tour "${tour.title}" ` +
-      `(nid ${tour.drupalInternalId}) into: ${langList}. ` +
-      `Please process within 24–48 hours.`;
+    const langNames = targets.map(labelFor).join(', ');
+    const langCodes = targets.map((c) => c.toUpperCase()).join(', ');
+
+    // i18n key `translations.requestBody` MUST exist with placeholders
+    // {{guide}}, {{title}}, {{nid}}, {{langs}}, {{codes}}.
+    const body = t('translations.requestBody', {
+      guide: guidePublicName,
+      title: tour.title,
+      nid:   tour.drupalInternalId,
+      langs: langNames,
+      codes: langCodes,
+    });
 
     try {
       await postTourComment(tour.id, tour.drupalInternalId, 'tour_translation_request', body);
