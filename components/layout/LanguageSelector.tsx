@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguageStore } from '../../stores/language.store';
 import { langCodeToCountryCode } from '../../services/language.service';
 import type { Language } from '../../services/language.service';
-import CountryFlag from 'react-native-country-flag';
+import { Flag } from '../ui/Flag';
 
 const FALLBACK_LANGUAGE: Language = {
   id: 'es',
@@ -56,7 +56,7 @@ export function LanguageSelector({ variant = 'chip' }: LanguageSelectorProps) {
           activeOpacity={0.8}
           style={styles.fieldTrigger}
         >
-          <CountryFlag isoCode={langCodeToCountryCode(active.id)} size={20} />
+          <Flag code={langCodeToCountryCode(active.id)} size={20} />
           <Text style={styles.fieldLabel}>{active.name}</Text>
           <Ionicons name="chevron-down" size={18} color="#6B7280" />
         </TouchableOpacity>
@@ -66,7 +66,7 @@ export function LanguageSelector({ variant = 'chip' }: LanguageSelectorProps) {
           activeOpacity={0.8}
           style={styles.trigger}
         >
-          <CountryFlag isoCode={langCodeToCountryCode(active.id)} size={12} />
+          <Flag code={langCodeToCountryCode(active.id)} size={12} />
           {!isMobile && (
             <Text style={styles.triggerLabel}>{active.name}</Text>
           )}
@@ -99,7 +99,7 @@ export function LanguageSelector({ variant = 'chip' }: LanguageSelectorProps) {
                   activeOpacity={0.7}
                   style={[styles.option, active.id === item.id && styles.optionActive]}
                 >
-                  <CountryFlag isoCode={langCodeToCountryCode(item.id)} size={18} />
+                  <Flag code={langCodeToCountryCode(item.id)} size={18} />
                   <Text style={[styles.optionText, active.id === item.id && styles.optionTextActive]}>
                     {item.name}
                   </Text>
@@ -131,7 +131,7 @@ export function LanguageSelector({ variant = 'chip' }: LanguageSelectorProps) {
                     activeOpacity={0.7}
                     style={[styles.option, active.id === item.id && styles.optionActive]}
                   >
-                    <CountryFlag isoCode={langCodeToCountryCode(item.id)} size={12} />
+                    <Flag code={langCodeToCountryCode(item.id)} size={12} />
                     <Text style={[styles.optionText, active.id === item.id && styles.optionTextActive]}>
                       {item.name}
                     </Text>

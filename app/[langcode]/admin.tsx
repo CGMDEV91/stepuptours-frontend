@@ -21,6 +21,7 @@ import { TranslationsTab } from '../../components/admin/TranslationsTab';
 import { LegalTab } from '../../components/admin/LegalTab';
 import { AnalyticsTab } from '../../components/admin/AnalyticsTab';
 import { FeedbackTab } from '../../components/admin/FeedbackTab';
+import { MessagesTab } from '../../components/admin/MessagesTab';
 import { DonationsView } from '../../components/shared/DonationsView';
 import { BusinessTab } from '../../components/dashboard/BusinessTab';
 import PageBanner from '../../components/layout/PageBanner';
@@ -29,7 +30,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'legal' | 'analytics' | 'feedback';
+type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'legal' | 'analytics' | 'feedback' | 'messages';
 
 interface Tab {
   id: TabId;
@@ -39,6 +40,7 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'settings',     labelKey: 'admin.tabs.settings',     icon: 'settings-outline' },
+  { id: 'messages',     labelKey: 'admin.tabs.messages',     icon: 'mail-outline' },
   { id: 'translations', labelKey: 'admin.tabs.translations', icon: 'language-outline' },
   { id: 'legal',        labelKey: 'admin.tabs.legal',        icon: 'document-text-outline' },
   { id: 'businesses',   labelKey: 'admin.tabs.businesses',   icon: 'business-outline' },
@@ -47,7 +49,7 @@ const TABS: Tab[] = [
   { id: 'feedback',     labelKey: 'admin.tabs.feedback',     icon: 'chatbubbles-outline' },
 ];
 
-const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics', 'feedback'];
+const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics', 'feedback', 'messages'];
 function isValidAdminTab(value: string): value is TabId {
   return VALID_ADMIN_TABS.includes(value as TabId);
 }
@@ -192,6 +194,8 @@ export default function AdminScreen() {
         return <AnalyticsTab />;
       case 'feedback':
         return <FeedbackTab />;
+      case 'messages':
+        return <MessagesTab />;
     }
   };
 

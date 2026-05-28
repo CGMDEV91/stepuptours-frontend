@@ -330,6 +330,13 @@ export default function TourDetailScreen() {
           <Text style={styles.previewBannerText}>{t('preview.bannerText')}</Text>
         </View>
       )}
+      {/* Untranslated content banner */}
+      {tour.isUntranslated && !isPreview && (
+        <View style={styles.untranslatedBanner}>
+          <Ionicons name="information-circle-outline" size={16} color="#1E40AF" />
+          <Text style={styles.untranslatedBannerText}>{t('tours.untranslatedNotice')}</Text>
+        </View>
+      )}
       <PageScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -518,6 +525,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: '#92400E',
+  },
+  untranslatedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#DBEAFE',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#BFDBFE',
+  },
+  untranslatedBannerText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1E40AF',
   },
   scrollView: {
     flex: 1,

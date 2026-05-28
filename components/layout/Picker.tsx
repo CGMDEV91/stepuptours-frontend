@@ -12,12 +12,15 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Flag } from '../ui/Flag';
 
 const AMBER_DARK = '#D97706';
 
 export interface PickerItem {
   id: string;
   label: string;
+  /** Optional ISO country code to render a leading flag (e.g. language items). */
+  flagCode?: string;
 }
 
 export interface PickerProps {
@@ -91,9 +94,12 @@ export function Picker({ visible, title, items, selectedId, onSelect, onClose, i
           onPress={() => { onSelect(item.id, item.label); onClose(); }}
           activeOpacity={0.7}
         >
-          <Text style={[styles.pickerItemText, item.id === selectedId && styles.pickerItemTextSelected]}>
-            {item.label}
-          </Text>
+          <View style={styles.pickerItemLeft}>
+            {item.flagCode ? <Flag code={item.flagCode} size={16} /> : null}
+            <Text style={[styles.pickerItemText, item.id === selectedId && styles.pickerItemTextSelected]}>
+              {item.label}
+            </Text>
+          </View>
           {item.id === selectedId && <Ionicons name="checkmark" size={18} color={AMBER_DARK} />}
         </TouchableOpacity>
       )}
@@ -146,9 +152,12 @@ export function Picker({ visible, title, items, selectedId, onSelect, onClose, i
               onPress={() => { onSelect(item.id, item.label); onClose(); }}
               activeOpacity={0.7}
             >
-              <Text style={[styles.pickerItemText, item.id === selectedId && styles.pickerItemTextSelected]}>
-                {item.label}
-              </Text>
+              <View style={styles.pickerItemLeft}>
+                {item.flagCode ? <Flag code={item.flagCode} size={16} /> : null}
+                <Text style={[styles.pickerItemText, item.id === selectedId && styles.pickerItemTextSelected]}>
+                  {item.label}
+                </Text>
+              </View>
               {item.id === selectedId && <Ionicons name="checkmark" size={18} color={AMBER_DARK} />}
             </TouchableOpacity>
           )}
@@ -227,6 +236,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#F9FAFB',
+  },
+  pickerItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
   },
   pickerItemSelected: {
     backgroundColor: '#FFFBEB',

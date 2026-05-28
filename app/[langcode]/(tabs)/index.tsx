@@ -652,6 +652,14 @@ export default function HomePage() {
     }
   };
 
+  const handleAuthorTypeSelect = (authorType: TourFilters['authorType']) => {
+    setFilters({ authorType });
+    fetchTours({ authorType, page: 1 });
+    if (authorType) {
+      void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `author:${authorType}` });
+    }
+  };
+
   const handleClear = () => {
     clearFilters();
     clearTours();
@@ -785,6 +793,32 @@ export default function HomePage() {
                 cardPadding={PADDING}
               />
             )}
+
+            {/* ── AUTHOR TYPE CHIPS ── */}
+            <View style={[styles.authorTypeRow, { paddingHorizontal: PADDING }]}>
+              {(['all', 'admin', 'guide'] as const).map((key) => {
+                const value: TourFilters['authorType'] = key === 'all' ? undefined : key;
+                const active = (filters.authorType ?? undefined) === value;
+                const label =
+                  key === 'all'
+                    ? t('home.filter.all')
+                    : key === 'admin'
+                    ? t('home.filter.byAdmin')
+                    : t('home.filter.byGuide');
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    style={[styles.authorTypeChip, active && styles.authorTypeChipActive]}
+                    onPress={() => handleAuthorTypeSelect(value)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={[styles.authorTypeChipText, active && styles.authorTypeChipTextActive]}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
             {/* ── FACET SUMMARY ── */}
             <FacetSummaryRow
@@ -1197,6 +1231,36 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: '#92400E',
+  },
+  authorTypeRow: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingTop: 12,
+    paddingBottom: 4,
+    maxWidth: 1200,
+    alignSelf: 'center',
+    width: '100%',
+    flexWrap: 'wrap',
+  },
+  authorTypeChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+  },
+  authorTypeChipActive: {
+    borderColor: AMBER,
+    backgroundColor: AMBER,
+  },
+  authorTypeChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  authorTypeChipTextActive: {
+    color: '#FFFFFF',
   },
   countPillRow: {
     paddingTop: 10,

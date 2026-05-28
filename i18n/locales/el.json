@@ -954,5 +954,18 @@
   "preview.bannerText": "Ιδιωτική προεπισκόπηση — η πρόοδος δεν αποθηκεύεται",
   "dashboard.toursQuota": "{{used}} / {{max}} tours δημιουργήθηκαν αυτόν τον μήνα",
   "dashboard.toursQuotaUnlimited": "{{used}} tours δημιουργήθηκαν αυτόν τον μήνα (απεριόριστο πλάνο)",
-  "dashboard.toursQuotaLimitReached": "Επιτεύχθηκε μηνιαίο όριο"
+  "dashboard.toursQuotaLimitReached": "Επιτεύχθηκε μηνιαίο όριο",
+  "home.filter.all": "Όλες οι ξεναγήσεις",
+  "home.filter.byAdmin": "StepUp Tours",
+  "home.filter.byGuide": "Από ξεναγούς",
+  "verified.tooltip": "Ξενάγηση επαληθευμένη από StepUp Tours",
+  "verified.label": "Πιστοποιημένος ξεναγός",
+  "tours.untranslatedNotice": "Εμφάνιση στη γλώσσα πρωτοτύπου — η μετάφραση δεν είναι διαθέσιμη",
+  "tours.signature.stepUp": "StepUp Tours",
+  "tours.requestTranslations.button": "Αίτημα μεταφράσεων",
+  "admin.tabs.messages": "Μηνύματα",
+  "admin.messages.intro": "Ξεναγήσεις με δραστηριότητα μηνυμάτων. Πάτησε μια ξενάγηση για να δεις τα νήματα.",
+  "admin.messages.empty": "Δεν υπάρχουν ακόμη μηνύματα σε ξεναγήσεις.",
+  "common.unknown": "Άγνωστο",
+  "nav.adminMessages": "Μηνύματα"
 }

@@ -73,6 +73,10 @@ export interface Tour {
   location: GeoLocation | null;
   featuredBusinesses: (Business | null)[];
   authorId: string;
+  authorPublicName?: string;
+  authorIsAdmin?: boolean;
+  availableLangs?: string[];
+  isUntranslated?: boolean;
   published: boolean;
   langcode?: string;
 }
@@ -190,6 +194,7 @@ export interface TourFilters {
   page?: number;
   limit?: number;
   sort?: 'rating' | 'alphabetical' | 'alphabetical_desc' | 'stops_desc' | 'stops_asc';
+  authorType?: 'admin' | 'guide';
 }
 
 // Tipos de autenticación

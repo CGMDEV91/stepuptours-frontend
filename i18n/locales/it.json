@@ -954,5 +954,18 @@
   "preview.bannerText": "Anteprima privata — i progressi non vengono salvati",
   "dashboard.toursQuota": "{{used}} / {{max}} tour creati questo mese",
   "dashboard.toursQuotaUnlimited": "{{used}} tour creati questo mese (piano illimitato)",
-  "dashboard.toursQuotaLimitReached": "Limite mensile raggiunto"
+  "dashboard.toursQuotaLimitReached": "Limite mensile raggiunto",
+  "home.filter.all": "Tutti i tour",
+  "home.filter.byAdmin": "StepUp Tours",
+  "home.filter.byGuide": "Dalle guide",
+  "verified.tooltip": "Tour verificato da StepUp Tours",
+  "verified.label": "Guida certificata",
+  "tours.untranslatedNotice": "Lingua originale — traduzione non disponibile",
+  "tours.signature.stepUp": "StepUp Tours",
+  "tours.requestTranslations.button": "Richiedi traduzioni",
+  "admin.tabs.messages": "Messaggi",
+  "admin.messages.intro": "Tour con attività di messaggi. Tocca un tour per aprire i suoi thread.",
+  "admin.messages.empty": "Nessun messaggio sui tour al momento.",
+  "common.unknown": "Sconosciuto",
+  "nav.adminMessages": "Messaggi"
 }

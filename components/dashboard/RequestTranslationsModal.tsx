@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import CountryFlag from 'react-native-country-flag';
+import { Flag } from '../ui/Flag';
 import { postTourComment } from '../../services/comments.service';
 import { langCodeToCountryCode } from '../../services/language.service';
 import type { Tour } from '../../types';
@@ -62,11 +62,13 @@ export function RequestTranslationsModal({
   };
 
   const handleSend = async () => {
-    if (selected.size === 0 || sending) return;
+    const done = new Set(tour.availableLangs ?? []);
+    const targets = Array.from(selected).filter((c) => !done.has(c));
+    if (targets.length === 0 || sending) return;
     setSending(true);
     setError(null);
 
-    const langList = Array.from(selected)
+    const langList = targets
       .map((c) => `${c.toUpperCase()}`)
       .join(', ');
 
@@ -113,25 +115,35 @@ export function RequestTranslationsModal({
           <ScrollView style={{ maxHeight: 200 }} showsVerticalScrollIndicator={false}>
             <View style={styles.langGrid}>
               {TARGET_LANGUAGES.map((lang) => {
-                const isSelected = selected.has(lang.code);
+                const alreadyDone = (tour.availableLangs ?? []).includes(lang.code);
+                const isSelected = !alreadyDone && selected.has(lang.code);
                 return (
                   <TouchableOpacity
                     key={lang.code}
-                    style={[styles.langChip, isSelected && styles.langChipSelected]}
-                    onPress={() => toggleLang(lang.code)}
+                    style={[
+                      styles.langChip,
+                      isSelected && styles.langChipSelected,
+                      alreadyDone && styles.langChipDone,
+                    ]}
+                    onPress={alreadyDone ? undefined : () => toggleLang(lang.code)}
+                    disabled={alreadyDone}
                     activeOpacity={0.8}
                   >
-                    <CountryFlag
-                      isoCode={langCodeToCountryCode(lang.code)}
-                      size={18}
-                      style={styles.flag}
-                    />
-                    <Text style={[styles.langLabel, isSelected && styles.langLabelSelected]}>
+                    <Flag code={langCodeToCountryCode(lang.code)} size={18} />
+                    <Text
+                      style={[
+                        styles.langLabel,
+                        isSelected && styles.langLabelSelected,
+                        alreadyDone && styles.langLabelDone,
+                      ]}
+                    >
                       {lang.label}
                     </Text>
-                    {isSelected && (
+                    {alreadyDone ? (
+                      <Ionicons name="checkmark-circle" size={14} color="#16A34A" />
+                    ) : isSelected ? (
                       <Ionicons name="checkmark-circle" size={14} color={AMBER} />
-                    )}
+                    ) : null}
                   </TouchableOpacity>
                 );
               })}
@@ -252,6 +264,10 @@ const styles = StyleSheet.create({
     borderColor: AMBER,
     backgroundColor: '#FFF7ED',
   },
+  langChipDone: {
+    borderColor: '#86EFAC',
+    backgroundColor: '#F0FDF4',
+  },
   flag: {
     borderRadius: 2,
   },
@@ -262,6 +278,10 @@ const styles = StyleSheet.create({
   },
   langLabelSelected: {
     color: '#D97706',
+    fontWeight: '600',
+  },
+  langLabelDone: {
+    color: '#16A34A',
     fontWeight: '600',
   },
 

@@ -24,6 +24,7 @@ import { GoogleLogo } from '../auth/GoogleLogo';
 import { getRegistrationSettings } from '../../services/admin.service';
 import { Picker } from './Picker';
 import type { PickerItem } from './Picker';
+import { langCodeToCountryCode } from '../../services/language.service';
 
 interface Props {
   visible: 'login' | 'register' | null;
@@ -334,7 +335,11 @@ function RegisterModal({ onClose, onSwitch, fullscreen, desktopWeb }: { onClose:
     return !Object.keys(errors).length;
   };
 
-  const langItems: PickerItem[] = languages.map((l) => ({ id: l.id, label: l.name }));
+  const langItems: PickerItem[] = languages.map((l) => ({
+    id: l.id,
+    label: l.name,
+    flagCode: langCodeToCountryCode(l.id),
+  }));
 
   const handleSubmit = async () => {
     clearError();

@@ -11,8 +11,10 @@
 //   POST /jsonapi/comment/{type}
 //   PATCH /jsonapi/comment/{type}/{uuid}   (mark read / resolve)
 
+import axios from 'axios';
 import { drupalGetJsonApiBaseRaw, drupalPost, drupalPatch } from '../lib/drupal-client';
 import { useLanguageStore } from '../stores/language.store';
+import { useAuthStore } from '../stores/auth.store';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -107,8 +109,15 @@ export async function postTourComment(
   body: string,
 ): Promise<TourComment> {
   const fieldName = THREAD_FIELD[threadType];
-  const langcode  = useLanguageStore.getState().currentLanguage ?? 'en';
+  // currentLanguage is a Language object ({ id, name, ... }); JSON:API expects
+  // the langcode as a plain string, so take its `id`.
+  const langcode  = useLanguageStore.getState().currentLanguage?.id ?? 'en';
 
+  // NOTE: do NOT include a `comment_type` relationship — the bundle is already
+  // conveyed by `type: comment--{threadType}`. Passing it with the machine name
+  // as `id` makes JSON:API look up a comment_type resource by that UUID and
+  // fail ("resource ... could not be found"). `entity_type` must be set so
+  // Drupal knows the commented entity is a node.
   const payload = {
     data: {
       type: `comment--${threadType}`,
@@ -116,14 +125,12 @@ export async function postTourComment(
         subject:      threadType,
         comment_body: { value: body, format: 'plain_text' },
         field_name:   fieldName,
+        entity_type:  'node',
         langcode,
       },
       relationships: {
         entity_id: {
           data: { type: 'node--tour', id: tourUuid },
-        },
-        comment_type: {
-          data: { type: 'comment_type--comment_type', id: threadType },
         },
       },
     },
@@ -157,6 +164,45 @@ export async function resolveComment(commentId: string, threadType: ThreadType):
       attributes: { field_resolved: true },
     },
   });
+}
+
+// ── Admin inbox ───────────────────────────────────────────────────────────────
+
+export interface AdminInboxThreadTotals {
+  total: number;
+  unreadFromGuide: number;
+}
+
+export interface AdminInboxTour {
+  tourId: string;
+  tourNid: number;
+  tourTitle: string;
+  ownerId: string | null;
+  ownerName: string | null;
+  lastCommentAt: string;
+  totals: {
+    review:             AdminInboxThreadTotals;
+    translationRequest: AdminInboxThreadTotals;
+    translationReview:  AdminInboxThreadTotals;
+  };
+}
+
+/**
+ * Admin-only: list all tours with message activity, with per-thread counts
+ * and a "lastCommentAt" timestamp. Sorted by most recent first.
+ */
+export async function getAdminMessagesInbox(): Promise<AdminInboxTour[]> {
+  const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
+  const session  = useAuthStore.getState().session;
+  const headers: Record<string, string> = {};
+  if (session?.token) {
+    headers.Authorization = `${session.tokenType === 'bearer' ? 'Bearer' : 'Basic'} ${session.token}`;
+  }
+  const { data } = await axios.get<AdminInboxTour[]>(
+    `${BASE_URL}/api/admin/messages/inbox`,
+    { headers },
+  );
+  return Array.isArray(data) ? data : [];
 }
 
 /**

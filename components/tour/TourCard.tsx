@@ -1,7 +1,7 @@
 // components/tour/TourCard.tsx
 // Reusable tour card component with image overlay, rating, favourites, and completion pill
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,9 @@ import { Tour } from '../../types';
 import { StarRating } from './StarRating';
 import { imageHeaders, pickTourImage } from '../../lib/drupal-client';
 import { buildTourSlug } from '../../lib/tour-slug';
+import { LanguagesRow } from '../ui/LanguagesRow';
+import { VerifiedSeal, VERIFIED_GOLD } from '../icons/VerifiedSeal';
+import { RequestTranslationsModal } from '../dashboard/RequestTranslationsModal';
 
 interface TourCardProps {
   tour: Tour;
@@ -30,6 +33,8 @@ interface TourCardProps {
   isOwner?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  /** Public name of the current owner — passed to the translations modal. */
+  ownerPublicName?: string;
 }
 
 const CARD_IMAGE_RATIO = 0.65;
@@ -48,9 +53,11 @@ export function TourCard({
   isOwner = false,
   onEdit,
   onDelete,
+  ownerPublicName,
 }: TourCardProps) {
   const router = useRouter();
   const { t } = useTranslation();
+  const [translationsModalOpen, setTranslationsModalOpen] = useState(false);
 
   const imageHeight = cardWidth * CARD_IMAGE_RATIO;
   const DEFAULT_IMAGES = [
@@ -134,7 +141,7 @@ export function TourCard({
           </TouchableOpacity>
         ) : null}
 
-        {/* Completed pill — only for authenticated users */}
+        {/* Completed pill — top-left, authenticated users only */}
         {isAuthenticated && isCompleted ? (
           <View style={styles.completedPill}>
             <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
@@ -164,34 +171,64 @@ export function TourCard({
             <Ionicons name="trash-outline" size={15} color="#EF4444" />
           </TouchableOpacity>
         ) : null}
+
       </View>
 
       {/* Meta area */}
       <View style={styles.metaArea}>
-        {/* Row 1: duration + stops */}
+        {/* Row 1: duration + stops (left) · certified pill (right) */}
         <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Ionicons name="time-outline" size={14} color={META_ICON_COLOR} />
-            <Text style={styles.metaText}>
-              {tour.duration} {t('home.minutes')}
-            </Text>
+          <View style={styles.metaItemsLeft}>
+            <View style={styles.metaItem}>
+              <Ionicons name="time-outline" size={14} color={META_ICON_COLOR} />
+              <Text style={styles.metaText}>
+                {tour.duration} {t('home.minutes')}
+              </Text>
+            </View>
+            {(tour.stopsCount ?? 0) > 0 && (
+              <>
+                <Text style={styles.metaSeparator}>·</Text>
+                <View style={styles.metaItem}>
+                  <Ionicons name="location-outline" size={14} color={META_ICON_COLOR} />
+                  <Text style={styles.metaText}>
+                    {tour.stopsCount} {t('tour.points')}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
-          {(tour.stopsCount ?? 0) > 0 && (
-            <>
-              <Text style={styles.metaSeparator}>·</Text>
-              <View style={styles.metaItem}>
-                <Ionicons name="location-outline" size={14} color={META_ICON_COLOR} />
-                <Text style={styles.metaText}>
-                  {tour.stopsCount} {t('tour.points')}
-                </Text>
-              </View>
-            </>
-          )}
+          {!isOwner && tour.published && !tour.authorIsAdmin ? (
+            <View style={styles.certifiedPill}>
+              <VerifiedSeal size={13} starColor="#FFFFFF" checkColor={VERIFIED_GOLD} />
+              <Text style={styles.certifiedPillText} numberOfLines={1}>
+                {t('verified.label')}
+              </Text>
+            </View>
+          ) : null}
         </View>
         {/* Row 2: star rating */}
         <View style={styles.ratingRow}>
           <StarRating rating={tour.averageRate} ratingCount={tour.ratingCount} size={14} />
         </View>
+
+        {/* Footer row: language flags (left) + author signature (right),
+            vertically aligned on the same baseline. */}
+        {!isOwner && (tour.availableLangs?.length || tour.authorIsAdmin || tour.authorPublicName) ? (
+          <View style={styles.footerRow}>
+            <View style={styles.footerLangs}>
+              {tour.availableLangs && tour.availableLangs.length > 0 ? (
+                <LanguagesRow langs={tour.availableLangs} size={16} max={6} />
+              ) : null}
+            </View>
+            {tour.authorIsAdmin || tour.authorPublicName ? (
+              <Text style={styles.signature} numberOfLines={1}>
+                {tour.authorIsAdmin
+                  ? t('tours.signature.stepUp')
+                  : tour.authorPublicName}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
 
         {/* Edit button — owner mode only */}
         {isOwner && onEdit ? (
@@ -207,7 +244,33 @@ export function TourCard({
             <Text style={styles.editButtonText}>{t('dashboard.tours.edit')}</Text>
           </TouchableOpacity>
         ) : null}
+
+        {/* Request translations — owner mode, published tour */}
+        {isOwner && tour.published ? (
+          <TouchableOpacity
+            style={styles.requestTranslationsButton}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              setTranslationsModalOpen(true);
+            }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="language-outline" size={14} color="#1D4ED8" />
+            <Text style={styles.requestTranslationsText}>
+              {t('tours.requestTranslations.button')}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
+
+      {isOwner && tour.published ? (
+        <RequestTranslationsModal
+          visible={translationsModalOpen}
+          tour={tour}
+          guidePublicName={ownerPublicName ?? tour.authorPublicName ?? ''}
+          onClose={() => setTranslationsModalOpen(false)}
+        />
+      ) : null}
     </TouchableOpacity>
   );
 }
@@ -296,6 +359,34 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  certifiedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    borderRadius: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    flexShrink: 0,
+    // Metallic gold: real gradient on web, solid fallback on native.
+    backgroundColor: '#F4B400',
+    ...(Platform.OS === 'web'
+      ? ({
+          backgroundImage: 'linear-gradient(135deg, #FDE08A 0%, #F4B400 45%, #C87E0A 75%, #FBD24E 100%)',
+          boxShadow: '0 1px 4px rgba(180,130,10,0.45)',
+        } as any)
+      : {
+          shadowColor: '#C87E0A',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.45,
+          shadowRadius: 3,
+          elevation: 2,
+        }),
+  },
+  certifiedPillText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#FFFFFF',
+  },
   metaArea: {
     paddingHorizontal: 14,
     paddingTop: 10,
@@ -305,7 +396,13 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 0,
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  metaItemsLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
   },
   ratingRow: {
     flexDirection: 'row',
@@ -389,5 +486,39 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: AMBER_DARK,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginTop: 4,
+  },
+  footerLangs: {
+    flexShrink: 1,
+  },
+  signature: {
+    fontSize: 11,
+    fontStyle: 'italic',
+    color: '#6B7280',
+    textAlign: 'right',
+    flexShrink: 0,
+  },
+  requestTranslationsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    marginTop: 6,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    backgroundColor: '#EFF6FF',
+  },
+  requestTranslationsText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1D4ED8',
   },
 });

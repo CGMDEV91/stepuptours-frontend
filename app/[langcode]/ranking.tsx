@@ -14,7 +14,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import CountryFlag from 'react-native-country-flag';
+import { Flag } from '../../components/ui/Flag';
 import { getRanking } from '../../services/ranking.service';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
@@ -85,7 +85,7 @@ function Avatar({
   }
 
   if (countryCode) {
-    return <CountryFlag isoCode={countryCode} size={16} />;
+    return <Flag code={countryCode} size={16} />;
   }
 
   // Fallback: globe icon

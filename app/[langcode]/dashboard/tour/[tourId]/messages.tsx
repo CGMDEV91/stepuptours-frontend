@@ -68,9 +68,12 @@ interface ThreadTabProps {
   tourNid: number;
   threadType: ThreadType;
   currentUserId: string;
+  /** True when the viewer is the guide (tour owner). Admins should not flip
+   *  field_read_by_author since that field tracks the guide's read state. */
+  shouldMarkRead: boolean;
 }
 
-function ThreadTab({ tourUuid, tourNid, threadType, currentUserId }: ThreadTabProps) {
+function ThreadTab({ tourUuid, tourNid, threadType, currentUserId, shouldMarkRead }: ThreadTabProps) {
   const { t } = useTranslation();
   const [comments, setComments]     = useState<TourComment[]>([]);
   const [loading, setLoading]       = useState(true);
@@ -83,17 +86,20 @@ function ThreadTab({ tourUuid, tourNid, threadType, currentUserId }: ThreadTabPr
     try {
       const data = await getTourComments(tourUuid, threadType);
       setComments(data);
-      // Mark unread comments from others as read.
-      const unread = data.filter(
-        (c) => !c.readByAuthor && c.authorId !== currentUserId,
-      );
-      await Promise.all(unread.map((c) => markCommentRead(c.id, threadType).catch(() => {})));
+      // Only the guide owner flips field_read_by_author — admins viewing the
+      // same thread must not change the guide's unread state.
+      if (shouldMarkRead) {
+        const unread = data.filter(
+          (c) => !c.readByAuthor && c.authorId !== currentUserId,
+        );
+        await Promise.all(unread.map((c) => markCommentRead(c.id, threadType).catch(() => {})));
+      }
     } catch {
       // keep empty
     } finally {
       setLoading(false);
     }
-  }, [tourUuid, threadType, currentUserId]);
+  }, [tourUuid, threadType, currentUserId, shouldMarkRead]);
 
   useEffect(() => { loadComments(); }, [loadComments]);
 
@@ -226,6 +232,7 @@ export default function TourMessagesScreen() {
   if (!tour || !user) return null;
 
   const tourNid = tour.drupalInternalId ?? 0;
+  const isOwner = tour.authorId === user.id;
 
   return (
     <View style={{ flex: 1, backgroundColor: '#F9FAFB', ...webFullHeight }}>
@@ -272,6 +279,7 @@ export default function TourMessagesScreen() {
               tourNid={tourNid}
               threadType={activeThread}
               currentUserId={user.id}
+              shouldMarkRead={isOwner && !isAdmin}
             />
           </View>
         </View>

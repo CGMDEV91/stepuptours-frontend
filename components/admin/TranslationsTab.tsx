@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import CountryFlag from 'react-native-country-flag';
+import { Flag } from '../ui/Flag';
 import { langCodeToCountryCode } from '../../services/language.service';
 import {
   getAdminLanguages,
@@ -193,7 +193,7 @@ export function TranslationsTab() {
               onPress={() => setSelectedLang(lang.id)}
               activeOpacity={0.8}
             >
-              <CountryFlag isoCode={langCodeToCountryCode(lang.id)} size={14} />
+              <Flag code={langCodeToCountryCode(lang.id)} size={14} />
               <Text style={[styles.langPillText, isActive && styles.langPillTextActive]}>
                 {lang.label}
               </Text>

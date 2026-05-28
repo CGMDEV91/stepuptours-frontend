@@ -452,9 +452,49 @@ export function mapDrupalTour(raw: any): Tour {
       raw.field_featured_business_3 ? mapDrupalBusiness(raw.field_featured_business_3) : null,
     ],
     authorId: raw.uid?.id ?? raw.uid ?? '',
+    authorPublicName:
+      raw.uid?.field_public_name ?? raw.uid?.display_name ?? raw.uid?.name ?? undefined,
+    authorIsAdmin: typeof raw.author_is_admin === 'boolean'
+      ? raw.author_is_admin
+      : deriveAuthorIsAdmin(raw.uid),
+    availableLangs: normalizeAvailableLangs(raw),
     published: raw.status ?? false,
     langcode: raw.langcode ?? 'en',
   };
+}
+
+function normalizeAvailableLangs(raw: any): string[] {
+  // `available_langs` is a computed multi-value string field exposed by the
+  // backend (Drupal stepuptours_computed_fields). May arrive as an array of
+  // strings or array of { value } objects depending on serialization.
+  const v = raw.available_langs;
+  let langs: string[] = [];
+  if (Array.isArray(v)) {
+    langs = v
+      .map((item: any) => (typeof item === 'string' ? item : item?.value))
+      .filter((x: any): x is string => typeof x === 'string' && x.length > 0);
+  } else if (typeof v === 'string' && v.length > 0) {
+    langs = [v];
+  }
+  // Fallback: at least show the language the resource was fetched in.
+  if (langs.length === 0 && raw.langcode) langs = [raw.langcode];
+  // De-duplicate while preserving order.
+  return Array.from(new Set(langs));
+}
+
+function deriveAuthorIsAdmin(uid: any): boolean {
+  if (!uid) return false;
+  // Superadmin UID 1 is always an admin in Drupal.
+  if (uid.drupal_internal__uid === 1 || uid.drupal_internal__uid === '1') return true;
+  // Roles may be exposed via JSON:API as either an array of role IDs or an
+  // array of role objects ({ id }), depending on serializer config.
+  const roles: any = uid.roles;
+  if (Array.isArray(roles)) {
+    return roles.some((r: any) =>
+      r === 'administrator' || r?.id === 'administrator' || r?.target_id === 'administrator',
+    );
+  }
+  return false;
 }
 
 export function mapDrupalTourStep(raw: any): TourStep {

@@ -8,7 +8,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
-import CountryFlag from 'react-native-country-flag';
+import { Flag } from '../ui/Flag';
 import { langCodeToCountryCode } from '../../services/language.service';
 import {
     getAdminLanguages, getTranslations, saveTranslations,
@@ -248,7 +248,7 @@ export function LegalTab() {
                                 onPress={() => setSelectedLang(lang.id)}
                                 activeOpacity={0.7}
                             >
-                                <CountryFlag isoCode={cc} size={14} />
+                                <Flag code={cc} size={14} />
                                 <Text style={[styles.langPillText, isActive && styles.langPillTextActive]}>
                                     {lang.label}
                                 </Text>

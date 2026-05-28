@@ -6,6 +6,7 @@ import { useAuthStore } from '../stores/auth.store';
 import {
   drupalGet,
   drupalGetRaw,
+  drupalGetJsonApiBaseRaw,
   drupalPost,
   drupalPatch,
   buildFilters,
@@ -50,6 +51,8 @@ const TOUR_FIELDS = {
     'status',
     'uid',
     'langcode',
+    'available_langs',
+    'author_is_admin',
   ],
   'node--business': ['title', 'field_description', 'field_logo', 'field_website', 'field_phone', 'field_location', 'field_category', 'langcode'],
   'taxonomy_term--cities': ['name'],
@@ -86,13 +89,18 @@ const TOUR_CARD_FIELDS = {
     'field_country',
     'field_steps_count',
     'status',
+    'uid',
+    'langcode',
+    'available_langs',
+    'author_is_admin',
   ],
   'taxonomy_term--cities': ['name'],
   'taxonomy_term--countries': ['name'],
   'file--file': ['uri', 'url', 'image_style_uri'],
+  'user--user': ['display_name', 'name', 'drupal_internal__uid', 'field_public_name'],
 };
 
-const TOUR_CARD_INCLUDE = ['field_image', 'field_city', 'field_country'];
+const TOUR_CARD_INCLUDE = ['field_image', 'field_city', 'field_country', 'uid'];
 
 // TTLs de la caché en memoria (ms).
 const TOURS_TTL = 5 * 60 * 1000;       // listados de tours
@@ -120,10 +128,25 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
 }
 
 async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
-  const { page = 1, limit = 20, countries, city, minRating, search, sort } = filters;
+  const { page = 1, limit = 20, countries, city, minRating, search, sort, authorType } = filters;
 
   const drupalFilters: Record<string, any> = { status: 1 };
   if (city) drupalFilters['field_city.name'] = city;
+
+  // Filter by author type: "admin" = the superadmin (UID 1, the official
+  // StepUp Tours account), "guide" = anyone else. We use Drupal's
+  // drupal_internal__uid on the uid relationship so we don't depend on any
+  // configured UUID — UID 1 is the canonical superadmin.
+  let authorFilterStr = '';
+  if (authorType === 'admin') {
+    authorFilterStr = 'filter[uid.drupal_internal__uid]=1';
+  } else if (authorType === 'guide') {
+    authorFilterStr = [
+      'filter[author][condition][path]=uid.drupal_internal__uid',
+      'filter[author][condition][operator]=%3C%3E',
+      'filter[author][condition][value]=1',
+    ].join('&');
+  }
 
   let sortParam = 'sort=-field_average_rate,-field_rating_count,drupal_internal__nid';
   if (sort === 'alphabetical')      sortParam = 'sort=title,drupal_internal__nid';
@@ -142,6 +165,7 @@ async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<To
     city ? '' : buildCountriesFilter(countries ?? []),
     minRating ? `filter[rate][condition][path]=field_average_rate&filter[rate][condition][operator]=>=&filter[rate][condition][value]=${minRating}` : '',
     search ? `filter[title][condition][path]=title&filter[title][condition][operator]=CONTAINS&filter[title][condition][value]=${encodeURIComponent(search)}` : '',
+    authorFilterStr,
   ].filter(Boolean).join('&');
 
   const dataParams = [
@@ -198,14 +222,19 @@ export async function getTourByNid(nid: number): Promise<Tour> {
   const { data } = await drupalGetRaw('/node/tour', params);
   const list = Array.isArray(data) ? data : data ? [data] : [];
   if (list.length === 0) {
-    // FIXME: el endpoint es lang-aware (/<lang>/jsonapi/), por lo que un tour
-    // sin traducción al idioma actual devuelve lista vacía y se sintetiza un
-    // 404. El guard lo trata como "no existe" y redirige a home en silencio.
-    // Mejor: hacer un fallback a /jsonapi/ sin prefijo y, si existe, cargar
-    // el tour en su idioma original con un aviso de "no traducido".
-    const e = new Error(`Tour with nid ${nid} not found`) as Error & { status?: number };
-    e.status = 404;
-    throw e;
+    // Lang-aware endpoint returned empty — the tour may exist but not in the
+    // requested language. Retry against the non-prefixed /jsonapi/ which
+    // returns the source-language version. If found, mark as untranslated so
+    // the UI can show an info banner.
+    const fallback = await drupalGetJsonApiBaseRaw(`/node/tour?${params}`);
+    if (fallback.data.length === 0) {
+      const e = new Error(`Tour with nid ${nid} not found`) as Error & { status?: number };
+      e.status = 404;
+      throw e;
+    }
+    const tour = mapDrupalTour(fallback.data[0]);
+    tour.isUntranslated = true;
+    return tour;
   }
 
   return mapDrupalTour(list[0]);
