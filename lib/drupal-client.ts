@@ -319,14 +319,14 @@ export async function drupalPatch<T>(endpoint: string, body: object): Promise<T>
 
 /**
  * PATCH targeting the entity's original-language URL.
- * When `langcode` is provided and is not 'en' (the site default), the request
- * is sent with the appropriate language prefix so Drupal edits the correct
- * translation instead of silently no-oping against a non-existent English
- * translation.
+ * When `langcode` is provided, the request is sent with the explicit language
+ * prefix so Drupal edits the correct translation. This is required for all
+ * languages including 'en' — without the prefix, Drupal defaults to the site's
+ * default language context (ES) and rejects a PATCH for a non-default translation.
  */
 export async function drupalPatchBase<T>(endpoint: string, body: object, langcode?: string): Promise<T> {
   const config: any = {};
-  if (langcode && langcode !== 'en') {
+  if (langcode) {
     config.baseURL = `${BASE_URL}/${langcode}${JSON_API_PREFIX}`;
   }
   const response = await drupalClientBase.patch(endpoint, body, config);
