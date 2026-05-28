@@ -992,5 +992,7 @@
   "dashboard.tours.unpublishConfirm": "Sei sicuro di voler rimuovere \"{{title}}\"? Non sarà più visibile pubblicamente.",
   "dashboard.tours.republishBtn": "Ripubblica tour",
   "translationsSection.manageBtn": "Gestisci",
-  "dashboard.tours.unpublishWarning": "Una volta rimosso, per ripubblicarlo devi richiederlo tramite la chat di revisione delle traduzioni."
+  "dashboard.tours.unpublishWarning": "Una volta rimosso, per ripubblicarlo devi richiederlo tramite la chat di revisione delle traduzioni.",
+  "messages.threadSupport": "Assistenza",
+  "translationsSection.editBtn": "Modifica"
 }

@@ -19,6 +19,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -55,8 +56,10 @@ export function ManageTranslationsModal({
   onChanged,
   onClose,
 }: ManageTranslationsModalProps) {
-  const { t }  = useTranslation();
-  const router = useRouter();
+  const { t }    = useTranslation();
+  const router   = useRouter();
+  const { width } = useWindowDimensions();
+  const isMobile  = Platform.OS !== 'web' || width < 600;
 
   const [rows, setRows]           = useState<TourTranslationInfo[]>([]);
   const [sourceLang, setSourceLang] = useState<string>('');
@@ -182,8 +185,8 @@ export function ManageTranslationsModal({
 
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.box} onPress={() => {}}>
+      <Pressable style={[styles.backdrop, isMobile && styles.backdropMobile]} onPress={onClose}>
+        <Pressable style={[styles.box, isMobile && styles.boxMobile]} onPress={() => {}}>
 
           {/* Header */}
           <View style={styles.header}>
@@ -205,7 +208,7 @@ export function ManageTranslationsModal({
               <ActivityIndicator size="small" color={AMBER} />
             </View>
           ) : (
-            <ScrollView style={{ maxHeight: 340 }} showsVerticalScrollIndicator={false}>
+            <ScrollView style={isMobile ? { flex: 1 } : { maxHeight: 340 }} showsVerticalScrollIndicator={false}>
               {rows.length === 0 ? (
                 <Text style={styles.emptyText}>{t('translationsSection.empty')}</Text>
               ) : (
@@ -223,6 +226,18 @@ export function ManageTranslationsModal({
                         </View>
                         {/* Right: actions */}
                         <View style={styles.translActions}>
+                          {/* Edit translation — opens create-tour form in edit mode for this langcode */}
+                          <TouchableOpacity
+                            style={styles.iconBtn}
+                            onPress={() => {
+                              onClose();
+                              router.push(`/${row.langcode}/dashboard/create-tour?tourId=${tour.id}` as any);
+                            }}
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="create-outline" size={15} color="#374151" />
+                          </TouchableOpacity>
+
                           {/* Preview (all langs incl. source) */}
                           <TouchableOpacity
                             style={styles.iconBtn}
@@ -350,6 +365,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
+  backdropMobile: {
+    backgroundColor: '#FFFFFF',
+    padding: 0,
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+  },
   box: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
@@ -366,6 +387,14 @@ const styles = StyleSheet.create({
           shadowRadius: 24,
           elevation: 12,
         }),
+  },
+  boxMobile: {
+    flex: 1,
+    borderRadius: 0,
+    maxWidth: undefined as any,
+    paddingTop: Platform.OS === 'ios' ? 56 : 32,
+    elevation: 0,
+    shadowOpacity: 0,
   },
 
   // Header

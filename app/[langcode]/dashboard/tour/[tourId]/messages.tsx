@@ -37,7 +37,7 @@ import type { Tour } from '../../../../../types';
 
 const AMBER  = '#F59E0B';
 const THREADS: { id: ThreadType; labelKey: string; icon: string }[] = [
-  { id: 'tour_review',              labelKey: 'messages.threadReview',      icon: 'eye-outline' },
+  { id: 'tour_review',              labelKey: 'messages.threadSupport',     icon: 'headset-outline' },
   { id: 'tour_translation_request', labelKey: 'messages.threadTranslReq',   icon: 'language-outline' },
   { id: 'tour_translation_review',  labelKey: 'messages.threadTranslRev',   icon: 'checkmark-done-outline' },
 ];
@@ -207,6 +207,8 @@ export default function TourMessagesScreen() {
   const { langcode, tourId }     = useLocalSearchParams<{ langcode: string; tourId: string }>();
   const { width }                = useWindowDimensions();
   const isMobile                 = width < 768;
+  // Pills show icon+text only when active on narrow screens so all 3 fit without scroll
+  const isMobileNarrow           = Platform.OS !== 'web' || width < 520;
 
   const user         = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
@@ -290,19 +292,23 @@ export default function TourMessagesScreen() {
           <View style={styles.tabBar}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBarContent}>
               {THREADS.map((th) => {
-                const isActive = th.id === activeThread;
-                const unread   = unreadByThread[th.id] ?? 0;
+                const isActive   = th.id === activeThread;
+                const unread     = unreadByThread[th.id] ?? 0;
+                // On narrow screens only show label for the active pill so all 3 fit without scrolling
+                const showLabel  = isActive || !isMobileNarrow;
                 return (
                   <TouchableOpacity
                     key={th.id}
-                    style={[styles.tabPill, isActive && styles.tabPillActive]}
+                    style={[styles.tabPill, isActive && styles.tabPillActive, !showLabel && styles.tabPillCompact]}
                     onPress={() => handleSelectThread(th.id)}
                     activeOpacity={0.8}
                   >
                     <Ionicons name={th.icon as any} size={14} color={isActive ? '#FFFFFF' : '#6B7280'} />
-                    <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
-                      {t(th.labelKey)}
-                    </Text>
+                    {showLabel && (
+                      <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+                        {t(th.labelKey)}
+                      </Text>
+                    )}
                     {unread > 0 && (
                       <View style={styles.unreadBadge}>
                         <Text style={styles.unreadBadgeText}>{unread > 9 ? '9+' : unread}</Text>
@@ -368,6 +374,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   tabPillActive: { backgroundColor: AMBER },
+  tabPillCompact: { paddingHorizontal: 10 },
   tabLabel: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
   tabLabelActive: { color: '#FFFFFF' },
 

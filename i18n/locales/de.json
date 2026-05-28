@@ -992,5 +992,7 @@
   "dashboard.tours.unpublishConfirm": "Möchtest du \"{{title}}\" wirklich zurückziehen? Er wird nicht mehr öffentlich sichtbar sein.",
   "dashboard.tours.republishBtn": "Tour wieder veröffentlichen",
   "translationsSection.manageBtn": "Verwalten",
-  "dashboard.tours.unpublishWarning": "Nach dem Zurückziehen musst du die Wiederveröffentlichung über den Chat für Übersetzungsüberprüfungen beantragen."
+  "dashboard.tours.unpublishWarning": "Nach dem Zurückziehen musst du die Wiederveröffentlichung über den Chat für Übersetzungsüberprüfungen beantragen.",
+  "messages.threadSupport": "Unterstützung",
+  "translationsSection.editBtn": "Bearbeiten"
 }

@@ -1019,5 +1019,7 @@
   "dashboard.tours.unpublishConfirm": "¿Seguro que quieres despublicar \"{{title}}\"? Dejará de ser visible públicamente.",
   "dashboard.tours.republishBtn": "Republicar tour",
   "translationsSection.manageBtn": "Gestionar",
-  "dashboard.tours.unpublishWarning": "Una vez despublicado, para volver a publicarlo debes solicitarlo a través del chat de revisión de traducciones."
+  "dashboard.tours.unpublishWarning": "Una vez despublicado, para volver a publicarlo debes solicitarlo a través del chat de revisión de traducciones.",
+  "messages.threadSupport": "Soporte",
+  "translationsSection.editBtn": "Editar"
 }

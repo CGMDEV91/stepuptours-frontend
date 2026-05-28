@@ -1019,5 +1019,7 @@
   "dashboard.tours.unpublishConfirm": "Are you sure you want to unpublish \"{{title}}\"? It will no longer be visible publicly.",
   "dashboard.tours.republishBtn": "Republish tour",
   "translationsSection.manageBtn": "Manage",
-  "dashboard.tours.unpublishWarning": "Once unpublished, to re-publish you must request it via the Translation Reviews chat."
+  "dashboard.tours.unpublishWarning": "Once unpublished, to re-publish you must request it via the Translation Reviews chat.",
+  "messages.threadSupport": "Support",
+  "translationsSection.editBtn": "Edit"
 }

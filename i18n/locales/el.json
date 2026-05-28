@@ -992,5 +992,7 @@
   "dashboard.tours.unpublishConfirm": "Είστε σίγουροι ότι θέλετε να αποσύρετε το \"{{title}}\"; Δεν θα είναι πλέον δημόσια ορατό.",
   "dashboard.tours.republishBtn": "Επαναδημοσίευση tour",
   "translationsSection.manageBtn": "Διαχείριση",
-  "dashboard.tours.unpublishWarning": "Μόλις αποσυρθεί, για να το επαναδημοσιεύσετε πρέπει να το ζητήσετε μέσω της συνομιλίας αναθεώρησης μεταφράσεων."
+  "dashboard.tours.unpublishWarning": "Μόλις αποσυρθεί, για να το επαναδημοσιεύσετε πρέπει να το ζητήσετε μέσω της συνομιλίας αναθεώρησης μεταφράσεων.",
+  "messages.threadSupport": "Υποστήριξη",
+  "translationsSection.editBtn": "Επεξεργασία"
 }
