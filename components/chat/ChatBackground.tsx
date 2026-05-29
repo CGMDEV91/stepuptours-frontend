@@ -8,9 +8,13 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import Svg, { Defs, Pattern, Rect, Path, Circle, G } from 'react-native-svg';
 
-const TILE = 230;
+// Doodles are authored on a 230-unit grid, then scaled down (SCALE) and packed
+// into a smaller tile so the icons render smaller AND appear more frequently.
+const SCALE = 0.5;
+const TILE = 130;
 const STROKE = '#D8DDE4';
-const STROKE_WIDTH = 2;
+// Stroke scales with the group transform, so author it larger to land ~1.5px.
+const STROKE_WIDTH = 3;
 const OPACITY = 0.8;
 
 interface Props {
@@ -36,7 +40,7 @@ export function ChatBackground({ baseColor = '#F6F7F9' }: Props) {
           {/* Base tint */}
           <Rect x={0} y={0} width={TILE} height={TILE} fill={baseColor} />
 
-          <G stroke={STROKE} strokeWidth={STROKE_WIDTH} fill="none" opacity={OPACITY} strokeLinejoin="round" strokeLinecap="round">
+          <G transform={`scale(${SCALE})`} stroke={STROKE} strokeWidth={STROKE_WIDTH} fill="none" opacity={OPACITY} strokeLinejoin="round" strokeLinecap="round">
             {/* Globe (top-left) */}
             <Circle cx={45} cy={45} r={17} />
             <Path d="M45 28 C36 34 36 56 45 62 C54 56 54 34 45 28" />
