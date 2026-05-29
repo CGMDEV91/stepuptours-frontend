@@ -19,22 +19,25 @@ import {
   startOnboarding,
   getOnboardStatus,
   getStripeDashboardUrl,
-  NoProfileError,
+  getPayouts,
   StripeNotConfiguredError,
 } from '../../services/payouts.service';
-import type { StripeOnboardStatus } from '../../types';
+import type { StripeOnboardStatus, Payout } from '../../types';
+import { formatDateTime } from '../../lib/date-format';
 
 const AMBER = '#F59E0B';
 
-interface PayoutsTabProps {
-  onGoToPayment: () => void;
-}
+const STATUS: Record<Payout['status'], { bg: string; fg: string; dot: string; key: string; def: string }> = {
+  succeeded: { bg: '#ECFDF3', fg: '#15803D', dot: '#16A34A', key: 'payouts.statusSuccess', def: 'Exitoso' },
+  pending:   { bg: '#FFFAEB', fg: '#B45309', dot: '#F59E0B', key: 'payouts.statusPending', def: 'Pendiente' },
+  failed:    { bg: '#FEF3F2', fg: '#DC2626', dot: '#EF4444', key: 'payouts.statusFailed', def: 'Fallido' },
+};
 
-export function PayoutsTab({ onGoToPayment }: PayoutsTabProps) {
+export function PayoutsTab() {
   const { t } = useTranslation();
 
   const [status, setStatus]         = useState<StripeOnboardStatus | null>(null);
-  const [noProfile, setNoProfile]   = useState(false);
+  const [payouts, setPayouts]       = useState<Payout[]>([]);
   const [loading, setLoading]       = useState(true);
   const [working, setWorking]       = useState(false);
   const [error, setError]           = useState<string | null>(null);
@@ -43,15 +46,11 @@ export function PayoutsTab({ onGoToPayment }: PayoutsTabProps) {
     try {
       setLoading(true);
       setError(null);
-      setNoProfile(false);
-      const s = await getOnboardStatus();
+      const [s, p] = await Promise.all([getOnboardStatus(), getPayouts()]);
       setStatus(s);
-    } catch (err) {
-      if (err instanceof NoProfileError) {
-        setNoProfile(true);
-      } else {
-        setError(t('payouts.errorLoadStatus', 'No se pudo cargar el estado de pagos. Inténtalo de nuevo.'));
-      }
+      setPayouts(p);
+    } catch {
+      setError(t('payouts.errorLoadStatus', 'No se pudo cargar el estado de pagos. Inténtalo de nuevo.'));
     } finally {
       setLoading(false);
     }
@@ -99,34 +98,6 @@ export function PayoutsTab({ onGoToPayment }: PayoutsTabProps) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={AMBER} />
-      </View>
-    );
-  }
-
-  if (noProfile) {
-    return (
-      <View style={styles.root}>
-        <View style={styles.header}>
-          <Ionicons name="wallet-outline" size={22} color={AMBER} />
-          <View style={styles.headerText}>
-            <Text style={styles.title}>{t('payouts.title', 'Cobros')}</Text>
-            <Text style={styles.subtitle}>
-              {t('payouts.subtitle', 'Recibe tus ganancias como guía directamente en tu cuenta bancaria a través de Stripe.')}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.warningBox}>
-          <Ionicons name="alert-circle-outline" size={20} color="#92400E" style={{ marginTop: 2 }} />
-          <Text style={styles.warningText}>
-            {t('payouts.noProfileDesc', 'Para configurar tus cobros primero debes completar tus datos de pago (nombre, IBAN y dirección fiscal).')}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.primaryBtn} onPress={onGoToPayment} activeOpacity={0.85}>
-          <Ionicons name="card-outline" size={17} color="#fff" style={{ marginRight: 8 }} />
-          <Text style={styles.primaryBtnText}>
-            {t('payouts.goToPaymentData', 'Completar datos de pago')}
-          </Text>
-        </TouchableOpacity>
       </View>
     );
   }
@@ -236,6 +207,59 @@ export function PayoutsTab({ onGoToPayment }: PayoutsTabProps) {
           )}
         </>
       )}
+
+      {/* Earnings table */}
+      <View style={styles.listSection}>
+        <Text style={styles.listTitle}>{t('payouts.listTitle', 'Tus cobros')}</Text>
+        {payouts.length === 0 ? (
+          <View style={styles.emptyBox}>
+            <Ionicons name="cash-outline" size={22} color="#9CA3AF" />
+            <Text style={styles.emptyText}>{t('payouts.empty', 'Aún no has recibido cobros.')}</Text>
+          </View>
+        ) : (
+          payouts.map((p) => <PayoutRow key={p.id} payout={p} />)
+        )}
+      </View>
+    </View>
+  );
+}
+
+function PayoutRow({ payout }: { payout: Payout }) {
+  const { t } = useTranslation();
+  const s = STATUS[payout.status] ?? STATUS.pending;
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowHeader}>
+        <Text style={styles.rowTour} numberOfLines={1}>{payout.tourTitle || '—'}</Text>
+        <View style={[styles.badge, { backgroundColor: s.bg }]}>
+          <View style={[styles.badgeDot, { backgroundColor: s.dot }]} />
+          <Text style={[styles.badgeText, { color: s.fg }]}>{t(s.key, s.def)}</Text>
+        </View>
+      </View>
+
+      <View style={styles.amounts}>
+        <Text style={styles.receiveLabel}>{t('payouts.youReceive', 'Recibes')}</Text>
+        <Text style={styles.receiveValue}>{payout.guideRevenue.toFixed(2)} {payout.currency}</Text>
+        <Text style={styles.grossText}>
+          · {t('payouts.gross', 'Donación')} {payout.amount.toFixed(2)} {payout.currency}
+        </Text>
+      </View>
+
+      {payout.status === 'failed' && payout.failureReason ? (
+        <Text style={styles.reason}>
+          {t('payouts.reasonLabel', 'Motivo')}: {payout.failureReason}
+        </Text>
+      ) : null}
+
+      <View style={styles.metaRow}>
+        {payout.donorName ? (
+          <>
+            <Text style={styles.metaText}>{payout.donorName}</Text>
+            <Text style={styles.metaText}>·</Text>
+          </>
+        ) : null}
+        <Text style={styles.metaText}>{formatDateTime(payout.createdAt)}</Text>
+      </View>
     </View>
   );
 }
@@ -377,5 +401,115 @@ const styles = StyleSheet.create({
     color: AMBER,
     fontSize: 13,
     fontWeight: '500',
+  },
+  listSection: {
+    marginTop: 28,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    paddingTop: 22,
+  },
+  listTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 14,
+  },
+  emptyBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 22,
+    paddingHorizontal: 16,
+  },
+  emptyText: {
+    fontSize: 13,
+    color: '#9CA3AF',
+  },
+  row: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  rowHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 10,
+  },
+  rowTour: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  badgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  amounts: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  receiveLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  receiveValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#15803D',
+  },
+  grossText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  reason: {
+    fontSize: 12,
+    color: '#DC2626',
+    marginTop: 8,
+    lineHeight: 17,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  metaText: {
+    fontSize: 11,
+    color: '#9CA3AF',
   },
 });

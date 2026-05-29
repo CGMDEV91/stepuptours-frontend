@@ -19,7 +19,6 @@ import { useToastStore } from '../../stores/toast.store';
 import { isAdmin as isAdminRole, isBusiness as isBusinessRole, isGuide as isGuideRole } from '../../lib/roles';
 import { MyToursTab } from '../../components/dashboard/MyToursTab';
 import { SubscriptionTab } from '../../components/dashboard/SubscriptionTab';
-import { PaymentDataTab } from '../../components/dashboard/PaymentDataTab';
 import { DonationsTab } from '../../components/dashboard/DonationsTab';
 import { PayoutsTab } from '../../components/dashboard/PayoutsTab';
 import { SupportTab } from '../../components/dashboard/SupportTab';
@@ -32,7 +31,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'tours' | 'support' | 'subscription' | 'payment' | 'donations' | 'payouts';
+type TabId = 'tours' | 'support' | 'subscription' | 'donations' | 'payouts';
 
 interface Tab {
   id: TabId;
@@ -44,12 +43,11 @@ const TABS: Tab[] = [
   { id: 'subscription', labelKey: 'dashboard.tabs.subscription', icon: 'card-outline' },
   { id: 'tours',        labelKey: 'dashboard.tabs.tours',        icon: 'map-outline' },
   { id: 'support',      labelKey: 'dashboard.tabs.support',      icon: 'chatbubbles-outline' },
-  { id: 'payment',      labelKey: 'dashboard.tabs.payment',      icon: 'wallet-outline' },
   { id: 'donations',    labelKey: 'dashboard.tabs.donations',    icon: 'heart-outline' },
   { id: 'payouts',      labelKey: 'dashboard.tabs.payouts',      icon: 'cash-outline' },
 ];
 
-const VALID_TABS: TabId[] = ['tours', 'support', 'subscription', 'payment', 'donations', 'payouts'];
+const VALID_TABS: TabId[] = ['tours', 'support', 'subscription', 'donations', 'payouts'];
 
 function isValidTab(value: string): value is TabId {
   return VALID_TABS.includes(value as TabId);
@@ -222,9 +220,8 @@ export default function DashboardScreen() {
       {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
       {activeTab === 'tours' && <MyToursTab userId={user.id} />}
       {activeTab === 'support' && <SupportTab onChanged={refreshTicketsUnread} />}
-      {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
       {activeTab === 'donations' && <DonationsTab userId={user.id} />}
-      {activeTab === 'payouts' && <PayoutsTab onGoToPayment={() => handleTabChange('payment')} />}
+      {activeTab === 'payouts' && <PayoutsTab />}
     </View>
   );
 

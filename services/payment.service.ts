@@ -32,6 +32,8 @@ export interface AdminDonation {
   guideRevenue: number;
   platformRevenue: number;
   paymentReference: string;
+  payoutStatus: 'succeeded' | 'pending' | 'failed';
+  payable: boolean;
   createdAt: string;
 }
 
@@ -87,6 +89,25 @@ export async function getAdminDonationsSummary(): Promise<DonationsSummary> {
   const { data } = await axios.get(`${BASE_URL}/api/admin/donations/summary`, {
     headers: getAuthHeader(),
   });
+  return data;
+}
+
+export interface SettlePayoutResult {
+  id: string;
+  status: 'succeeded' | 'pending' | 'failed';
+  message: string | null;
+}
+
+/**
+ * Manually pays a guide their share for a pending donation (admin only).
+ * Runs the real Stripe transfer; on success the payout is marked completed.
+ */
+export async function settleAdminPayout(id: string): Promise<SettlePayoutResult> {
+  const { data } = await axios.post(
+    `${BASE_URL}/api/admin/donations/${id}/settle`,
+    {},
+    { headers: { 'Content-Type': 'application/json', ...getAuthHeader() } },
+  );
   return data;
 }
 

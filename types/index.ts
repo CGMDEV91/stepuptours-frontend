@@ -171,6 +171,18 @@ export interface StripeOnboardStatus {
   detailsSubmitted: boolean;
 }
 
+export interface Payout {
+  id: string;
+  amount: number;
+  guideRevenue: number;
+  currency: string;
+  status: 'succeeded' | 'pending' | 'failed';
+  failureReason: string | null;
+  tourTitle: string;
+  donorName: string | null;
+  createdAt: string;
+}
+
 export interface Donation {
   id: string;
   tourId: string;

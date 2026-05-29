@@ -7,6 +7,7 @@ import {
   Text,
   ActivityIndicator,
   StyleSheet,
+  TouchableOpacity,
   useWindowDimensions,
   Platform,
 } from 'react-native';
@@ -17,15 +18,57 @@ import {
   getAdminDonations,
   getAdminDonationsSummary,
   getMyDonations,
+  settleAdminPayout,
   type AdminDonation,
   type DonationsSummary,
 } from '../../services/payment.service';
+import { useToastStore } from '../../stores/toast.store';
 import type { Donation } from '../../types';
 
 const AMBER = '#F59E0B';
 const AMBER_DARK = '#D97706';
 const GREEN = '#16A34A';
 const NAVY = '#1E293B';
+
+type PayoutStatus = 'succeeded' | 'pending' | 'failed';
+
+const PAYOUT_BADGE: Record<PayoutStatus, { bg: string; fg: string; dot: string; key: string; def: string }> = {
+  succeeded: { bg: '#ECFDF3', fg: '#15803D', dot: '#16A34A', key: 'payouts.statusSuccess', def: 'Exitoso' },
+  pending:   { bg: '#FFFAEB', fg: '#B45309', dot: '#F59E0B', key: 'payouts.statusPending', def: 'Pendiente' },
+  failed:    { bg: '#FEF3F2', fg: '#DC2626', dot: '#EF4444', key: 'payouts.statusFailed', def: 'Fallido' },
+};
+
+function PayoutBadge({ status }: { status: PayoutStatus }) {
+  const { t } = useTranslation();
+  const s = PAYOUT_BADGE[status] ?? PAYOUT_BADGE.pending;
+  return (
+    <View style={[styles.payoutBadge, { backgroundColor: s.bg }]}>
+      <View style={[styles.payoutBadgeDot, { backgroundColor: s.dot }]} />
+      <Text style={[styles.payoutBadgeText, { color: s.fg }]}>{t(s.key, s.def)}</Text>
+    </View>
+  );
+}
+
+function PayButton({ onPress, busy }: { onPress: () => void; busy: boolean }) {
+  const { t } = useTranslation();
+  return (
+    <TouchableOpacity
+      style={[styles.payBtn, busy && styles.payBtnBusy]}
+      onPress={onPress}
+      disabled={busy}
+      activeOpacity={0.85}
+    >
+      {busy ? (
+        <ActivityIndicator size="small" color="#FFFFFF" />
+      ) : (
+        <>
+          <Ionicons name="cash-outline" size={14} color="#FFFFFF" style={{ marginRight: 5 }} />
+          <Text style={styles.payBtnText}>{t('admin.payouts.pay', 'Pagar')}</Text>
+        </>
+      )}
+    </TouchableOpacity>
+  );
+}
 
 interface DonationsViewProps {
   mode: 'admin' | 'professional' | 'donor';
@@ -58,6 +101,8 @@ interface DonationRow {
   tourOwnerIsAdmin?: boolean;
   guideRevenue?: number;
   platformRevenue?: number;
+  payoutStatus?: PayoutStatus;
+  payable?: boolean;
 }
 
 export function DonationsView({ mode, userId }: DonationsViewProps) {
@@ -70,6 +115,28 @@ export function DonationsView({ mode, userId }: DonationsViewProps) {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [settlingId, setSettlingId] = useState<string | null>(null);
+
+  const handlePay = useCallback(async (id: string) => {
+    setSettlingId(id);
+    try {
+      const res = await settleAdminPayout(id);
+      if (res.status === 'succeeded') {
+        setRows((prev) =>
+          prev.map((r) => (r.id === id ? { ...r, payoutStatus: 'succeeded', payable: false } : r)),
+        );
+        useToastStore.getState().showToast(t('admin.payouts.paid', 'Pago enviado al guía'), 'success');
+      } else {
+        useToastStore
+          .getState()
+          .showToast(res.message ?? t('admin.payouts.payError', 'No se pudo completar el pago'), 'error');
+      }
+    } catch {
+      useToastStore.getState().showToast(t('admin.payouts.payError', 'No se pudo completar el pago'), 'error');
+    } finally {
+      setSettlingId(null);
+    }
+  }, [t]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -92,6 +159,8 @@ export function DonationsView({ mode, userId }: DonationsViewProps) {
             tourOwnerIsAdmin: d.tourOwnerIsAdmin,
             guideRevenue: d.guideRevenue,
             platformRevenue: d.platformRevenue,
+            payoutStatus: d.payoutStatus,
+            payable: d.payable,
           })),
         );
         setSummary(sum);
@@ -174,9 +243,9 @@ export function DonationsView({ mode, userId }: DonationsViewProps) {
           </Text>
         </View>
       ) : isDesktop ? (
-        <DonationsTable rows={rows} mode={mode} t={t} />
+        <DonationsTable rows={rows} mode={mode} t={t} onPay={handlePay} settlingId={settlingId} />
       ) : (
-        <DonationCards rows={rows} mode={mode} t={t} />
+        <DonationCards rows={rows} mode={mode} t={t} onPay={handlePay} settlingId={settlingId} />
       )}
     </View>
   );
@@ -231,10 +300,14 @@ function DonationsTable({
   rows,
   mode,
   t,
+  onPay,
+  settlingId,
 }: {
   rows: DonationRow[];
   mode: 'admin' | 'professional' | 'donor';
   t: (key: string) => string;
+  onPay: (id: string) => void;
+  settlingId: string | null;
 }) {
   const isAdmin = mode === 'admin';
   const isDonor = mode === 'donor';
@@ -266,6 +339,9 @@ function DonationsTable({
             </Text>
             <Text style={[styles.tableCell, styles.tableHeader, styles.cellRevenue]}>
               {t('donation.split.guide')}
+            </Text>
+            <Text style={[styles.tableCell, styles.tableHeader, styles.cellPayout]}>
+              {t('admin.payouts.column')}
             </Text>
           </>
         )}
@@ -313,6 +389,12 @@ function DonationsTable({
               <Text style={[styles.tableCell, styles.cellRevenue, { color: '#2563EB', fontWeight: '600' }]}>
                 {formatCurrency(row.guideRevenue ?? 0)}
               </Text>
+              <View style={[styles.cellPayout, styles.payoutCell]}>
+                <PayoutBadge status={row.payoutStatus ?? 'pending'} />
+                {row.payable && (
+                  <PayButton onPress={() => onPay(row.id)} busy={settlingId === row.id} />
+                )}
+              </View>
             </>
           )}
         </View>
@@ -327,10 +409,14 @@ function DonationCards({
   rows,
   mode,
   t,
+  onPay,
+  settlingId,
 }: {
   rows: DonationRow[];
   mode: 'admin' | 'professional' | 'donor';
   t: (key: string) => string;
+  onPay: (id: string) => void;
+  settlingId: string | null;
 }) {
   const isAdmin = mode === 'admin';
   const isDonor = mode === 'donor';
@@ -376,6 +462,14 @@ function DonationCards({
                 <Text style={styles.splitMiniGuide}>
                   G: {(row.guideRevenue ?? 0).toFixed(2)}
                 </Text>
+              </View>
+            )}
+            {isAdmin && (
+              <View style={styles.cardPayout}>
+                <PayoutBadge status={row.payoutStatus ?? 'pending'} />
+                {row.payable && (
+                  <PayButton onPress={() => onPay(row.id)} busy={settlingId === row.id} />
+                )}
               </View>
             )}
           </View>
@@ -509,9 +603,62 @@ const styles = StyleSheet.create({
   cellDonor: { flex: 1.5 },
   cellAmount: { flex: 1, textAlign: 'right' },
   cellRevenue: { flex: 0.8, textAlign: 'right' },
+  cellPayout: { flex: 1.4 },
   amountText: {
     fontWeight: '600',
     color: GREEN,
+  },
+
+  // Payout status + pay action
+  payoutCell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  cardPayout: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  payoutBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  payoutBadgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  payoutBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  payBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: AMBER,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    minWidth: 74,
+  },
+  payBtnBusy: {
+    opacity: 0.7,
+  },
+  payBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   // Badges
@@ -540,7 +687,7 @@ const styles = StyleSheet.create({
 
   // Mobile cards
   cardList: {
-    gap: 10,
+    gap: 8,
   },
   donationCard: {
     backgroundColor: '#FFFFFF',
@@ -551,7 +698,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 30,
   },
   donationCardLeft: {
     flex: 1,

@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth.store';
-import type { StripeOnboardStatus } from '../types';
+import type { StripeOnboardStatus, Payout } from '../types';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
 
@@ -51,35 +51,38 @@ export async function startOnboarding(
   }
 }
 
-export class NoProfileError extends Error {
-  constructor() { super('no_profile'); }
-}
-
 export class StripeNotConfiguredError extends Error {
   constructor() { super('stripe_not_configured'); }
 }
 
 /**
  * Comprueba si el guía ha completado el onboarding en Stripe.
- * Lanza NoProfileError si el guía no tiene professional_profile aún.
+ * El perfil se autocrea al conectar Stripe, por lo que ya no hay 404.
  */
 export async function getOnboardStatus(): Promise<StripeOnboardStatus> {
-  try {
-    const { data } = await axios.get(
-      `${BASE_URL}/api/guide/stripe/onboard/status`,
-      { headers: authHeaders() },
-    );
-    return {
-      onboardingComplete: data?.onboardingComplete ?? false,
-      stripeAccountId: data?.stripeAccountId ?? null,
-      payoutsEnabled: data?.payoutsEnabled ?? false,
-      chargesEnabled: data?.chargesEnabled ?? false,
-      detailsSubmitted: data?.detailsSubmitted ?? false,
-    };
-  } catch (err: any) {
-    if (err?.response?.status === 404) throw new NoProfileError();
-    throw err;
-  }
+  const { data } = await axios.get(
+    `${BASE_URL}/api/guide/stripe/onboard/status`,
+    { headers: authHeaders() },
+  );
+  return {
+    onboardingComplete: data?.onboardingComplete ?? false,
+    stripeAccountId: data?.stripeAccountId ?? null,
+    payoutsEnabled: data?.payoutsEnabled ?? false,
+    chargesEnabled: data?.chargesEnabled ?? false,
+    detailsSubmitted: data?.detailsSubmitted ?? false,
+  };
+}
+
+/**
+ * Lista los cobros del guía (su parte de cada donación a sus tours),
+ * incluidos los fallidos con el motivo de Stripe.
+ */
+export async function getPayouts(): Promise<Payout[]> {
+  const { data } = await axios.get(
+    `${BASE_URL}/api/me/payouts`,
+    { headers: authHeaders() },
+  );
+  return data?.payouts ?? [];
 }
 
 /**
