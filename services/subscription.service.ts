@@ -29,10 +29,11 @@ export interface CheckoutSessionStatus {
  */
 export async function createStripeCheckoutSession(
   planId: string,
+  autoRenew: boolean = true,
 ): Promise<CreateCheckoutSessionResult> {
   const { data } = await axios.post(
     `${BASE_URL}/api/subscription/create`,
-    { planId },
+    { planId, autoRenew },
     { headers: { 'Content-Type': 'application/json', ...getAuthHeader() } },
   );
   return data;

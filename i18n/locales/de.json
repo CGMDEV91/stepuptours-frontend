@@ -1013,5 +1013,13 @@
   "dashboard.quota.viewPlansSub": "Upgrade deinen Plan, um mehr Touren zu erstellen.",
   "dashboard.plan.free": "Kostenlos",
   "dashboard.plan.basic": "Basis",
-  "dashboard.plan.premium": "Premium"
+  "dashboard.plan.premium": "Premium",
+  "subscription.feature.toursPerMonth": "{{n}} Touren pro Monat",
+  "subscription.feature.toursPerYear": "{{n}} Touren pro Jahr",
+  "subscription.feature.toursUnlimited": "Unbegrenzte Touren",
+  "subscription.autoRenewOptIn": "Automatische Verlängerung",
+  "subscription.autoRenewHint": "Abwählen, um nur diesen Zeitraum zu bezahlen; keine automatische Verlängerung.",
+  "dashboard.quota.planSubYear": "Jährliches Tour-Limit",
+  "dashboard.subscription.maxToursMonth": "Touren pro Monat",
+  "dashboard.subscription.maxToursYear": "Touren pro Jahr"
 }

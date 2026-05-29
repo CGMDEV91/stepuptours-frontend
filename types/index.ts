@@ -106,6 +106,7 @@ export interface SubscriptionPlan {
   planType: 'free' | 'premium' | 'business_monthly' | 'business_annual';
   billingCycle: 'monthly' | 'annual' | 'minute' | 'none';
   price: number;
+  maxToursPerMonth: number;   // -1 = unlimited (per billing period: month or year)
   maxFeaturedDetail: number;
   maxFeaturedSteps: number;   // -1 = unlimited
   maxLanguages: number;       // -1 = unlimited

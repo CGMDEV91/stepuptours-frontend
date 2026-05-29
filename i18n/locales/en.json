@@ -1075,5 +1075,13 @@
   "dashboard.quota.viewPlansSub": "Upgrade your plan to create more tours.",
   "dashboard.plan.free": "Free",
   "dashboard.plan.basic": "Basic",
-  "dashboard.plan.premium": "Premium"
+  "dashboard.plan.premium": "Premium",
+  "subscription.feature.toursPerMonth": "{{n}} tours per month",
+  "subscription.feature.toursPerYear": "{{n}} tours per year",
+  "subscription.feature.toursUnlimited": "Unlimited tours",
+  "subscription.autoRenewOptIn": "Auto-renewal",
+  "subscription.autoRenewHint": "Uncheck to pay only this period; it will not renew automatically.",
+  "dashboard.quota.planSubYear": "Annual tour limit",
+  "dashboard.subscription.maxToursMonth": "Tours per month",
+  "dashboard.subscription.maxToursYear": "Tours per year"
 }

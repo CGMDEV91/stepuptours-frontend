@@ -170,9 +170,11 @@ export function SubscriptionTab({ userId, onScrollTop }: SubscriptionTabProps) {
   }
 
   const plan = subscription.plan;
-  const maxBusinessLabel = plan.maxFeaturedDetail === -1 ? t('dashboard.subscription.unlimited') : String(plan.maxFeaturedDetail);
-  const maxStepsLabel    = plan.maxFeaturedSteps === -1   ? t('dashboard.subscription.unlimited') : String(plan.maxFeaturedSteps);
-  const maxLangLabel     = plan.maxLanguages === -1       ? t('dashboard.subscription.unlimited') : String(plan.maxLanguages);
+  const maxLangLabel  = plan.maxLanguages === -1 ? t('dashboard.subscription.unlimited') : String(plan.maxLanguages);
+  const maxToursLabel = plan.maxToursPerMonth === -1 ? t('dashboard.subscription.unlimited') : String(plan.maxToursPerMonth);
+  const toursLimitLabel = plan.billingCycle === 'annual'
+    ? t('dashboard.subscription.maxToursYear')
+    : t('dashboard.subscription.maxToursMonth');
 
   return (
     <View style={styles.container}>
@@ -272,8 +274,7 @@ export function SubscriptionTab({ userId, onScrollTop }: SubscriptionTabProps) {
 
       <Text style={styles.sectionTitle}>{t('dashboard.subscription.limits')}</Text>
       <View style={styles.limitsGrid}>
-        <LimitCard icon="business-outline" label={t('dashboard.subscription.maxBusiness')} value={maxBusinessLabel} />
-        <LimitCard icon="location-outline" label={t('subscription.maxSteps')} value={maxStepsLabel} />
+        <LimitCard icon="map-outline" label={toursLimitLabel} value={maxToursLabel} />
         <LimitCard icon="language-outline" label={t('dashboard.subscription.maxLanguages')} value={maxLangLabel} />
       </View>
 
@@ -295,6 +296,8 @@ function NoSubscriptionView({ onSubscribed, userId }: NoSubscriptionViewProps) {
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  // Auto-renewal opt-in: checked by default. Uncheck to pay a single period.
+  const [autoRenew, setAutoRenew] = useState(true);
 
   useEffect(() => {
     getSubscriptionPlans()
@@ -372,13 +375,33 @@ function NoSubscriptionView({ onSubscribed, userId }: NoSubscriptionViewProps) {
               </Text>
 
               <View style={styles.featureList}>
-                <PlanFeature icon="business-outline" text={t('subscription.feature.businesses', { n: selectedPlan.maxFeaturedDetail === -1 ? '∞' : selectedPlan.maxFeaturedDetail })} />
-                <PlanFeature icon="location-outline" text={t('subscription.feature.steps', { n: selectedPlan.maxFeaturedSteps === -1 ? '∞' : selectedPlan.maxFeaturedSteps })} />
+                <PlanFeature
+                  icon="map-outline"
+                  text={
+                    selectedPlan.maxToursPerMonth === -1
+                      ? t('subscription.feature.toursUnlimited')
+                      : selectedPlan.billingCycle === 'annual'
+                        ? t('subscription.feature.toursPerYear', { n: selectedPlan.maxToursPerMonth })
+                        : t('subscription.feature.toursPerMonth', { n: selectedPlan.maxToursPerMonth })
+                  }
+                />
                 <PlanFeature icon="language-outline" text={t('subscription.feature.languages', { n: selectedPlan.maxLanguages === -1 ? '∞' : selectedPlan.maxLanguages })} />
-                {selectedPlan.featuredPerStep && (
-                  <PlanFeature icon="star-outline" text={t('subscription.feature.featuredPerStep')} />
-                )}
               </View>
+
+              {/* Auto-renewal opt-in (checked by default) */}
+              <TouchableOpacity
+                style={styles.autoRenewRow}
+                onPress={() => setAutoRenew((v) => !v)}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.autoRenewCheckbox, autoRenew && styles.autoRenewCheckboxOn]}>
+                  {autoRenew && <Ionicons name="checkmark" size={14} color="#FFFFFF" />}
+                </View>
+                <View style={{ flex: 1, minHeight: 0 }}>
+                  <Text style={styles.autoRenewLabel}>{t('subscription.autoRenewOptIn')}</Text>
+                  <Text style={styles.autoRenewHint}>{t('subscription.autoRenewHint')}</Text>
+                </View>
+              </TouchableOpacity>
 
               {!checkoutOpen ? (
                 <TouchableOpacity
@@ -394,6 +417,7 @@ function NoSubscriptionView({ onSubscribed, userId }: NoSubscriptionViewProps) {
               ) : (
                 <SubscriptionCheckout
                   plan={selectedPlan}
+                  autoRenew={autoRenew}
                   onSuccess={onSubscribed}
                   onCancel={() => setCheckoutOpen(false)}
                 />
@@ -422,6 +446,7 @@ function NoSubscriptionView({ onSubscribed, userId }: NoSubscriptionViewProps) {
 
 interface SubscriptionCheckoutProps {
   plan: SubscriptionPlan;
+  autoRenew: boolean;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -438,7 +463,7 @@ function SubscriptionCheckout(props: SubscriptionCheckoutProps) {
     setInitializing(true);
     setInitError('');
 
-    createStripeCheckoutSession(props.plan.id)
+    createStripeCheckoutSession(props.plan.id, props.autoRenew)
       .then((result) => {
         if (cancelled) return;
         setClientSecret(result.clientSecret);
@@ -458,7 +483,7 @@ function SubscriptionCheckout(props: SubscriptionCheckoutProps) {
       });
 
     return () => { cancelled = true; };
-  }, [props.plan.id, t]);
+  }, [props.plan.id, props.autoRenew, t]);
 
   if (Platform.OS !== 'web') {
     return <NativeCheckoutPlaceholder onCancel={props.onCancel} />;
@@ -950,6 +975,17 @@ const styles = StyleSheet.create({
   featureList: { gap: 8 },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   featureText: { fontSize: 14, color: '#374151' },
+  autoRenewRow: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    marginTop: 14, marginBottom: 4,
+  },
+  autoRenewCheckbox: {
+    width: 22, height: 22, borderRadius: 6, borderWidth: 1.5, borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginTop: 1,
+  },
+  autoRenewCheckboxOn: { backgroundColor: AMBER, borderColor: AMBER },
+  autoRenewLabel: { fontSize: 14, fontWeight: '600', color: '#111827' },
+  autoRenewHint: { fontSize: 12, color: '#6B7280', marginTop: 2, lineHeight: 16 },
   subscribeBtn: {
     backgroundColor: AMBER,
     borderRadius: 12,

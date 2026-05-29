@@ -701,6 +701,7 @@ export function mapDrupalSubscriptionPlan(raw: any): SubscriptionPlan {
     planType: raw.field_plan_type ?? 'premium',
     billingCycle: normalizeBillingCycle(raw.field_billing_cycle),
     price: parseFloat(raw.field_price ?? '0'),
+    maxToursPerMonth: raw.field_max_tours_per_month ?? -1,
     maxFeaturedDetail: raw.field_max_featured_detail ?? 1,
     maxFeaturedSteps: raw.field_max_featured_steps ?? 3,
     maxLanguages: raw.field_max_languages ?? 5,

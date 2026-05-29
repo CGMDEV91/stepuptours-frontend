@@ -1013,5 +1013,13 @@
   "dashboard.quota.viewPlansSub": "Améliorez votre forfait pour créer plus de visites.",
   "dashboard.plan.free": "Gratuit",
   "dashboard.plan.basic": "Basique",
-  "dashboard.plan.premium": "Premium"
+  "dashboard.plan.premium": "Premium",
+  "subscription.feature.toursPerMonth": "{{n}} visites par mois",
+  "subscription.feature.toursPerYear": "{{n}} visites par an",
+  "subscription.feature.toursUnlimited": "Visites illimitées",
+  "subscription.autoRenewOptIn": "Renouvellement automatique",
+  "subscription.autoRenewHint": "Décochez pour ne payer que cette période ; pas de renouvellement automatique.",
+  "dashboard.quota.planSubYear": "Limite annuelle de visites",
+  "dashboard.subscription.maxToursMonth": "Visites par mois",
+  "dashboard.subscription.maxToursYear": "Visites par an"
 }

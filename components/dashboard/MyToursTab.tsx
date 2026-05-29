@@ -172,7 +172,11 @@ function QuotaBar({ quota, onViewPlans }: QuotaBarProps) {
             <Text style={styles.planBadgeText}>{planLabel}</Text>
           </View>
         </View>
-        <Text style={styles.quotaSegSub}>{t('dashboard.quota.planSub')}</Text>
+        <Text style={styles.quotaSegSub}>
+          {quota.billing === 'year'
+            ? t('dashboard.quota.planSubYear')
+            : t('dashboard.quota.planSub')}
+        </Text>
       </View>
 
       <Divider />

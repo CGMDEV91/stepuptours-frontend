@@ -1075,5 +1075,13 @@
   "dashboard.quota.viewPlansSub": "Mejora tu plan para crear más tours.",
   "dashboard.plan.free": "Gratis",
   "dashboard.plan.basic": "Básico",
-  "dashboard.plan.premium": "Premium"
+  "dashboard.plan.premium": "Premium",
+  "subscription.feature.toursPerMonth": "{{n}} tours al mes",
+  "subscription.feature.toursPerYear": "{{n}} tours al año",
+  "subscription.feature.toursUnlimited": "Tours ilimitados",
+  "subscription.autoRenewOptIn": "Renovación automática",
+  "subscription.autoRenewHint": "Desmárcalo para pagar solo este periodo; no se renovará automáticamente.",
+  "dashboard.quota.planSubYear": "Límite anual de tours",
+  "dashboard.subscription.maxToursMonth": "Tours al mes",
+  "dashboard.subscription.maxToursYear": "Tours al año"
 }

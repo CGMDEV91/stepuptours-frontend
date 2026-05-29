@@ -1013,5 +1013,13 @@
   "dashboard.quota.viewPlansSub": "Αναβαθμίστε το πλάνο σας για να δημιουργήσετε περισσότερες περιηγήσεις.",
   "dashboard.plan.free": "Δωρεάν",
   "dashboard.plan.basic": "Βασικό",
-  "dashboard.plan.premium": "Premium"
+  "dashboard.plan.premium": "Premium",
+  "subscription.feature.toursPerMonth": "{{n}} περιηγήσεις ανά μήνα",
+  "subscription.feature.toursPerYear": "{{n}} περιηγήσεις ανά έτος",
+  "subscription.feature.toursUnlimited": "Απεριόριστες περιηγήσεις",
+  "subscription.autoRenewOptIn": "Αυτόματη ανανέωση",
+  "subscription.autoRenewHint": "Καταργήστε την επιλογή για να πληρώσετε μόνο αυτήν την περίοδο· δεν θα ανανεωθεί αυτόματα.",
+  "dashboard.quota.planSubYear": "Ετήσιο όριο περιηγήσεων",
+  "dashboard.subscription.maxToursMonth": "Περιηγήσεις ανά μήνα",
+  "dashboard.subscription.maxToursYear": "Περιηγήσεις ανά έτος"
 }

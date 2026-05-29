@@ -94,6 +94,14 @@ export default function DashboardScreen() {
     router.setParams({ tab });
   };
 
+  // Sync the active tab when the `tab` URL param changes from elsewhere
+  // (e.g. the "Ver planes" button in MyToursTab calls router.setParams).
+  useEffect(() => {
+    if (tabParam && isValidTab(tabParam) && tabParam !== activeTab) {
+      setActiveTab(tabParam as TabId);
+    }
+  }, [tabParam]);
+
   // ── Scroll to top on mount + tab change ───────────────────────────────────
   useEffect(() => {
     // Prevent browser from restoring scroll position on page refresh (web only)
