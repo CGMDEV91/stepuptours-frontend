@@ -8,6 +8,7 @@ import { useAuthStore } from '../../stores/auth.store';
 import { getSocialLinks, type SocialLinksConfig } from '../../services/admin.service';
 import { useFeedbackStore } from '../../stores/feedback.store';
 import { isNative } from '../../lib/platform';
+import { imageHeaders } from '../../lib/drupal-client';
 
 const NAVY = '#1C2B3A';
 const NAVY_LIGHT = '#243447';
@@ -67,7 +68,7 @@ function FooterWeb() {
 
   useEffect(() => {
     const base = process.env.EXPO_PUBLIC_API_URL ?? '';
-    fetch(`${base}/api/site-settings`)
+    fetch(`${base}/api/site-settings`, { headers: { Accept: 'application/json', ...imageHeaders } })
         .then(r => r.json())
         .then((data) => {
           setSettings(prev => ({

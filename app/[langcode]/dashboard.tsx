@@ -22,6 +22,8 @@ import { SubscriptionTab } from '../../components/dashboard/SubscriptionTab';
 import { PaymentDataTab } from '../../components/dashboard/PaymentDataTab';
 import { DonationsTab } from '../../components/dashboard/DonationsTab';
 import { PayoutsTab } from '../../components/dashboard/PayoutsTab';
+import { SupportTab } from '../../components/dashboard/SupportTab';
+import { getTicketsUnread } from '../../services/tickets.service';
 import PageBanner from '../../components/layout/PageBanner';
 import Footer from '../../components/layout/Footer';
 import { PageScrollView } from '../../components/layout/PageScrollView';
@@ -30,7 +32,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'tours' | 'subscription' | 'payment' | 'donations' | 'payouts';
+type TabId = 'tours' | 'support' | 'subscription' | 'payment' | 'donations' | 'payouts';
 
 interface Tab {
   id: TabId;
@@ -41,12 +43,13 @@ interface Tab {
 const TABS: Tab[] = [
   { id: 'subscription', labelKey: 'dashboard.tabs.subscription', icon: 'card-outline' },
   { id: 'tours',        labelKey: 'dashboard.tabs.tours',        icon: 'map-outline' },
+  { id: 'support',      labelKey: 'dashboard.tabs.support',      icon: 'chatbubbles-outline' },
   { id: 'payment',      labelKey: 'dashboard.tabs.payment',      icon: 'wallet-outline' },
   { id: 'donations',    labelKey: 'dashboard.tabs.donations',    icon: 'heart-outline' },
   { id: 'payouts',      labelKey: 'dashboard.tabs.payouts',      icon: 'cash-outline' },
 ];
 
-const VALID_TABS: TabId[] = ['tours', 'subscription', 'payment', 'donations', 'payouts'];
+const VALID_TABS: TabId[] = ['tours', 'support', 'subscription', 'payment', 'donations', 'payouts'];
 
 function isValidTab(value: string): value is TabId {
   return VALID_TABS.includes(value as TabId);
@@ -73,6 +76,18 @@ export default function DashboardScreen() {
   const initialTab: TabId = tabParam && isValidTab(tabParam) ? tabParam : 'subscription';
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const scrollRef = useRef<ScrollView>(null);
+
+  // ── Support tickets unread badge ──────────────────────────────────────────
+  const [ticketsUnread, setTicketsUnread] = useState(0);
+  const refreshTicketsUnread = React.useCallback(() => {
+    if (useAuthStore.getState().isLoading || !useAuthStore.getState().user) return;
+    getTicketsUnread().then((r) => setTicketsUnread(r.tickets)).catch(() => {});
+  }, []);
+  useEffect(() => {
+    // Only fetch once auth is ready (avoids a 401 on first mount before the
+    // session is restored).
+    if (!isAuthLoading && user) refreshTicketsUnread();
+  }, [refreshTicketsUnread, activeTab, isAuthLoading, user?.id]);
 
   const handleTabChange = (tab: TabId) => {
     setActiveTab(tab);
@@ -169,6 +184,11 @@ export default function DashboardScreen() {
             <Text style={[styles.mobileTabLabel, isActive && styles.mobileTabLabelActive]}>
               {t(tab.labelKey)}
             </Text>
+            {tab.id === 'support' && ticketsUnread > 0 && (
+              <View style={styles.tabBadge}>
+                <Text style={styles.tabBadgeText}>{ticketsUnread > 9 ? '9+' : ticketsUnread}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -200,6 +220,11 @@ export default function DashboardScreen() {
               <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
                 {t(tab.labelKey)}
               </Text>
+              {tab.id === 'support' && ticketsUnread > 0 && (
+                <View style={styles.tabBadge}>
+                  <Text style={styles.tabBadgeText}>{ticketsUnread > 9 ? '9+' : ticketsUnread}</Text>
+                </View>
+              )}
             </TouchableOpacity>
           );
         })}
@@ -214,6 +239,7 @@ export default function DashboardScreen() {
     }>
       {activeTab === 'subscription' && <SubscriptionTab userId={user.id} onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />}
       {activeTab === 'tours' && <MyToursTab userId={user.id} />}
+      {activeTab === 'support' && <SupportTab onChanged={refreshTicketsUnread} />}
       {activeTab === 'payment' && <PaymentDataTab userId={user.id} />}
       {activeTab === 'donations' && <DonationsTab userId={user.id} />}
       {activeTab === 'payouts' && <PayoutsTab onGoToPayment={() => handleTabChange('payment')} />}
@@ -299,6 +325,20 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     color: '#FFFFFF',
+  },
+  tabBadge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 5,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
   },
 
   // ── Mobile tab bar ────────────────────────────────────────────────────────

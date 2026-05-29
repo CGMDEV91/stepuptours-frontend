@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
 import { PageScrollView } from '../../components/layout/PageScrollView';
+import { imageHeaders } from '../../lib/drupal-client';
 
 const AMBER = '#F59E0B';
 
@@ -24,7 +25,7 @@ export default function MoreScreen() {
 
   useEffect(() => {
     const base = process.env.EXPO_PUBLIC_API_URL ?? '';
-    fetch(`${base}/api/site-settings`)
+    fetch(`${base}/api/site-settings`, { headers: { Accept: 'application/json', ...imageHeaders } })
       .then((r) => r.json())
       .then((d) => { if (d?.siteEmail) setEmail(d.siteEmail); })
       .catch(() => {});

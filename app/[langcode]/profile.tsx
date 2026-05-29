@@ -31,6 +31,7 @@ import { LanguageSelector } from '../../components/layout/LanguageSelector';
 import { PageScrollView } from '../../components/layout/PageScrollView';
 import { webFullHeight } from '../../lib/web-styles';
 import { isNative } from '../../lib/platform';
+import { imageHeaders } from '../../lib/drupal-client';
 import { getAbandonedTourPref, setAbandonedTourPref } from '../../lib/notification-prefs';
 import { syncPushToken } from '../../services/notifications.service';
 import type { TourActivity, User } from '../../types';
@@ -129,7 +130,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!isNative) return;
     const base = process.env.EXPO_PUBLIC_API_URL ?? '';
-    fetch(`${base}/api/site-settings`)
+    fetch(`${base}/api/site-settings`, { headers: { Accept: 'application/json', ...imageHeaders } })
       .then((r) => r.json())
       .then((d) => { if (d?.siteEmail) setSiteEmail(d.siteEmail); })
       .catch(() => {});

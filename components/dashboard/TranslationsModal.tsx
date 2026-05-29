@@ -29,9 +29,10 @@ import {
   approveTranslation,
   unpublishTranslation,
   deleteTourTranslation,
+  getToursQuota,
   type TourTranslationInfo,
 } from '../../services/dashboard.service';
-import { postTourComment } from '../../services/comments.service';
+import { createTicket } from '../../services/tickets.service';
 import { langCodeToCountryCode } from '../../services/language.service';
 import type { Tour } from '../../types';
 import { buildTourSlug } from '../../lib/tour-slug';
@@ -92,6 +93,7 @@ export function TranslationsModal({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [sending, setSending]   = useState(false);
   const [requestSent, setRequestSent] = useState(false);
+  const [planType, setPlanType] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     if (!tour?.drupalInternalId) return;
@@ -112,8 +114,11 @@ export function TranslationsModal({
       setRequestSent(false);
       setOpenMenuLang(null);
       refresh();
+      getToursQuota().then((q) => setPlanType(q.planType)).catch(() => setPlanType(null));
     }
   }, [visible, tour, refresh]);
+
+  const isFreePlan = planType === 'free';
 
   // Languages that already exist (source + any translation, published or not).
   const doneLangs = new Set<string>([
@@ -134,6 +139,16 @@ export function TranslationsModal({
 
   const handleSend = async () => {
     if (!tour) return;
+    // Free / no plan → cannot request translations. Prompt upgrade.
+    if (isFreePlan) {
+      setConfirm({
+        title: t('plan.upgradeTitle', 'Upgrade your plan'),
+        message: t('translations.upgradeRequired', 'Translations are a premium feature. Upgrade your plan to request translations.'),
+        confirmLabel: t('plan.upgradeCta', 'Upgrade plan'),
+        onConfirm: () => { onClose(); router.replace(`/${uiLang}/dashboard?tab=subscription` as any); },
+      });
+      return;
+    }
     const targets = Array.from(selected).filter((c) => !doneLangs.has(c));
     if (targets.length === 0 || sending) return;
     setSending(true);
@@ -153,7 +168,13 @@ export function TranslationsModal({
     });
 
     try {
-      await postTourComment(tour.id, tour.drupalInternalId, 'tour_translation_request', body);
+      // A translation request opens a dedicated support ticket (one per submit).
+      await createTicket({
+        title: `${t('tickets.translationTitle', 'Translation request')} — ${tour.title} (${langCodes})`,
+        body,
+        kind: 'translation',
+        tourNid: tour.drupalInternalId,
+      });
       setSelected(new Set());
       setRequestSent(true);
     } catch (e: any) {
@@ -240,7 +261,7 @@ export function TranslationsModal({
   return (
       <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
         <Pressable style={[styles.backdrop, isMobile && styles.backdropMobile]} onPress={onClose}>
-          <Pressable style={[styles.box, isMobile && styles.boxMobile]} onPress={() => setOpenMenuLang(null)}>
+          <Pressable style={[styles.box, isMobile && styles.boxMobile]} onPress={() => {}}>
 
             {/* Header */}
             <View style={styles.header}>
@@ -263,27 +284,95 @@ export function TranslationsModal({
 
               <View style={styles.langColumn}>
                 {TARGET_LANGUAGES.map((lang) => {
-                  const done       = doneLangs.has(lang.code);
-                  const isSelected = !done && selected.has(lang.code);
-                  return (
-                    <TouchableOpacity
-                      key={lang.code}
-                      style={[styles.langRow, isSelected && styles.langRowSelected, done && styles.langRowDone]}
-                      onPress={() => toggleLang(lang.code)}
-                      disabled={done}
-                      activeOpacity={0.8}
-                    >
+                  const tr        = rows.find((r) => r.langcode === lang.code);
+                  const isSource  = lang.code === sourceLang;
+                  const isTranslated = !!tr;
+                  const requestable  = !isTranslated && !isSource;
+                  const isSelected = requestable && selected.has(lang.code);
+                  const menuOpen   = openMenuLang === lang.code;
+                  const isBusy     = busyLang === lang.code;
+
+                  const rowInner = (
+                    <>
                       <Flag code={langCodeToCountryCode(lang.code)} size={20} />
-                      <Text style={[styles.langName, done && styles.langNameDone]}>{lang.label}</Text>
+                      <Text style={[styles.langName, (isTranslated || isSource) && styles.langNameDone]}>{lang.label}</Text>
                       <View style={{ flex: 1 }} />
-                      {done ? (
-                        <Ionicons name="checkmark-circle" size={18} color="#16A34A" />
+                      {isTranslated ? (
+                        <>
+                          <StatusPill status={tr!.published ? 'approved' : 'pending'} />
+                          <TouchableOpacity
+                            style={styles.opsBtn}
+                            onPress={() => setOpenMenuLang(menuOpen ? null : lang.code)}
+                            disabled={isBusy}
+                            activeOpacity={0.8}
+                          >
+                            {isBusy
+                              ? <ActivityIndicator size="small" color="#6B7280" />
+                              : <Ionicons name="ellipsis-vertical" size={16} color="#374151" />}
+                          </TouchableOpacity>
+                        </>
+                      ) : isSource ? (
+                        <View style={styles.sourcePill}>
+                          <Text style={styles.sourcePillText}>{t('translationsSection.statusSource', 'Original')}</Text>
+                        </View>
                       ) : isSelected ? (
                         <Ionicons name="checkmark-circle" size={18} color={AMBER} />
                       ) : (
                         <Ionicons name="ellipse-outline" size={18} color="#D1D5DB" />
                       )}
-                    </TouchableOpacity>
+                    </>
+                  );
+
+                  return (
+                    <View key={lang.code} style={styles.langItemWrap}>
+                      {requestable ? (
+                        <TouchableOpacity
+                          style={[styles.langRow, isSelected && styles.langRowSelected]}
+                          onPress={() => toggleLang(lang.code)}
+                          activeOpacity={0.8}
+                        >
+                          {rowInner}
+                        </TouchableOpacity>
+                      ) : (
+                        <View style={[styles.langRow, styles.langRowDone]}>
+                          {rowInner}
+                        </View>
+                      )}
+
+                      {isTranslated && menuOpen && (
+                        <View style={styles.opsMenu}>
+                          <OpsItem
+                            icon="create-outline"
+                            label={t('common.edit', 'Edit')}
+                            onPress={() => { setOpenMenuLang(null); onClose(); router.push(editUrl(lang.code) as any); }}
+                          />
+                          <OpsItem
+                            icon="eye-outline"
+                            label={t('common.preview', 'Preview')}
+                            onPress={() => { setOpenMenuLang(null); onClose(); router.push(previewUrl(lang.code) as any); }}
+                          />
+                          {tr!.published ? (
+                            <OpsItem
+                              icon="eye-off-outline"
+                              label={t('translationsSection.unpublish')}
+                              onPress={() => { setOpenMenuLang(null); handleUnpublishTranslation(lang.code); }}
+                            />
+                          ) : (
+                            <OpsItem
+                              icon="checkmark-circle-outline"
+                              label={t('translationsSection.approve')}
+                              onPress={() => { setOpenMenuLang(null); handleApprove(lang.code); }}
+                            />
+                          )}
+                          <OpsItem
+                            icon="trash-outline"
+                            label={t('translationsSection.deleteTitle', 'Delete translation')}
+                            danger
+                            onPress={() => { setOpenMenuLang(null); handleDeleteTranslation(lang.code); }}
+                          />
+                        </View>
+                      )}
+                    </View>
                   );
                 })}
               </View>
@@ -310,80 +399,6 @@ export function TranslationsModal({
                   ? <ActivityIndicator size="small" color="#FFFFFF" />
                   : <Text style={styles.requestBtnText}>{t('translations.requestModalCta')}</Text>}
               </TouchableOpacity>
-
-              {/* ── Separator ──────────────────────────────────────────────── */}
-              <View style={styles.divider} />
-
-              {/* ── Existing translations ──────────────────────────────────── */}
-              <Text style={styles.sectionLabel}>{t('translationsSection.existingTitle', 'Existing translations')}</Text>
-
-              {loading ? (
-                <View style={styles.loadingBox}><ActivityIndicator size="small" color={AMBER} /></View>
-              ) : rows.length === 0 ? (
-                <Text style={styles.emptyText}>{t('translationsSection.empty')}</Text>
-              ) : (
-                <View style={styles.rowList}>
-                  {rows.map((row) => {
-                    const isBusy = busyLang === row.langcode;
-                    const menuOpen = openMenuLang === row.langcode;
-                    return (
-                      <View key={row.langcode} style={styles.translWrap}>
-                        <View style={styles.translRow}>
-                          <View style={styles.translLeft}>
-                            <Flag code={langCodeToCountryCode(row.langcode)} size={20} />
-                            <Text style={styles.langName} numberOfLines={1}>{row.langName}</Text>
-                            <StatusPill status={row.published ? 'approved' : 'pending'} />
-                          </View>
-                          <TouchableOpacity
-                            style={styles.opsBtn}
-                            onPress={() => setOpenMenuLang(menuOpen ? null : row.langcode)}
-                            disabled={isBusy}
-                            activeOpacity={0.8}
-                          >
-                            {isBusy
-                              ? <ActivityIndicator size="small" color="#6B7280" />
-                              : <Ionicons name="ellipsis-vertical" size={16} color="#374151" />}
-                          </TouchableOpacity>
-                        </View>
-
-                        {menuOpen && (
-                          <View style={styles.opsMenu}>
-                            <OpsItem
-                              icon="create-outline"
-                              label={t('common.edit', 'Edit')}
-                              onPress={() => { setOpenMenuLang(null); onClose(); router.push(editUrl(row.langcode) as any); }}
-                            />
-                            <OpsItem
-                              icon="eye-outline"
-                              label={t('common.preview', 'Preview')}
-                              onPress={() => { setOpenMenuLang(null); onClose(); router.push(previewUrl(row.langcode) as any); }}
-                            />
-                            {row.published ? (
-                              <OpsItem
-                                icon="eye-off-outline"
-                                label={t('translationsSection.unpublish')}
-                                onPress={() => { setOpenMenuLang(null); handleUnpublishTranslation(row.langcode); }}
-                              />
-                            ) : (
-                              <OpsItem
-                                icon="checkmark-circle-outline"
-                                label={t('translationsSection.approve')}
-                                onPress={() => { setOpenMenuLang(null); handleApprove(row.langcode); }}
-                              />
-                            )}
-                            <OpsItem
-                              icon="trash-outline"
-                              label={t('translationsSection.deleteTitle', 'Delete translation')}
-                              danger
-                              onPress={() => { setOpenMenuLang(null); handleDeleteTranslation(row.langcode); }}
-                            />
-                          </View>
-                        )}
-                      </View>
-                    );
-                  })}
-                </View>
-              )}
 
               {error ? <Text style={styles.errorText}>{error}</Text> : null}
             </ScrollView>
@@ -468,6 +483,9 @@ const styles = StyleSheet.create({
 
   // Request languages column
   langColumn: { gap: 8 },
+  langItemWrap: { borderRadius: 10, overflow: 'hidden' },
+  sourcePill: { backgroundColor: '#E0E7FF', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  sourcePillText: { fontSize: 10, fontWeight: '700', color: '#3730A3', letterSpacing: 0.3 },
   langRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     paddingHorizontal: 12, paddingVertical: 11, borderRadius: 10,

@@ -80,6 +80,9 @@ export interface Tour {
   availableLangs?: string[];
   isUntranslated?: boolean;
   published: boolean;
+  /** True once an admin has ever published/approved the tour. Until then the
+   *  tour is "under review" and the guide cannot publish it. */
+  adminApproved?: boolean;
   langcode?: string;
 }
 

@@ -28,7 +28,6 @@ import {
   republishTour,
   type ToursQuota,
 } from '../../services/dashboard.service';
-import { getUnreadCountByTour } from '../../services/comments.service';
 import { TourCard } from '../tour/TourCard';
 import { TranslationsModal } from './TranslationsModal';
 import { ConfirmModal } from '../shared/ConfirmModal';
@@ -184,11 +183,11 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
-  const [unreadByTour, setUnreadByTour] = useState<Record<string, number>>({});
   const [translModal, setTranslModal] = useState<Tour | null>(null);
   const [pendingTourPublish, setPendingTourPublish] = useState<Tour | null>(null);
   const [togglingPublishId, setTogglingPublishId] = useState<string | null>(null);
   const [quota, setQuota] = useState<ToursQuota | null>(null);
+  const [upgradeVisible, setUpgradeVisible] = useState(false);
   const user = useAuthStore((s) => s.user);
 
   // ── Responsive grid ───────────────────────────────────────────────────────
@@ -216,14 +215,6 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   }, [userId]);
 
   useEffect(() => { loadTours(); }, [loadTours]);
-
-  // Load unread message counts (non-blocking, userId = UUID in this app).
-  useEffect(() => {
-    if (!userId) return;
-    getUnreadCountByTour(userId)
-      .then(setUnreadByTour)
-      .catch(() => {});
-  }, [userId]);
 
   // Load monthly tour quota (non-blocking).
   useEffect(() => {
@@ -296,6 +287,20 @@ export function MyToursTab({ userId }: MyToursTabProps) {
     }
   }, [confirmTourPublish]);
 
+  // Gate tour creation by plan quota. -1 = unlimited.
+  const handleCreate = useCallback(() => {
+    if (quota && quota.max !== -1 && quota.used >= quota.max) {
+      setUpgradeVisible(true);
+      return;
+    }
+    router.push(`/${langcode}/dashboard/create-tour` as any);
+  }, [quota, router, langcode]);
+
+  const goToUpgrade = useCallback(() => {
+    setUpgradeVisible(false);
+    router.replace(`/${langcode}/dashboard?tab=subscription` as any);
+  }, [router, langcode]);
+
   const handleEdit = useCallback((tour: Tour) => {
     router.push(
         `/${langcode}/dashboard/create-tour?tourId=${tour.id}&contentLang=${tour.langcode}` as any
@@ -333,7 +338,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
         <TouchableOpacity
           style={styles.createBtn}
           activeOpacity={0.85}
-          onPress={() => router.push(`/${langcode}/dashboard/create-tour` as any)}
+          onPress={handleCreate}
         >
           <Ionicons name="add" size={18} color="#FFFFFF" />
           <Text style={styles.createBtnText}>{t('dashboard.tours.create')}</Text>
@@ -382,7 +387,6 @@ export function MyToursTab({ userId }: MyToursTabProps) {
       ) : (
         <View style={styles.grid}>
           {filteredTours.map((item) => {
-            const unread = unreadByTour[item.id] ?? 0;
             return (
               <View key={item.id} style={{ width: cardWidth, position: 'relative' }}>
                 <TourCard
@@ -395,23 +399,6 @@ export function MyToursTab({ userId }: MyToursTabProps) {
                 />
                 {/* Action buttons row */}
                 <View style={styles.cardActions}>
-                  {/* Messages button + unread badge */}
-                  <TouchableOpacity
-                    style={[styles.actionBtn, unread > 0 && styles.actionBtnUnread]}
-                    onPress={() => router.push(`/${langcode}/dashboard/tour/${item.id}/messages` as any)}
-                    activeOpacity={0.85}
-                  >
-                    <Ionicons name="chatbubble-outline" size={13} color={unread > 0 ? '#D97706' : '#6B7280'} />
-                    <Text style={[styles.actionBtnText, unread > 0 && styles.actionBtnTextUnread]}>
-                      {t('messages.buttonLabel')}
-                    </Text>
-                    {unread > 0 && (
-                      <View style={styles.unreadBadge}>
-                        <Text style={styles.unreadBadgeText}>{unread}</Text>
-                      </View>
-                    )}
-                  </TouchableOpacity>
-
                   {/* Translations — request + manage (unified) */}
                   <TouchableOpacity
                     style={styles.actionBtn}
@@ -422,30 +409,40 @@ export function MyToursTab({ userId }: MyToursTabProps) {
                     <Text style={styles.actionBtnText}>{t('translations.manageBtn', 'Translations')}</Text>
                   </TouchableOpacity>
 
-                  {/* Unpublish / republish the whole tour */}
-                  <TouchableOpacity
-                    style={styles.actionBtn}
-                    onPress={() => handleTourPublishRequest(item)}
-                    disabled={togglingPublishId === item.id}
-                    activeOpacity={0.85}
-                  >
-                    {togglingPublishId === item.id ? (
-                      <ActivityIndicator size="small" color="#6B7280" />
-                    ) : (
-                      <>
-                        <Ionicons
-                          name={item.published ? 'eye-off-outline' : 'eye-outline'}
-                          size={13}
-                          color="#6B7280"
-                        />
-                        <Text style={styles.actionBtnText}>
-                          {item.published
-                            ? t('dashboard.tours.unpublishBtn')
-                            : t('dashboard.tours.republishBtn')}
-                        </Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
+                  {/* Publish state — under review (admin not yet approved) is
+                      a disabled badge; once approved the guide toggles freely. */}
+                  {!item.adminApproved ? (
+                    <View style={[styles.actionBtn, styles.actionBtnReview]}>
+                      <Ionicons name="hourglass-outline" size={13} color="#92400E" />
+                      <Text style={[styles.actionBtnText, styles.actionBtnTextReview]}>
+                        {t('dashboard.tours.underReview', 'Under review')}
+                      </Text>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => handleTourPublishRequest(item)}
+                      disabled={togglingPublishId === item.id}
+                      activeOpacity={0.85}
+                    >
+                      {togglingPublishId === item.id ? (
+                        <ActivityIndicator size="small" color="#6B7280" />
+                      ) : (
+                        <>
+                          <Ionicons
+                            name={item.published ? 'eye-off-outline' : 'eye-outline'}
+                            size={13}
+                            color="#6B7280"
+                          />
+                          <Text style={styles.actionBtnText}>
+                            {item.published
+                              ? t('dashboard.tours.unpublishBtn')
+                              : t('dashboard.tours.publishBtn', 'Publish')}
+                          </Text>
+                        </>
+                      )}
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 {deletingId === item.id ? (
@@ -479,6 +476,17 @@ export function MyToursTab({ userId }: MyToursTabProps) {
         confirmLabel={t('common.ok', 'OK')}
         onConfirm={() => setAlertMsg(null)}
         onClose={() => setAlertMsg(null)}
+      />
+
+      {/* Upgrade plan popup (tour limit reached) */}
+      <ConfirmModal
+        visible={upgradeVisible}
+        title={t('plan.upgradeTitle', 'Upgrade your plan')}
+        message={t('plan.upgradeToursBody', 'You have reached your tour limit for this month. Upgrade your plan to create more tours.')}
+        confirmLabel={t('plan.upgradeCta', 'Upgrade plan')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={goToUpgrade}
+        onClose={() => setUpgradeVisible(false)}
       />
 
       {/* Unpublish tour confirmation */}
@@ -687,6 +695,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FDE68A',
   },
+  actionBtnReview: {
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
   actionBtnText: {
     fontSize: 12,
     fontWeight: '600',
@@ -694,6 +707,9 @@ const styles = StyleSheet.create({
   },
   actionBtnTextUnread: {
     color: '#D97706',
+  },
+  actionBtnTextReview: {
+    color: '#92400E',
   },
   actionBtnDanger: {
     backgroundColor: '#FEF2F2',

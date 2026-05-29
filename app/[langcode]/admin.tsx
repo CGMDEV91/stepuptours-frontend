@@ -21,7 +21,8 @@ import { TranslationsTab } from '../../components/admin/TranslationsTab';
 import { LegalTab } from '../../components/admin/LegalTab';
 import { AnalyticsTab } from '../../components/admin/AnalyticsTab';
 import { FeedbackTab } from '../../components/admin/FeedbackTab';
-import { MessagesTab } from '../../components/admin/MessagesTab';
+import { AdminTicketsTab } from '../../components/admin/AdminTicketsTab';
+import { getAdminTicketsUnread } from '../../services/tickets.service';
 import { DonationsView } from '../../components/shared/DonationsView';
 import { BusinessTab } from '../../components/dashboard/BusinessTab';
 import PageBanner from '../../components/layout/PageBanner';
@@ -30,7 +31,7 @@ import { webFullHeight } from '../../lib/web-styles';
 const AMBER = '#F59E0B';
 const CONTENT_MAX_WIDTH = 900;
 
-type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'legal' | 'analytics' | 'feedback' | 'messages';
+type TabId = 'settings' | 'translations' | 'businesses' | 'donations' | 'legal' | 'analytics' | 'feedback' | 'tickets';
 
 interface Tab {
   id: TabId;
@@ -40,7 +41,7 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'settings',     labelKey: 'admin.tabs.settings',     icon: 'settings-outline' },
-  { id: 'messages',     labelKey: 'admin.tabs.messages',     icon: 'mail-outline' },
+  { id: 'tickets',      labelKey: 'admin.tabs.tickets',      icon: 'chatbox-ellipses-outline' },
   { id: 'translations', labelKey: 'admin.tabs.translations', icon: 'language-outline' },
   { id: 'legal',        labelKey: 'admin.tabs.legal',        icon: 'document-text-outline' },
   { id: 'businesses',   labelKey: 'admin.tabs.businesses',   icon: 'business-outline' },
@@ -49,7 +50,7 @@ const TABS: Tab[] = [
   { id: 'feedback',     labelKey: 'admin.tabs.feedback',     icon: 'chatbubbles-outline' },
 ];
 
-const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics', 'feedback', 'messages'];
+const VALID_ADMIN_TABS: TabId[] = ['settings', 'translations', 'legal', 'businesses', 'donations', 'analytics', 'feedback', 'tickets'];
 function isValidAdminTab(value: string): value is TabId {
   return VALID_ADMIN_TABS.includes(value as TabId);
 }
@@ -71,6 +72,16 @@ export default function AdminScreen() {
   const initialTab: TabId = tabParam && isValidAdminTab(tabParam) ? tabParam : 'settings';
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const scrollRef = useRef<ScrollView>(null);
+
+  // ── Tickets unread badge ──────────────────────────────────────────────────
+  const [ticketsUnread, setTicketsUnread] = useState(0);
+  const refreshTicketsUnread = React.useCallback(() => {
+    if (useAuthStore.getState().isLoading || !useAuthStore.getState().user) return;
+    getAdminTicketsUnread().then((r) => setTicketsUnread(r.tickets)).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (!isAuthLoading && user) refreshTicketsUnread();
+  }, [refreshTicketsUnread, activeTab, isAuthLoading, user?.id]);
 
   const handleTabChange = (tab: TabId) => {
     setActiveTab(tab);
@@ -140,6 +151,11 @@ export default function AdminScreen() {
                 <Text style={[styles.mobileTabLabel, isActive && styles.mobileTabLabelActive]}>
                   {t(tab.labelKey)}
                 </Text>
+                {tab.id === 'tickets' && ticketsUnread > 0 && (
+                  <View style={styles.tabBadge}>
+                    <Text style={styles.tabBadgeText}>{ticketsUnread > 9 ? '9+' : ticketsUnread}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
           );
         })}
@@ -171,6 +187,11 @@ export default function AdminScreen() {
                   <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
                     {t(tab.labelKey)}
                   </Text>
+                  {tab.id === 'tickets' && ticketsUnread > 0 && (
+                    <View style={styles.tabBadge}>
+                      <Text style={styles.tabBadgeText}>{ticketsUnread > 9 ? '9+' : ticketsUnread}</Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
             );
           })}
@@ -194,8 +215,8 @@ export default function AdminScreen() {
         return <AnalyticsTab />;
       case 'feedback':
         return <FeedbackTab />;
-      case 'messages':
-        return <MessagesTab />;
+      case 'tickets':
+        return <AdminTicketsTab onChanged={refreshTicketsUnread} />;
     }
   };
 
@@ -298,6 +319,20 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     color: '#FFFFFF',
+  },
+  tabBadge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 5,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
   },
 
   // ── Mobile tab bar ────────────────────────────────────────────────────────
