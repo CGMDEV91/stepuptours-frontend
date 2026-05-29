@@ -12,12 +12,14 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../../stores/auth.store';
 import { webFullHeight } from '../../../../lib/web-styles';
+import { ChatBackground } from '../../../../components/chat/ChatBackground';
 import {
   getAdminTicket,
   adminReplyTicket,
@@ -34,6 +36,8 @@ export default function AdminTicketChatScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<TicketMessage[]>([]);
@@ -95,82 +99,94 @@ export default function AdminTicketChatScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={[styles.screen, webFullHeight]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={8} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={22} color="#374151" />
-        </TouchableOpacity>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.headerNumber}>{ticket.number}{ticket.ownerName ? ` · ${ticket.ownerName}` : ''}</Text>
-          <Text style={styles.headerTitle} numberOfLines={1}>{ticket.title}</Text>
-        </View>
-        {!ticket.resolved && (
-          <TouchableOpacity
-            style={[styles.resolveBtn, resolving && styles.btnDisabled]}
-            onPress={handleResolve}
-            disabled={resolving}
-            activeOpacity={0.85}
-          >
-            {resolving ? <ActivityIndicator size="small" color="#065F46" /> : (
-              <>
-                <Ionicons name="checkmark-done-outline" size={14} color="#065F46" />
-                <Text style={styles.resolveBtnText}>{t('tickets.markResolved', 'Resolve')}</Text>
-              </>
-            )}
+    <KeyboardAvoidingView style={[styles.screen, isDesktop && styles.screenDesktop, webFullHeight]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} hitSlop={8} style={styles.backBtn}>
+            <Ionicons name="chevron-back" size={22} color="#374151" />
           </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerNumber}>{ticket.number}{ticket.ownerName ? ` · ${ticket.ownerName}` : ''}</Text>
+            <Text style={styles.headerTitle} numberOfLines={1}>{ticket.title}</Text>
+          </View>
+          {!ticket.resolved && (
+            <TouchableOpacity
+              style={[styles.resolveBtn, resolving && styles.btnDisabled]}
+              onPress={handleResolve}
+              disabled={resolving}
+              activeOpacity={0.85}
+            >
+              {resolving ? <ActivityIndicator size="small" color="#065F46" /> : (
+                <>
+                  <Ionicons name="checkmark-done-outline" size={14} color="#065F46" />
+                  <Text style={styles.resolveBtnText}>{t('tickets.markResolved', 'Resolve')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={styles.threadWrap}>
+          <ChatBackground />
+          <ScrollView ref={scrollRef} style={styles.thread} contentContainerStyle={styles.threadContent}>
+            {messages.map((m) => {
+              const isSystem = !!m.msgKey;
+              const isOwn = !isSystem && !!user && m.authorId === user.id;
+              const text = isSystem ? (t(m.msgKey as string, m.msgParams ?? {}) as string) : m.body;
+              if (isSystem) {
+                return <View key={m.id} style={styles.systemRow}><Text style={styles.systemText}>{text}</Text></View>;
+              }
+              return (
+                <View key={m.id} style={[styles.bubble, isOwn ? styles.bubbleOwn : styles.bubbleOther]}>
+                  {!isOwn && m.authorName ? <Text style={styles.author}>{m.authorName}</Text> : null}
+                  <Text style={[styles.bubbleText, isOwn && styles.bubbleTextOwn]}>{text}</Text>
+                  <View style={isOwn ? styles.tailOwn : styles.tailOther} />
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        {ticket.resolved ? (
+          <View style={styles.resolvedBar}>
+            <Ionicons name="checkmark-done-outline" size={16} color="#6B7280" />
+            <Text style={styles.resolvedBarText}>{t('tickets.statusResolved', 'Resolved')}</Text>
+          </View>
+        ) : (
+          <View style={styles.inputBar}>
+            <TextInput
+              style={styles.input}
+              value={draft}
+              onChangeText={setDraft}
+              placeholder={t('messages.placeholder', 'Write a message…')}
+              placeholderTextColor="#9CA3AF"
+              multiline
+            />
+            <TouchableOpacity
+              style={[styles.sendBtn, (sending || !draft.trim()) && styles.btnDisabled]}
+              onPress={handleSend}
+              disabled={sending || !draft.trim()}
+              activeOpacity={0.85}
+            >
+              {sending ? <ActivityIndicator size="small" color="#FFFFFF" /> : <Ionicons name="send" size={18} color="#FFFFFF" />}
+            </TouchableOpacity>
+          </View>
         )}
       </View>
-
-      <ScrollView ref={scrollRef} style={styles.thread} contentContainerStyle={styles.threadContent}>
-        {messages.map((m) => {
-          const isSystem = !!m.msgKey;
-          const isOwn = !isSystem && !!user && m.authorId === user.id;
-          const text = isSystem ? (t(m.msgKey as string, m.msgParams ?? {}) as string) : m.body;
-          if (isSystem) {
-            return <View key={m.id} style={styles.systemRow}><Text style={styles.systemText}>{text}</Text></View>;
-          }
-          return (
-            <View key={m.id} style={[styles.bubble, isOwn ? styles.bubbleOwn : styles.bubbleOther]}>
-              {!isOwn && m.authorName ? <Text style={styles.author}>{m.authorName}</Text> : null}
-              <Text style={[styles.bubbleText, isOwn && styles.bubbleTextOwn]}>{text}</Text>
-            </View>
-          );
-        })}
-      </ScrollView>
-
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-      {ticket.resolved ? (
-        <View style={styles.resolvedBar}>
-          <Ionicons name="checkmark-done-outline" size={16} color="#6B7280" />
-          <Text style={styles.resolvedBarText}>{t('tickets.statusResolved', 'Resolved')}</Text>
-        </View>
-      ) : (
-        <View style={styles.inputBar}>
-          <TextInput
-            style={styles.input}
-            value={draft}
-            onChangeText={setDraft}
-            placeholder={t('messages.placeholder', 'Write a message…')}
-            placeholderTextColor="#9CA3AF"
-            multiline
-          />
-          <TouchableOpacity
-            style={[styles.sendBtn, (sending || !draft.trim()) && styles.btnDisabled]}
-            onPress={handleSend}
-            disabled={sending || !draft.trim()}
-            activeOpacity={0.85}
-          >
-            {sending ? <ActivityIndicator size="small" color="#FFFFFF" /> : <Ionicons name="send" size={18} color="#FFFFFF" />}
-          </TouchableOpacity>
-        </View>
-      )}
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F9FAFB' },
+  screenDesktop: { backgroundColor: '#E9EBEF', alignItems: 'center', paddingVertical: 32, paddingHorizontal: 16 },
+  card: { flex: 1, width: '100%', backgroundColor: '#FFFFFF' },
+  cardDesktop: {
+    maxWidth: 760, borderRadius: 16, overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 24, elevation: 8,
+  },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F9FAFB' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
   backBtn: { padding: 2 },
@@ -179,16 +195,33 @@ const styles = StyleSheet.create({
   resolveBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#D1FAE5', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 7 },
   resolveBtnText: { fontSize: 12, fontWeight: '700', color: '#065F46' },
 
-  thread: { flex: 1 },
-  threadContent: { padding: 16, gap: 10 },
+  threadWrap: { flex: 1, position: 'relative', overflow: 'hidden' },
+  thread: { flex: 1, backgroundColor: 'transparent' },
+  threadContent: { padding: 16, gap: 12 },
   systemRow: { alignItems: 'center', marginVertical: 4 },
-  systemText: { fontSize: 12, color: '#6B7280', fontStyle: 'italic', textAlign: 'center', backgroundColor: '#F3F4F6', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
+  systemText: { fontSize: 12, color: '#6B7280', fontStyle: 'italic', textAlign: 'center', backgroundColor: 'rgba(243,244,246,0.92)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
   bubble: { maxWidth: '85%', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9 },
-  bubbleOwn: { alignSelf: 'flex-end', backgroundColor: AMBER },
-  bubbleOther: { alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E7EB' },
+  bubbleOwn: { alignSelf: 'flex-end', backgroundColor: AMBER, borderBottomRightRadius: 3 },
+  bubbleOther: { alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E7EB', borderBottomLeftRadius: 3 },
   author: { fontSize: 11, fontWeight: '700', color: '#6B7280', marginBottom: 2 },
   bubbleText: { fontSize: 14, color: '#111827', lineHeight: 19 },
   bubbleTextOwn: { color: '#FFFFFF' },
+  tailOwn: {
+    position: 'absolute', bottom: -2, right: 1,
+    width: 0, height: 0,
+    borderLeftWidth: 6, borderLeftColor: 'transparent',
+    borderRightWidth: 6, borderRightColor: 'transparent',
+    borderTopWidth: 9, borderTopColor: AMBER,
+    transform: [{ rotate: '-22deg' }],
+  },
+  tailOther: {
+    position: 'absolute', bottom: -2, left: 1,
+    width: 0, height: 0,
+    borderLeftWidth: 6, borderLeftColor: 'transparent',
+    borderRightWidth: 6, borderRightColor: 'transparent',
+    borderTopWidth: 9, borderTopColor: '#FFFFFF',
+    transform: [{ rotate: '22deg' }],
+  },
 
   errorText: { fontSize: 13, color: '#EF4444', textAlign: 'center', paddingHorizontal: 16, paddingBottom: 6 },
   inputBar: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 10, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E5E7EB' },

@@ -189,16 +189,6 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
       </TouchableOpacity>
       {userIsAdmin && (
         <TouchableOpacity
-          onPress={() => handleNavigate(`/${lang}/admin?tab=messages`)}
-          activeOpacity={0.7}
-          style={styles.dropdownItem}
-        >
-          <Ionicons name="mail-outline" size={16} color="#6B7280" style={styles.dropdownIcon} />
-          <Text style={styles.dropdownItemText}>{t('nav.adminMessages')}</Text>
-        </TouchableOpacity>
-      )}
-      {userIsAdmin && (
-        <TouchableOpacity
           onPress={() => handleNavigate(`/${lang}/admin`)}
           activeOpacity={0.7}
           style={styles.dropdownItem}

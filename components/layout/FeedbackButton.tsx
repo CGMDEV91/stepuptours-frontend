@@ -92,8 +92,9 @@ export function FeedbackButton() {
     }
   };
 
-  // Hide the FAB on the admin page — the modal stays available via the footer link.
-  const showFab = !pathname.includes('/admin');
+  // Hide the FAB on the admin page (modal stays available via the footer link)
+  // and on chat/ticket screens, where it overlaps the send-message button.
+  const showFab = !pathname.includes('/admin') && !pathname.includes('/tickets');
   const bottomOffset = isNative ? 88 : 24;
 
   return (
