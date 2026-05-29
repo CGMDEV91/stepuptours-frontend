@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../../../stores/auth.store';
 import { webFullHeight } from '../../../../lib/web-styles';
 import { ChatBackground } from '../../../../components/chat/ChatBackground';
+import { formatDateTime } from '../../../../lib/date-format';
 import {
   getAdminTicket,
   adminReplyTicket,
@@ -136,10 +137,12 @@ export default function AdminTicketChatScreen() {
               if (isSystem) {
                 return <View key={m.id} style={styles.systemRow}><Text style={styles.systemText}>{text}</Text></View>;
               }
+              const authorLabel = m.authorIsAdmin ? t('tickets.supportAuthor', 'Support') : m.authorName;
               return (
                 <View key={m.id} style={[styles.bubble, isOwn ? styles.bubbleOwn : styles.bubbleOther]}>
-                  {!isOwn && m.authorName ? <Text style={styles.author}>{m.authorName}</Text> : null}
+                  {!isOwn && authorLabel ? <Text style={styles.author}>{authorLabel}</Text> : null}
                   <Text style={[styles.bubbleText, isOwn && styles.bubbleTextOwn]}>{text}</Text>
+                  <Text style={[styles.timestamp, isOwn && styles.timestampOwn]}>{formatDateTime(m.createdAt)}</Text>
                   <View style={isOwn ? styles.tailOwn : styles.tailOther} />
                 </View>
               );
@@ -206,6 +209,8 @@ const styles = StyleSheet.create({
   author: { fontSize: 11, fontWeight: '700', color: '#6B7280', marginBottom: 2 },
   bubbleText: { fontSize: 14, color: '#111827', lineHeight: 19 },
   bubbleTextOwn: { color: '#FFFFFF' },
+  timestamp: { fontSize: 10, color: '#9CA3AF', marginTop: 4, alignSelf: 'flex-end' },
+  timestampOwn: { color: 'rgba(255,255,255,0.85)' },
   tailOwn: {
     position: 'absolute', bottom: -2, right: 1,
     width: 0, height: 0,

@@ -1065,5 +1065,6 @@
   "toast.tour_deleted": "Tour deleted",
   "toast.translation_approved": "Translation approved",
   "toast.translation_unpublished": "Translation unpublished",
-  "toast.translation_deleted": "Translation deleted"
+  "toast.translation_deleted": "Translation deleted",
+  "tickets.supportAuthor": "Support"
 }

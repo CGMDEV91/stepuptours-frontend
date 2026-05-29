@@ -38,6 +38,8 @@ export interface TicketMessage {
   msgParams: Record<string, any> | null;
   authorId: string | null;
   authorName: string | null;
+  /** True when the author is support staff (admin) — shown as "Support". */
+  authorIsAdmin?: boolean;
   createdAt: string;
 }
 

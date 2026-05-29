@@ -1003,5 +1003,6 @@
   "toast.tour_deleted": "Visite supprimée",
   "toast.translation_approved": "Traduction approuvée",
   "toast.translation_unpublished": "Traduction dépubliée",
-  "toast.translation_deleted": "Traduction supprimée"
+  "toast.translation_deleted": "Traduction supprimée",
+  "tickets.supportAuthor": "Assistance"
 }

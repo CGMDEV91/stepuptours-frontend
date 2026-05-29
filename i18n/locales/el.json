@@ -1003,5 +1003,6 @@
   "toast.tour_deleted": "Η περιήγηση διαγράφηκε",
   "toast.translation_approved": "Η μετάφραση εγκρίθηκε",
   "toast.translation_unpublished": "Η μετάφραση αποσύρθηκε",
-  "toast.translation_deleted": "Η μετάφραση διαγράφηκε"
+  "toast.translation_deleted": "Η μετάφραση διαγράφηκε",
+  "tickets.supportAuthor": "Υποστήριξη"
 }
