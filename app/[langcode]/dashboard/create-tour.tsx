@@ -27,6 +27,7 @@ import { webFullHeight } from '../../../lib/web-styles';
 import {
   createTour,
   updateTour,
+  updateTourTranslation,
   createTourStep,
   updateTourStep,
   deleteTourStep,
@@ -131,6 +132,8 @@ export default function CreateTourScreen() {
    *   - Only tour-level fields (title, description, duration, image) are editable.
    */
   const [sourceLangcode, setSourceLangcode] = useState<string>('');
+  /** Drupal internal NID of the source node — needed for patchTourTranslation. */
+  const [sourceDrupalNid, setSourceDrupalNid] = useState<number | null>(null);
   const isTranslationMode =
       isEditMode &&
       !!sourceLangcode &&
@@ -351,6 +354,7 @@ export default function CreateTourScreen() {
         .then(async ([sourceTour, sourceTourSteps]) => {
           let translationsInfo = null;
           if (sourceTour.drupalInternalId) {
+            setSourceDrupalNid(sourceTour.drupalInternalId);
             translationsInfo = await listTourTranslations(sourceTour.drupalInternalId).catch(() => null);
           }
           if (cancelled) return;
@@ -468,17 +472,26 @@ export default function CreateTourScreen() {
       }
 
       if (isEditMode && tourId) {
-        // PATCH the tour node.
-        // entityLangcode ensures drupalPatchBase builds the correct URL:
-        //   - source mode:      /{sourceLang}/jsonapi/node/tour/{id}
-        //   - translation mode: /{contentLang}/jsonapi/node/tour/{id}
-        await updateTour(tourId, {
-          title: title.trim(),
-          description: description.trim(),
-          duration: parseInt(duration, 10) || 0,
-          cityId: cityId || undefined,
-          ...(imageId !== undefined ? { imageId } : {}),
-        }, entityLangcode || undefined);
+        if (isTranslationMode && sourceDrupalNid && entityLangcode) {
+          // Translation mode: use the custom guide endpoint to patch the named
+          // translation directly, bypassing JSON:API URL language negotiation.
+          // (Patching via /jsonapi/ resolves to the session language context,
+          // which may not match, causing a 422 for non-default-language edits.)
+          await updateTourTranslation(sourceDrupalNid, entityLangcode, {
+            title: title.trim(),
+            description: description.trim(),
+            ...(imageId !== undefined ? { imageFileUuid: imageId } : {}),
+          });
+        } else {
+          // Source-language mode: use JSON:API PATCH with the correct lang prefix.
+          await updateTour(tourId, {
+            title: title.trim(),
+            description: description.trim(),
+            duration: parseInt(duration, 10) || 0,
+            cityId: cityId || undefined,
+            ...(imageId !== undefined ? { imageId } : {}),
+          }, entityLangcode || undefined);
+        }
 
         // Step mutations only apply in source-language mode.
         // Guides cannot delete steps; they unpublish them (status=false). Each
@@ -550,7 +563,7 @@ export default function CreateTourScreen() {
     }
   }, [
     title, description, duration, cityId, steps, langcode, router, t,
-    isEditMode, tourId, isTranslationMode,
+    isEditMode, tourId, isTranslationMode, sourceDrupalNid,
     imageUri, imageFilename, uploadedImageId, languageCode, entityLangcode,
   ]);
 

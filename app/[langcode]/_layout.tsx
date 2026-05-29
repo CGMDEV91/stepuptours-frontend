@@ -150,6 +150,10 @@ export default function LangcodeLayout() {
     if (!ready || !user || languages.length === 0) return;
     if (!isNewLogin) return;
     clearNewLogin();
+    // Close any open auth modal immediately — before the router.replace below.
+    // Without this, the dark backdrop can persist if navigation fires before
+    // LoginModal.handleSubmit reaches its own onClose() call (race condition).
+    closeAuthModal();
 
     const preferredLang = user.preferredLanguage;
     let targetLang = langcode;

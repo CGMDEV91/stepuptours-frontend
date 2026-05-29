@@ -84,6 +84,7 @@ function mapApiMeTour(raw: any, userId: string): Tour {
     authorIsAdmin: false,
     availableLangs: Array.isArray(raw.availableLangs) ? raw.availableLangs : [raw.langcode].filter(Boolean),
     published: raw.published ?? false,
+    adminApproved: raw.adminApproved ?? raw.published ?? false,
     langcode: raw.langcode ?? raw.sourceLang ?? 'en',
   };
 }
@@ -402,6 +403,38 @@ export async function deleteTourTranslation(nid: number, langcode: string): Prom
   await axios.delete(
       `${DRUPAL_BASE}/api/me/tour/${nid}/translation/${langcode}`,
       { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/**
+ * Update the title/description (and optionally the image) of a specific
+ * tour translation via the custom guide endpoint, bypassing JSON:API URL
+ * language negotiation.
+ *
+ * This is needed because the default language (EN) has no URL prefix in
+ * Drupal, so patching via /jsonapi/ resolves to the session language context
+ * (which may be different), causing a 422 "translation does not exist" error.
+ */
+export async function updateTourTranslation(
+    nid: number,
+    langcode: string,
+    data: {
+      title: string;
+      description: string;
+      imageFileUuid?: string | null;
+    },
+): Promise<void> {
+  const body: Record<string, any> = {
+    title: data.title,
+    field_description: { value: data.description, format: 'basic_html' },
+  };
+  if (data.imageFileUuid !== undefined) {
+    body.field_image_uuid = data.imageFileUuid ?? null;
+  }
+  await axios.post(
+      `${DRUPAL_BASE}/api/me/tour/${nid}/translation/${langcode}/save`,
+      body,
+      { headers: { 'Content-Type': 'application/json', ...getDashboardAuthHeader() } },
   );
 }
 
