@@ -1042,7 +1042,6 @@
   "dashboard.tours.unpublishConfirm": "Are you sure you want to unpublish \"{{title}}\"? It will no longer be visible publicly.",
   "dashboard.tours.republishBtn": "Republish tour",
   "dashboard.tours.publishBtn": "Publish tour",
-  "dashboard.tours.underReview": "Under review",
   "plan.upgradeTitle": "Upgrade your plan",
   "plan.upgradeToursBody": "You have reached your tour limit for this month. Upgrade your plan to create more tours.",
   "plan.upgradeCta": "Upgrade plan",
@@ -1062,5 +1061,9 @@
   "createTour.steps.deleteConfirm": "Delete this stop permanently? This cannot be undone.",
   "createTour.validation.publishedStepRequired": "Add at least one published stop before saving.",
   "translationsSection.deleteTitle": "Delete translation",
-  "translationsSection.deleteWarning": "Delete this translation and its step translations? This cannot be undone."
+  "translationsSection.deleteWarning": "Delete this translation and its step translations? This cannot be undone.",
+  "toast.tour_deleted": "Tour deleted",
+  "toast.translation_approved": "Translation approved",
+  "toast.translation_unpublished": "Translation unpublished",
+  "toast.translation_deleted": "Translation deleted"
 }

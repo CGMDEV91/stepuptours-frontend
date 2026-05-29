@@ -10,12 +10,12 @@ import {
   ActivityIndicator,
   StyleSheet,
   useWindowDimensions,
-  Animated,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
+import { useToastStore } from '../../stores/toast.store';
 import { SiteSettingsTab } from '../../components/admin/SiteSettingsTab';
 import { TranslationsTab } from '../../components/admin/TranslationsTab';
 import { LegalTab } from '../../components/admin/LegalTab';
@@ -93,23 +93,15 @@ export default function AdminScreen() {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [activeTab]);
 
-  // ── Toast ──────────────────────────────────────────────────────────────────
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const toastOpacity = useRef(new Animated.Value(0)).current;
-  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // ── Toast (via global store — rendered by Toast.tsx in _layout.tsx) ────────
+  const showToast = useToastStore((s) => s.showToast);
 
   useEffect(() => {
     if (!toastParam) return;
     const i18nKey = `toast.${toastParam}`;
     const resolved = t(i18nKey);
     const message = resolved !== i18nKey ? resolved : toastParam;
-    setToastMessage(message);
-    Animated.timing(toastOpacity, { toValue: 1, duration: 250, useNativeDriver: true }).start(() => {
-      toastTimeoutRef.current = setTimeout(() => {
-        Animated.timing(toastOpacity, { toValue: 0, duration: 400, useNativeDriver: true }).start(() => setToastMessage(null));
-      }, 2500);
-    });
-    return () => { if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current); };
+    showToast(message, 'success');
   }, [toastParam]);
 
   const isAdmin = user?.roles?.includes('administrator');
@@ -270,13 +262,7 @@ export default function AdminScreen() {
             </>
         )}
 
-        {/* Toast notification */}
-        {toastMessage ? (
-            <Animated.View style={[styles.toast, { opacity: toastOpacity }]} pointerEvents="none">
-              <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
-              <Text style={styles.toastText}>{toastMessage}</Text>
-            </Animated.View>
-        ) : null}
+        {/* Toast rendered globally by Toast.tsx in _layout.tsx */}
       </View>
   );
 }
@@ -365,28 +351,4 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
-  toast: {
-    position: 'absolute',
-    bottom: 32,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#1F2937',
-    borderRadius: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    elevation: 6,
-    maxWidth: 360,
-  },
-  toastText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
 });

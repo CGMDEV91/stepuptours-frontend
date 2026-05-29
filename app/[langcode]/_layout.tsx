@@ -14,6 +14,7 @@ import { BottomTabBar } from '../../components/layout/BottomTabBar';
 import { IntroSlides } from '../../components/layout/IntroSlides';
 import CookieBanner from '../../components/layout/CookieBanner';
 import { ServerErrorModal } from '../../components/layout/ServerErrorModal';
+import { Toast } from '../../components/ui/Toast';
 import { trackSiteVisit } from '../../services/analytics.service';
 import { isNative } from '../../lib/platform';
 import { wasIntroShown, markIntroShown } from '../../lib/intro-state';
@@ -197,6 +198,8 @@ export default function LangcodeLayout() {
       {showIntro && <IntroSlides onDone={handleIntroDone} />}
       {user && <FeedbackButton />}
       <ServerErrorModal />
+      {/* Global Drupal-style toast — floats above all content */}
+      <Toast />
     </View>
   );
 }

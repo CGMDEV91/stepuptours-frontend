@@ -1042,7 +1042,6 @@
   "dashboard.tours.unpublishConfirm": "¿Seguro que quieres despublicar \"{{title}}\"? Dejará de ser visible públicamente.",
   "dashboard.tours.republishBtn": "Republicar tour",
   "dashboard.tours.publishBtn": "Publicar tour",
-  "dashboard.tours.underReview": "En revisión",
   "plan.upgradeTitle": "Mejora tu plan",
   "plan.upgradeToursBody": "Has alcanzado tu límite de tours de este mes. Mejora tu plan para crear más tours.",
   "plan.upgradeCta": "Mejorar plan",
@@ -1062,5 +1061,9 @@
   "createTour.steps.deleteConfirm": "¿Eliminar esta parada permanentemente? No se puede deshacer.",
   "createTour.validation.publishedStepRequired": "Añade al menos una parada publicada antes de guardar.",
   "translationsSection.deleteTitle": "Eliminar traducción",
-  "translationsSection.deleteWarning": "¿Eliminar esta traducción y las traducciones de sus paradas? No se puede deshacer."
+  "translationsSection.deleteWarning": "¿Eliminar esta traducción y las traducciones de sus paradas? No se puede deshacer.",
+  "toast.tour_deleted": "Tour eliminado",
+  "toast.translation_approved": "Traducción aprobada",
+  "toast.translation_unpublished": "Traducción despublicada",
+  "toast.translation_deleted": "Traducción eliminada"
 }

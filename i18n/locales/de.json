@@ -999,5 +999,9 @@
   "createTour.editSubtitle": "Aktualisiere die Details deiner Tour",
   "createTour.translationMode.title": "Übersetzung bearbeiten",
   "createTour.translationMode.description": "Du bearbeitest eine Übersetzung dieser Tour. Hier können nur Titel, Beschreibung, Dauer und Titelbild aktualisiert werden. Um Stationen hinzuzufügen, zu entfernen oder neu anzuordnen, wechsle zur Originalsprache ({{lang}}).",
-  "createTour.translationMode.stepsReadOnly": "schreibgeschützt"
+  "createTour.translationMode.stepsReadOnly": "schreibgeschützt",
+  "toast.tour_deleted": "Tour gelöscht",
+  "toast.translation_approved": "Übersetzung genehmigt",
+  "toast.translation_unpublished": "Übersetzung zurückgezogen",
+  "toast.translation_deleted": "Übersetzung gelöscht"
 }

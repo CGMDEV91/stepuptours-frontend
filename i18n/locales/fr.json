@@ -573,8 +573,8 @@
   "common.error": "Erreur",
   "common.retry": "Réessayer",
   "common.back": "Retour",
-  "toast.business_saved": "Entreprise enregistrée avec succès",
-  "toast.tour_saved": "Tour enregistré avec succès",
+  "toast.business_saved": "Établissement enregistré avec succès",
+  "toast.tour_saved": "Visite enregistrée avec succès",
   "createBusiness.title.new": "Nouveau commerce",
   "createBusiness.title.edit": "Modifier le commerce",
   "createBusiness.subtitle.new": "Ajoutez un nouveau commerce à votre portfolio",
@@ -999,5 +999,9 @@
   "createTour.editSubtitle": "Mettez à jour les informations de votre tour",
   "createTour.translationMode.title": "Modification d'une traduction",
   "createTour.translationMode.description": "Vous modifiez une traduction de ce tour. Seuls le titre, la description, la durée et l'image de couverture peuvent être mis à jour ici. Pour ajouter, supprimer ou réorganiser les étapes, passez à la langue d'origine ({{lang}}).",
-  "createTour.translationMode.stepsReadOnly": "lecture seule"
+  "createTour.translationMode.stepsReadOnly": "lecture seule",
+  "toast.tour_deleted": "Visite supprimée",
+  "toast.translation_approved": "Traduction approuvée",
+  "toast.translation_unpublished": "Traduction dépubliée",
+  "toast.translation_deleted": "Traduction supprimée"
 }

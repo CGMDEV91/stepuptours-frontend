@@ -32,6 +32,7 @@ import { TourCard } from '../tour/TourCard';
 import { TranslationsModal } from './TranslationsModal';
 import { ConfirmModal } from '../shared/ConfirmModal';
 import { useAuthStore } from '../../stores/auth.store';
+import { useToastStore } from '../../stores/toast.store';
 import type { Tour } from '../../types';
 
 const AMBER = '#F59E0B';
@@ -172,6 +173,7 @@ function QuotaBar({ quota }: QuotaBarProps) {
 export function MyToursTab({ userId }: MyToursTabProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const showToast = useToastStore((s) => s.showToast);
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { width } = useWindowDimensions();
 
@@ -254,6 +256,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
       if (!nid) throw new Error('Tour id not found');
       await deleteTour(nid);
       setTours((prev) => prev.filter((t) => t.id !== tourId));
+      showToast(t('toast.tour_deleted'));
     } catch (err: any) {
       setAlertMsg(err.message ?? t('common.error'));
     } finally {

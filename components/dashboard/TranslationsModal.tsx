@@ -35,6 +35,7 @@ import {
 import { createTicket } from '../../services/tickets.service';
 import { langCodeToCountryCode } from '../../services/language.service';
 import type { Tour } from '../../types';
+import { useToastStore } from '../../stores/toast.store';
 import { buildTourSlug } from '../../lib/tour-slug';
 
 const AMBER = '#F59E0B';
@@ -67,6 +68,7 @@ export function TranslationsModal({
 }: TranslationsModalProps) {
   const { t }     = useTranslation();
   const router    = useRouter();
+  const showToast = useToastStore((s) => s.showToast);
   const pathname  = usePathname();
   const { width } = useWindowDimensions();
   const isMobile  = Platform.OS !== 'web' || width < 600;
@@ -191,6 +193,7 @@ export function TranslationsModal({
     setError(null);
     try {
       await approveTranslation(tour.drupalInternalId, lc);
+      showToast(t('toast.translation_approved'));
       refresh();
       onChanged();
     } catch (e: any) {
@@ -211,6 +214,7 @@ export function TranslationsModal({
         setError(null);
         try {
           await unpublishTranslation(tour.drupalInternalId, lc);
+          showToast(t('toast.translation_unpublished'));
           refresh();
           onChanged();
         } catch (e: any) {
@@ -233,6 +237,7 @@ export function TranslationsModal({
         setError(null);
         try {
           await deleteTourTranslation(tour.drupalInternalId, lc);
+          showToast(t('toast.translation_deleted'));
           refresh();
           onChanged();
         } catch (e: any) {

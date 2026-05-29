@@ -574,8 +574,8 @@
   "common.error": "Σφάλμα",
   "common.retry": "Επανάληψη",
   "common.back": "Πίσω",
-  "toast.business_saved": "Η επιχείρηση αποθηκεύτηκε με επιτυχία",
-  "toast.tour_saved": "Η περιήγηση αποθηκεύτηκε με επιτυχία",
+  "toast.business_saved": "Η επιχείρηση αποθηκεύτηκε επιτυχώς",
+  "toast.tour_saved": "Η περιήγηση αποθηκεύτηκε επιτυχώς",
   "createBusiness.title.new": "Νέα επιχείρηση",
   "createBusiness.title.edit": "Επεξεργασία επιχείρησης",
   "createBusiness.subtitle.new": "Προσθέστε μια νέα επιχείρηση στο χαρτοφυλάκιό σας",
@@ -999,5 +999,9 @@
   "createTour.editSubtitle": "Ενημερώστε τις λεπτομέρειες της περιήγησής σας",
   "createTour.translationMode.title": "Επεξεργασία μετάφρασης",
   "createTour.translationMode.description": "Επεξεργάζεστε μια μετάφραση αυτής της περιήγησης. Εδώ μπορείτε να ενημερώσετε μόνο τον τίτλο, την περιγραφή, τη διάρκεια και την εικόνα εξωφύλλου. Για να προσθέσετε, να αφαιρέσετε ή να αναδιατάξετε στάσεις, μεταβείτε στην αρχική γλώσσα ({{lang}}).",
-  "createTour.translationMode.stepsReadOnly": "μόνο ανάγνωση"
+  "createTour.translationMode.stepsReadOnly": "μόνο ανάγνωση",
+  "toast.tour_deleted": "Η περιήγηση διαγράφηκε",
+  "toast.translation_approved": "Η μετάφραση εγκρίθηκε",
+  "toast.translation_unpublished": "Η μετάφραση αποσύρθηκε",
+  "toast.translation_deleted": "Η μετάφραση διαγράφηκε"
 }
