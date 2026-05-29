@@ -19,7 +19,6 @@ import { imageHeaders, pickTourImage } from '../../lib/drupal-client';
 import { buildTourSlug } from '../../lib/tour-slug';
 import { LanguagesRow } from '../ui/LanguagesRow';
 import { VerifiedSeal, VERIFIED_GOLD } from '../icons/VerifiedSeal';
-import { RequestTranslationsModal } from '../dashboard/RequestTranslationsModal';
 
 interface TourCardProps {
   tour: Tour;
@@ -57,7 +56,6 @@ export function TourCard({
 }: TourCardProps) {
   const router = useRouter();
   const { t } = useTranslation();
-  const [translationsModalOpen, setTranslationsModalOpen] = useState(false);
 
   const imageHeight = cardWidth * CARD_IMAGE_RATIO;
   const DEFAULT_IMAGES = [
@@ -245,32 +243,8 @@ export function TourCard({
           </TouchableOpacity>
         ) : null}
 
-        {/* Request translations — owner mode, published tour */}
-        {isOwner && tour.published ? (
-          <TouchableOpacity
-            style={styles.requestTranslationsButton}
-            onPress={(e) => {
-              e.stopPropagation?.();
-              setTranslationsModalOpen(true);
-            }}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="language-outline" size={14} color="#1D4ED8" />
-            <Text style={styles.requestTranslationsText}>
-              {t('tours.requestTranslations.button')}
-            </Text>
-          </TouchableOpacity>
-        ) : null}
+        {/* Translations are managed from the My Tours action row (TranslationsModal). */}
       </View>
-
-      {isOwner && tour.published ? (
-        <RequestTranslationsModal
-          visible={translationsModalOpen}
-          tour={tour}
-          guidePublicName={ownerPublicName ?? tour.authorPublicName ?? ''}
-          onClose={() => setTranslationsModalOpen(false)}
-        />
-      ) : null}
     </TouchableOpacity>
   );
 }

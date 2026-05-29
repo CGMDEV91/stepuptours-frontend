@@ -978,6 +978,11 @@
   "translations.requestModalCta": "Enviar solicitud",
   "translations.notice24to48h": "Las traducciones suelen estar listas en 24-48 horas.",
   "translations.requestBtn": "Traducciones",
+  "translations.manageBtn": "Traducciones",
+  "translations.requestSent": "Solicitud enviada. Te responderemos pronto.",
+  "translationsSection.existingTitle": "Traducciones existentes",
+  "common.edit": "Editar",
+  "common.preview": "Previsualizar",
   "preview.bannerText": "Vista previa privada — el progreso no se guarda",
   "dashboard.toursQuota": "{{used}} / {{max}} tours creados este mes",
   "dashboard.toursQuotaUnlimited": "{{used}} tours creados este mes (plan ilimitado)",
@@ -1027,5 +1032,11 @@
   "createTour.translationMode.title": "Editando traducción",
   "createTour.translationMode.description": "Estás editando una traducción de este tour. Solo puedes modificar el título, descripción, duración e imagen de portada. Para añadir, eliminar o reordenar paradas, cambia al idioma original ({{lang}}).",
   "createTour.translationMode.stepsReadOnly": "solo lectura",
-  "createTour.translationMode.stepsMissing": "Algunas paradas aún no están traducidas a este idioma y se muestran en el idioma original. Contacta con soporte para solicitar la traducción de las paradas."
+  "createTour.translationMode.stepsMissing": "Algunas paradas aún no están traducidas a este idioma y se muestran en el idioma original. Contacta con soporte para solicitar la traducción de las paradas.",
+  "createTour.steps.unpublished": "Despublicada — oculta para los visitantes",
+  "createTour.steps.deleteTitle": "Eliminar parada",
+  "createTour.steps.deleteConfirm": "¿Eliminar esta parada permanentemente? No se puede deshacer.",
+  "createTour.validation.publishedStepRequired": "Añade al menos una parada publicada antes de guardar.",
+  "translationsSection.deleteTitle": "Eliminar traducción",
+  "translationsSection.deleteWarning": "¿Eliminar esta traducción y las traducciones de sus paradas? No se puede deshacer."
 }

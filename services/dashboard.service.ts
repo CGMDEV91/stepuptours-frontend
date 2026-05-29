@@ -10,8 +10,6 @@ import {
   drupalPost,
   drupalPatch,
   drupalPatchBase,
-  drupalDelete,
-  drupalDeleteBase,
   buildInclude,
   buildFields,
   buildGeoFieldValue,
@@ -309,6 +307,7 @@ export async function getTourStepsForEdit(tourId: string): Promise<TourStep[]> {
         'field_featured_business',
         'field_duration',
         'langcode',
+        'status',
       ],
       'node--business': ['title', 'field_description', 'field_logo', 'field_website', 'field_phone', 'field_location', 'field_category'],
       'taxonomy_term--business_category': ['name'],
@@ -342,6 +341,7 @@ export async function getTourStepsInLang(tourId: string, contentLang: string): P
         'field_featured_business',
         'field_duration',
         'langcode',
+        'status',
       ],
       'node--business': ['title', 'field_description', 'field_logo', 'field_website', 'field_phone', 'field_location', 'field_category'],
       'taxonomy_term--business_category': ['name'],
@@ -367,6 +367,7 @@ function mapDrupalTourStepFromJsonApi(item: any): TourStep {
     description: attrs.field_description?.value ?? attrs.field_description ?? '',
     contentLangcode: attrs.langcode ?? 'en',
     order: attrs.field_order ?? 0,
+    published: attrs.status ?? true,
     location: attrs.field_location
         ? { lat: attrs.field_location.lat, lon: attrs.field_location.lon }
         : null,
@@ -381,15 +382,27 @@ function mapDrupalTourStepFromJsonApi(item: any): TourStep {
 }
 
 /**
- * Delete a whole tour entity.
+ * Delete a whole tour and cascade-delete its steps and user activities.
  *
- * JSON:API only allows deleting the DEFAULT translation of an entity (deleting a
- * non-default translation errors with "Deleting a resource object translation is
- * not yet supported"). So we address the tour's own source/default langcode via
- * drupalDeleteBase, NOT the UI language. Pass the tour's source `langcode`.
+ * Uses the custom guide endpoint (not JSON:API) so the server can cascade
+ * related entities and enforce ownership. `nid` is the tour's Drupal node id.
  */
-export async function deleteTour(tourId: string, langcode?: string): Promise<void> {
-  await drupalDeleteBase(`/node/tour/${tourId}`, langcode);
+export async function deleteTour(nid: number): Promise<void> {
+  await axios.delete(
+      `${DRUPAL_BASE}/api/me/tour/${nid}`,
+      { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/**
+ * Delete a single non-default tour translation, cascading the same translation
+ * on every step of the tour. The source language cannot be deleted this way.
+ */
+export async function deleteTourTranslation(nid: number, langcode: string): Promise<void> {
+  await axios.delete(
+      `${DRUPAL_BASE}/api/me/tour/${nid}/translation/${langcode}`,
+      { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
 }
 
 export async function createTour(data: {
@@ -589,14 +602,37 @@ export async function updateTourStep(
 }
 
 /**
- * Delete a whole tour-step entity.
- *
- * Like deleteTour, JSON:API only supports deleting the DEFAULT translation, so
- * we target the step's source/default langcode (its creation language), not the
- * UI language. In source-edit mode that langcode equals the tour's source lang.
+ * Delete a whole tour-step entity (all translations) via the custom guide
+ * endpoint. `stepUuid` is the step node UUID.
  */
-export async function deleteTourStep(stepId: string, langcode?: string): Promise<void> {
-  await drupalDeleteBase(`/node/tour_step/${stepId}`, langcode);
+export async function deleteTourStep(stepUuid: string): Promise<void> {
+  await axios.delete(
+      `${DRUPAL_BASE}/api/me/tour-step/${stepUuid}`,
+      { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/**
+ * Delete a single non-default translation of a step (the step keeps the rest).
+ */
+export async function deleteTourStepTranslation(stepUuid: string, langcode: string): Promise<void> {
+  await axios.delete(
+      `${DRUPAL_BASE}/api/me/tour-step/${stepUuid}/translation/${langcode}`,
+      { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
+}
+
+/**
+ * Publish or unpublish a step via the custom guide endpoint. JSON:API can't
+ * PATCH the `status` field without admin permissions, so this runs server-side
+ * with an ownership check instead.
+ */
+export async function setStepPublished(stepUuid: string, published: boolean): Promise<void> {
+  await axios.post(
+      `${DRUPAL_BASE}/api/me/tour-step/${stepUuid}/${published ? 'publish' : 'unpublish'}`,
+      {},
+      { headers: { Accept: 'application/json', ...getDashboardAuthHeader() } },
+  );
 }
 
 // ── Professional Profile ──────────────────────────────────────────────────────

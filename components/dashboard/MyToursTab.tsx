@@ -24,12 +24,14 @@ import {
   getToursByAuthor,
   deleteTour,
   getToursQuota,
+  unpublishTour,
+  republishTour,
   type ToursQuota,
 } from '../../services/dashboard.service';
 import { getUnreadCountByTour } from '../../services/comments.service';
 import { TourCard } from '../tour/TourCard';
-import { RequestTranslationsModal } from './RequestTranslationsModal';
-import { ManageTranslationsModal } from './ManageTranslationsModal';
+import { TranslationsModal } from './TranslationsModal';
+import { ConfirmModal } from '../shared/ConfirmModal';
 import { useAuthStore } from '../../stores/auth.store';
 import type { Tour } from '../../types';
 
@@ -181,9 +183,11 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Tour | null>(null);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
   const [unreadByTour, setUnreadByTour] = useState<Record<string, number>>({});
   const [translModal, setTranslModal] = useState<Tour | null>(null);
-  const [manageTranslModal, setManageTranslModal] = useState<Tour | null>(null);
+  const [pendingTourPublish, setPendingTourPublish] = useState<Tour | null>(null);
+  const [togglingPublishId, setTogglingPublishId] = useState<string | null>(null);
   const [quota, setQuota] = useState<ToursQuota | null>(null);
   const user = useAuthStore((s) => s.user);
 
@@ -247,39 +251,50 @@ export function MyToursTab({ userId }: MyToursTabProps) {
 
   // ── Delete flow ───────────────────────────────────────────────────────────
   const handleDeleteRequest = useCallback((tour: Tour) => {
-    if (Platform.OS === 'web') {
-      setPendingDelete(tour);
-    } else {
-      Alert.alert(
-        t('dashboard.tours.deleteTitle'),
-        t('dashboard.tours.deleteConfirm', { title: tour.title }),
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          {
-            text: t('common.delete'),
-            style: 'destructive',
-            onPress: () => confirmDelete(tour.id),
-          },
-        ]
-      );
-    }
-  }, [t]);
+    setPendingDelete(tour);
+  }, []);
 
   const confirmDelete = useCallback(async (tourId: string) => {
     setPendingDelete(null);
     setDeletingId(tourId);
     try {
-      // Delete via the tour's source langcode so JSON:API removes the whole
-      // entity instead of attempting an unsupported translation delete.
-      const langcode = tours.find((t) => t.id === tourId)?.langcode;
-      await deleteTour(tourId, langcode);
+      // Delete via the custom guide endpoint (cascades steps + activities).
+      const nid = tours.find((t) => t.id === tourId)?.drupalInternalId;
+      if (!nid) throw new Error('Tour id not found');
+      await deleteTour(nid);
       setTours((prev) => prev.filter((t) => t.id !== tourId));
     } catch (err: any) {
-      Alert.alert(t('common.error'), err.message ?? 'Failed to delete tour');
+      setAlertMsg(err.message ?? t('common.error'));
     } finally {
       setDeletingId(null);
     }
   }, [t, tours]);
+
+  // ── Tour-level publish toggle ───────────────────────────────────────────────
+  const confirmTourPublish = useCallback(async (tour: Tour) => {
+    setPendingTourPublish(null);
+    setTogglingPublishId(tour.id);
+    try {
+      if (tour.published) {
+        await unpublishTour(tour.drupalInternalId);
+      } else {
+        await republishTour(tour.drupalInternalId);
+      }
+      await loadTours();
+    } catch (err: any) {
+      setAlertMsg(err.message ?? t('common.error'));
+    } finally {
+      setTogglingPublishId(null);
+    }
+  }, [loadTours, t]);
+
+  const handleTourPublishRequest = useCallback((tour: Tour) => {
+    if (tour.published) {
+      setPendingTourPublish(tour);   // unpublish needs confirmation
+    } else {
+      confirmTourPublish(tour);      // republish is immediate
+    }
+  }, [confirmTourPublish]);
 
   const handleEdit = useCallback((tour: Tour) => {
     router.push(
@@ -397,26 +412,39 @@ export function MyToursTab({ userId }: MyToursTabProps) {
                     )}
                   </TouchableOpacity>
 
-                  {/* Request translations — only for published tours */}
-                  {item.published && (
-                    <TouchableOpacity
-                      style={styles.actionBtn}
-                      onPress={() => setTranslModal(item)}
-                      activeOpacity={0.85}
-                    >
-                      <Ionicons name="language-outline" size={13} color="#6B7280" />
-                      <Text style={styles.actionBtnText}>{t('translations.requestBtn')}</Text>
-                    </TouchableOpacity>
-                  )}
-
-                  {/* Manage translations (approve / unpublish / tour publish controls) */}
+                  {/* Translations — request + manage (unified) */}
                   <TouchableOpacity
                     style={styles.actionBtn}
-                    onPress={() => setManageTranslModal(item)}
+                    onPress={() => setTranslModal(item)}
                     activeOpacity={0.85}
                   >
-                    <Ionicons name="settings-outline" size={13} color="#6B7280" />
-                    <Text style={styles.actionBtnText}>{t('translationsSection.manageBtn')}</Text>
+                    <Ionicons name="language-outline" size={13} color="#6B7280" />
+                    <Text style={styles.actionBtnText}>{t('translations.manageBtn', 'Translations')}</Text>
+                  </TouchableOpacity>
+
+                  {/* Unpublish / republish the whole tour */}
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleTourPublishRequest(item)}
+                    disabled={togglingPublishId === item.id}
+                    activeOpacity={0.85}
+                  >
+                    {togglingPublishId === item.id ? (
+                      <ActivityIndicator size="small" color="#6B7280" />
+                    ) : (
+                      <>
+                        <Ionicons
+                          name={item.published ? 'eye-off-outline' : 'eye-outline'}
+                          size={13}
+                          color="#6B7280"
+                        />
+                        <Text style={styles.actionBtnText}>
+                          {item.published
+                            ? t('dashboard.tours.unpublishBtn')
+                            : t('dashboard.tours.republishBtn')}
+                        </Text>
+                      </>
+                    )}
                   </TouchableOpacity>
                 </View>
 
@@ -431,31 +459,50 @@ export function MyToursTab({ userId }: MyToursTabProps) {
         </View>
       )}
 
-      {/* Web delete confirmation modal */}
-      <DeleteModal
+      {/* Delete tour confirmation */}
+      <ConfirmModal
         visible={pendingDelete !== null}
-        tourTitle={pendingDelete?.title ?? ''}
+        title={t('dashboard.tours.deleteTitle')}
+        message={t('dashboard.tours.deleteConfirm', { title: pendingDelete?.title ?? '' })}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
+        destructive
         onConfirm={() => pendingDelete && confirmDelete(pendingDelete.id)}
-        onCancel={() => setPendingDelete(null)}
+        onClose={() => setPendingDelete(null)}
       />
 
-      {/* Request translations modal */}
+      {/* Warning / error alert */}
+      <ConfirmModal
+        visible={alertMsg !== null}
+        title={t('common.error')}
+        message={alertMsg ?? ''}
+        confirmLabel={t('common.ok', 'OK')}
+        onConfirm={() => setAlertMsg(null)}
+        onClose={() => setAlertMsg(null)}
+      />
+
+      {/* Unpublish tour confirmation */}
+      <ConfirmModal
+        visible={pendingTourPublish !== null}
+        title={t('dashboard.tours.unpublishTitle')}
+        message={t('dashboard.tours.unpublishWarning')}
+        confirmLabel={t('dashboard.tours.unpublishBtn')}
+        cancelLabel={t('common.cancel')}
+        destructive
+        onConfirm={() => pendingTourPublish && confirmTourPublish(pendingTourPublish)}
+        onClose={() => setPendingTourPublish(null)}
+      />
+
+      {/* Translations modal (request + manage unified) */}
       {translModal && user && (
-        <RequestTranslationsModal
+        <TranslationsModal
           visible={translModal !== null}
           tour={translModal}
           guidePublicName={user.publicName}
+          onChanged={loadTours}
           onClose={() => setTranslModal(null)}
         />
       )}
-
-      {/* Manage translations modal */}
-      <ManageTranslationsModal
-        visible={manageTranslModal !== null}
-        tour={manageTranslModal}
-        onChanged={loadTours}
-        onClose={() => setManageTranslModal(null)}
-      />
     </>
   );
 }

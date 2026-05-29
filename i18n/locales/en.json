@@ -978,6 +978,11 @@
   "translations.requestModalCta": "Send Request",
   "translations.notice24to48h": "Translations are usually ready within 24–48 hours.",
   "translations.requestBtn": "Translations",
+  "translations.manageBtn": "Translations",
+  "translations.requestSent": "Request sent. We will get back to you soon.",
+  "translationsSection.existingTitle": "Existing translations",
+  "common.edit": "Edit",
+  "common.preview": "Preview",
   "preview.bannerText": "Private preview — progress is not saved",
   "dashboard.toursQuota": "{{used}} / {{max}} tours created this month",
   "dashboard.toursQuotaUnlimited": "{{used}} tours created this month (unlimited plan)",
@@ -1027,5 +1032,11 @@
   "createTour.translationMode.title": "Editing translation",
   "createTour.translationMode.description": "You are editing a translation of this tour. Only the title, description, duration and cover image can be updated here. To add, remove or reorder stops, switch to the original language ({{lang}}).",
   "createTour.translationMode.stepsReadOnly": "read-only",
-  "createTour.translationMode.stepsMissing": "Some stops are not yet translated into this language and are shown in the original language. Please contact support to request a translation of the stops."
+  "createTour.translationMode.stepsMissing": "Some stops are not yet translated into this language and are shown in the original language. Please contact support to request a translation of the stops.",
+  "createTour.steps.unpublished": "Unpublished — hidden from visitors",
+  "createTour.steps.deleteTitle": "Delete stop",
+  "createTour.steps.deleteConfirm": "Delete this stop permanently? This cannot be undone.",
+  "createTour.validation.publishedStepRequired": "Add at least one published stop before saving.",
+  "translationsSection.deleteTitle": "Delete translation",
+  "translationsSection.deleteWarning": "Delete this translation and its step translations? This cannot be undone."
 }

@@ -30,6 +30,7 @@ import {
   createTourStep,
   updateTourStep,
   deleteTourStep,
+  setStepPublished,
   getTourById,
   getTourByIdInLang,
   getTourStepsForEdit,
@@ -37,6 +38,7 @@ import {
   listTourTranslations,
 } from '../../../services/dashboard.service';
 import { ImagePickerField } from '../../../components/shared/ImagePickerField';
+import { ConfirmModal } from '../../../components/shared/ConfirmModal';
 import PageBanner from '../../../components/layout/PageBanner';
 import { uploadDrupalFile, getApiLanguage } from '../../../lib/drupal-client';
 
@@ -57,6 +59,8 @@ interface StepEntry {
   lat: string;
   lon: string;
   duration: string;
+  /** Drupal publish state. Unpublished steps are hidden from visitors. */
+  published: boolean;
 }
 
 function makeKey(): string {
@@ -70,7 +74,7 @@ export default function CreateTourScreen() {
     /**
      * contentLang: the language of the tour content to load/save.
      *
-     * Set by ManageTranslationsModal when the guide clicks "Edit" on a
+     * Set by the Translations modal when the guide clicks "Edit" on a
      * translation row. It is ALWAYS passed now so we have a reliable signal:
      *
      *   • contentLang === sourceLang  → editing source, isTranslationMode = false
@@ -78,7 +82,7 @@ export default function CreateTourScreen() {
      *   • contentLang absent          → new tour, isTranslationMode = false
      *
      * Crucially, `langcode` (the URL prefix) is kept equal to the UI language
-     * and is NEVER changed by ManageTranslationsModal, so the interface language
+     * and is NEVER changed by the Translations modal, so the interface language
      * is unaffected when the guide opens an editor for a translated tour.
      */
     contentLang?: string;
@@ -107,7 +111,6 @@ export default function CreateTourScreen() {
 
   // ── Edit mode: loading state ──────────────────────────────────────────────
   const [isLoadingTour, setIsLoadingTour] = useState(isEditMode);
-  const originalStepIds = useRef<string[]>([]);
 
   /**
    * entityLangcode: the langcode we send to drupalPatchBase when saving.
@@ -225,19 +228,66 @@ export default function CreateTourScreen() {
 
   // ── Tour steps ──────────────────────────────────────────────────────────
   const [steps, setSteps] = useState<StepEntry[]>([]);
+  // Key of the step currently being deleted/toggled (shows a spinner / disables).
+  const [busyStepKey, setBusyStepKey] = useState<string | null>(null);
+  // Step pending delete confirmation (drives the confirm modal).
+  const [pendingDeleteStep, setPendingDeleteStep] = useState<StepEntry | null>(null);
+  // Warning / error message shown in a modal (replaces native Alert).
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
 
   const addStep = useCallback(() => {
     if (isTranslationMode) return;
     setSteps((prev) => [
       ...prev,
-      { key: makeKey(), title: '', description: '', lat: '', lon: '', duration: '' },
+      { key: makeKey(), title: '', description: '', lat: '', lon: '', duration: '', published: true },
     ]);
   }, [isTranslationMode]);
 
-  const removeStep = useCallback((key: string) => {
+  // Publish/unpublish a step. Persisted steps go through the custom guide
+  // endpoint immediately (JSON:API can't PATCH `status`); new unsaved steps just
+  // flip local state (they are created published on save).
+  const togglePublish = useCallback(async (step: StepEntry) => {
+    if (isTranslationMode || busyStepKey) return;
+    const next = !step.published;
+    if (step.drupalId) {
+      setBusyStepKey(step.key);
+      try {
+        await setStepPublished(step.drupalId, next);
+      } catch (err: any) {
+        setAlertMsg(err?.message ?? t('createTour.error.generic'));
+        setBusyStepKey(null);
+        return;
+      }
+      setBusyStepKey(null);
+    }
+    setSteps((prev) => prev.map((s) => (s.key === step.key ? { ...s, published: next } : s)));
+  }, [isTranslationMode, busyStepKey, t]);
+
+  // Delete a step. Persisted steps are deleted server-side (whole entity);
+  // new unsaved steps are just dropped from the form.
+  const performDeleteStep = useCallback(async (step: StepEntry) => {
     if (isTranslationMode) return;
-    setSteps((prev) => prev.filter((s) => s.key !== key));
-  }, [isTranslationMode]);
+    if (!step.drupalId) {
+      setSteps((prev) => prev.filter((s) => s.key !== step.key));
+      setPendingDeleteStep(null);
+      return;
+    }
+    setBusyStepKey(step.key);
+    try {
+      await deleteTourStep(step.drupalId);
+      setSteps((prev) => prev.filter((s) => s.key !== step.key));
+      setPendingDeleteStep(null);
+    } catch (err: any) {
+      setAlertMsg(err?.message ?? t('createTour.error.generic'));
+    } finally {
+      setBusyStepKey(null);
+    }
+  }, [isTranslationMode, t]);
+
+  const removeStep = useCallback((step: StepEntry) => {
+    if (isTranslationMode || busyStepKey) return;
+    setPendingDeleteStep(step);
+  }, [isTranslationMode, busyStepKey]);
 
   const updateStep = useCallback((key: string, field: keyof StepEntry, value: string) => {
     if (isTranslationMode) return;
@@ -266,6 +316,12 @@ export default function CreateTourScreen() {
   // ── Edit mode: load existing tour data ────────────────────────────────────
   useEffect(() => {
     if (!isEditMode || !tourId) return;
+    // Wait until auth is ready: listTourTranslations / getTourById need the
+    // session header. On a full page reload the auth store rehydrates async; if
+    // we fetch too early listTourTranslations 403s, sourceLang falls back to the
+    // wrong (default-rendered) langcode and the form wrongly enters translation
+    // mode (steps locked). Gating on auth keeps source editing editable.
+    if (isAuthLoading || !user) return;
 
     let cancelled = false;
     setIsLoadingTour(true);
@@ -299,7 +355,12 @@ export default function CreateTourScreen() {
           }
           if (cancelled) return;
 
-          const resolvedSourceLang = translationsInfo?.sourceLang ?? sourceTour.langcode ?? '';
+          // Prefer the backend-resolved source lang. If it couldn't be resolved,
+          // fall back to contentLang (NOT sourceTour.langcode, which is rendered
+          // in the site default language) so we never wrongly enter translation
+          // mode and lock the steps.
+          const resolvedSourceLang =
+              translationsInfo?.sourceLang ?? contentLang ?? sourceTour.langcode ?? '';
           setSourceLangcode(resolvedSourceLang);
 
           // Resolve the language to load/save:
@@ -348,10 +409,9 @@ export default function CreateTourScreen() {
             lat:  s.location ? String(s.location.lat) : '',
             lon:  s.location ? String(s.location.lon) : '',
             duration: '',
+            published: s.published,
           }));
           setSteps(loadedSteps);
-          // originalStepIds always tracks source steps for deletion detection.
-          originalStepIds.current = sourceTourSteps.map((s) => s.id);
 
           // In translation mode, flag steps that came back as source-language
           // fallback (no real translation in the target language).
@@ -369,7 +429,8 @@ export default function CreateTourScreen() {
     return () => { cancelled = true; };
     // contentLang is intentionally in the dep array so the form reloads if it
     // changes (e.g. the user navigates from one translation edit to another).
-  }, [isEditMode, tourId, contentLang]);
+    // isAuthLoading / user.id gate the fetch until the session is ready.
+  }, [isEditMode, tourId, contentLang, isAuthLoading, user?.id]);
 
   // ── Save ─────────────────────────────────────────────────────────────────
   const [saving, setSaving] = useState(false);
@@ -384,13 +445,15 @@ export default function CreateTourScreen() {
     }
 
     if (!isTranslationMode) {
-      if (steps.length === 0) {
-        setValidationError(t('createTour.validation.stepsRequired'));
+      // At least one PUBLISHED step is required; unpublished steps don't count
+      // and don't require a title.
+      if (!steps.some((s) => s.published)) {
+        setValidationError(t('createTour.validation.publishedStepRequired'));
         return;
       }
-      const firstEmptyStep = steps.findIndex((s) => !s.title.trim());
-      if (firstEmptyStep !== -1) {
-        setValidationError(t('createTour.validation.stepTitleRequired', { order: firstEmptyStep + 1 }));
+      const firstEmptyPublished = steps.findIndex((s) => s.published && !s.title.trim());
+      if (firstEmptyPublished !== -1) {
+        setValidationError(t('createTour.validation.stepTitleRequired', { order: firstEmptyPublished + 1 }));
         return;
       }
     }
@@ -418,18 +481,10 @@ export default function CreateTourScreen() {
         }, entityLangcode || undefined);
 
         // Step mutations only apply in source-language mode.
+        // Guides cannot delete steps; they unpublish them (status=false). Each
+        // step is patched with its publish state and order so reordering and
+        // unpublishing persist. New steps are created published.
         if (!isTranslationMode) {
-          const currentDrupalIds = new Set(
-              steps.filter((s) => s.drupalId).map((s) => s.drupalId as string)
-          );
-          const removedIds = originalStepIds.current.filter((id) => !currentDrupalIds.has(id));
-          for (const id of removedIds) {
-            // Delete the whole step entity via its source/default langcode
-            // (== entityLangcode in source mode). JSON:API rejects deleting a
-            // non-default translation, so never use the UI language here.
-            await deleteTourStep(id, entityLangcode || undefined);
-          }
-
           for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             const lat = parseFloat(step.lat);
@@ -489,12 +544,7 @@ export default function CreateTourScreen() {
       // never contentLang — the UI language must not change.
       router.replace(`/${langcode}/dashboard?tab=tours&toast=tour_saved` as any);
     } catch (err: any) {
-      const message = err.message ?? t('createTour.error.generic');
-      if (Platform.OS !== 'web') {
-        Alert.alert(t('createTour.error.title'), message);
-      } else {
-        setValidationError(message);
-      }
+      setAlertMsg(err.message ?? t('createTour.error.generic'));
     } finally {
       setSaving(false);
     }
@@ -702,9 +752,9 @@ export default function CreateTourScreen() {
               )}
 
               {!isTranslationMode && steps.map((step, index) => (
-                  <View key={step.key} style={styles.stepCard}>
+                  <View key={step.key} style={[styles.stepCard, !step.published && styles.stepCardUnpublished]}>
                     <View style={styles.stepHeader}>
-                      <View style={styles.stepOrderBadge}>
+                      <View style={[styles.stepOrderBadge, !step.published && styles.stepOrderBadgeMuted]}>
                         <Text style={styles.stepOrderText}>{index + 1}</Text>
                       </View>
                       <View style={styles.stepActions}>
@@ -722,71 +772,103 @@ export default function CreateTourScreen() {
                         >
                           <Ionicons name="chevron-down" size={16} color={index === steps.length - 1 ? '#D1D5DB' : '#6B7280'} />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.stepDeleteBtn} onPress={() => removeStep(step.key)}>
-                          <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                        {/* Publish / unpublish (hidden from visitors when off). */}
+                        <TouchableOpacity
+                            style={styles.stepActionBtn}
+                            onPress={() => togglePublish(step)}
+                            disabled={busyStepKey === step.key}
+                        >
+                          <Ionicons
+                              name={step.published ? 'eye-off-outline' : 'eye-outline'}
+                              size={16}
+                              color="#6B7280"
+                          />
+                        </TouchableOpacity>
+                        {/* Delete the step permanently. */}
+                        <TouchableOpacity
+                            style={styles.stepDeleteBtn}
+                            onPress={() => removeStep(step)}
+                            disabled={busyStepKey === step.key}
+                        >
+                          {busyStepKey === step.key
+                              ? <ActivityIndicator size="small" color="#EF4444" />
+                              : <Ionicons name="trash-outline" size={16} color="#EF4444" />}
                         </TouchableOpacity>
                       </View>
                     </View>
 
-                    <Text style={styles.label}>
-                      {t('createTour.field.stepTitle')} <Text style={styles.required}>*</Text>
-                    </Text>
-                    <TextInput
-                        style={styles.input}
-                        value={step.title}
-                        onChangeText={(v) => updateStep(step.key, 'title', v)}
-                        placeholder={t('createTour.placeholder.stepTitle')}
-                        placeholderTextColor="#9CA3AF"
-                    />
+                    {step.published ? (
+                        <>
+                          <Text style={styles.label}>
+                            {t('createTour.field.stepTitle')} <Text style={styles.required}>*</Text>
+                          </Text>
+                          <TextInput
+                              style={styles.input}
+                              value={step.title}
+                              onChangeText={(v) => updateStep(step.key, 'title', v)}
+                              placeholder={t('createTour.placeholder.stepTitle')}
+                              placeholderTextColor="#9CA3AF"
+                          />
 
-                    <Text style={styles.label}>{t('createTour.field.stepDescription')}</Text>
-                    <TextInput
-                        style={[styles.input, styles.inputMultiline]}
-                        value={step.description}
-                        onChangeText={(v) => updateStep(step.key, 'description', v)}
-                        placeholder={t('createTour.placeholder.stepDescription')}
-                        placeholderTextColor="#9CA3AF"
-                        multiline
-                        numberOfLines={3}
-                        textAlignVertical="top"
-                    />
+                          <Text style={styles.label}>{t('createTour.field.stepDescription')}</Text>
+                          <TextInput
+                              style={[styles.input, styles.inputMultiline]}
+                              value={step.description}
+                              onChangeText={(v) => updateStep(step.key, 'description', v)}
+                              placeholder={t('createTour.placeholder.stepDescription')}
+                              placeholderTextColor="#9CA3AF"
+                              multiline
+                              numberOfLines={3}
+                              textAlignVertical="top"
+                          />
 
-                    <View style={styles.row}>
-                      <View style={styles.rowField}>
-                        <Text style={styles.label}>{t('createTour.field.lat')}</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={step.lat}
-                            onChangeText={(v) => updateStep(step.key, 'lat', v)}
-                            placeholder="41.3851"
-                            placeholderTextColor="#9CA3AF"
-                            keyboardType="decimal-pad"
-                        />
-                      </View>
-                      <View style={styles.rowField}>
-                        <Text style={styles.label}>{t('createTour.field.lon')}</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={step.lon}
-                            onChangeText={(v) => updateStep(step.key, 'lon', v)}
-                            placeholder="2.1734"
-                            placeholderTextColor="#9CA3AF"
-                            keyboardType="decimal-pad"
-                        />
-                      </View>
-                      <View style={styles.rowField}>
-                        <Text style={styles.label}>{t('createTour.field.stepDuration')}</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={step.duration}
-                            onChangeText={(v) => updateStep(step.key, 'duration', v.replace(/[^0-9]/g, ''))}
-                            placeholder="15"
-                            placeholderTextColor="#9CA3AF"
-                            keyboardType="numeric"
-                        />
-                      </View>
-                    </View>
-
+                          <View style={styles.row}>
+                            <View style={styles.rowField}>
+                              <Text style={styles.label}>{t('createTour.field.lat')}</Text>
+                              <TextInput
+                                  style={styles.input}
+                                  value={step.lat}
+                                  onChangeText={(v) => updateStep(step.key, 'lat', v)}
+                                  placeholder="41.3851"
+                                  placeholderTextColor="#9CA3AF"
+                                  keyboardType="decimal-pad"
+                              />
+                            </View>
+                            <View style={styles.rowField}>
+                              <Text style={styles.label}>{t('createTour.field.lon')}</Text>
+                              <TextInput
+                                  style={styles.input}
+                                  value={step.lon}
+                                  onChangeText={(v) => updateStep(step.key, 'lon', v)}
+                                  placeholder="2.1734"
+                                  placeholderTextColor="#9CA3AF"
+                                  keyboardType="decimal-pad"
+                              />
+                            </View>
+                            <View style={styles.rowField}>
+                              <Text style={styles.label}>{t('createTour.field.stepDuration')}</Text>
+                              <TextInput
+                                  style={styles.input}
+                                  value={step.duration}
+                                  onChangeText={(v) => updateStep(step.key, 'duration', v.replace(/[^0-9]/g, ''))}
+                                  placeholder="15"
+                                  placeholderTextColor="#9CA3AF"
+                                  keyboardType="numeric"
+                              />
+                            </View>
+                          </View>
+                        </>
+                    ) : (
+                        /* Unpublished: collapsed + greyed, with a request-deletion action. */
+                        <View style={styles.stepCollapsedBody}>
+                          <Text style={styles.stepCollapsedTitle} numberOfLines={1}>
+                            {step.title || t('createTour.placeholder.stepTitle')}
+                          </Text>
+                          <Text style={styles.stepUnpublishedLabel}>
+                            {t('createTour.steps.unpublished', 'Unpublished — hidden from visitors')}
+                          </Text>
+                        </View>
+                    )}
                   </View>
               ))}
             </View>
@@ -1007,6 +1089,29 @@ export default function CreateTourScreen() {
               </View>
             </Modal>
         )}
+
+        {/* Delete step confirmation */}
+        <ConfirmModal
+            visible={pendingDeleteStep !== null}
+            title={t('createTour.steps.deleteTitle', 'Delete stop')}
+            message={t('createTour.steps.deleteConfirm', 'Delete this stop permanently? This cannot be undone.')}
+            confirmLabel={t('common.delete')}
+            cancelLabel={t('common.cancel')}
+            destructive
+            busy={!!pendingDeleteStep && busyStepKey === pendingDeleteStep.key}
+            onConfirm={() => pendingDeleteStep && performDeleteStep(pendingDeleteStep)}
+            onClose={() => setPendingDeleteStep(null)}
+        />
+
+        {/* Warning / error alert */}
+        <ConfirmModal
+            visible={alertMsg !== null}
+            title={t('createTour.error.title', 'Something went wrong')}
+            message={alertMsg ?? ''}
+            confirmLabel={t('common.ok', 'OK')}
+            onConfirm={() => setAlertMsg(null)}
+            onClose={() => setAlertMsg(null)}
+        />
       </View>
   );
 }
@@ -1118,6 +1223,30 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
   },
+  stepCardUnpublished: {
+    backgroundColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    opacity: 0.85,
+  },
+  stepOrderBadgeMuted: { backgroundColor: '#9CA3AF' },
+  stepCollapsedBody: { gap: 6 },
+  stepCollapsedTitle: { fontSize: 14, fontWeight: '600', color: '#6B7280' },
+  stepUnpublishedLabel: { fontSize: 12, color: '#9CA3AF', fontStyle: 'italic' },
+  requestDeleteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    backgroundColor: '#FEF2F2',
+    marginTop: 2,
+  },
+  requestDeleteBtnText: { fontSize: 12, fontWeight: '600', color: '#B91C1C' },
   stepHeader: {
     flexDirection: 'row',
     alignItems: 'center',

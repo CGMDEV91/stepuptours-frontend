@@ -588,6 +588,7 @@ export function mapDrupalTourStep(raw: any): TourStep {
     description: raw.field_description?.value ?? raw.field_description ?? '',
     contentLangcode: raw.langcode ?? DRUPAL_DEFAULT_LANG,
     order: raw.field_order ?? 0,
+    published: raw.status ?? true,
     location: raw.field_location
         ? { lat: raw.field_location.lat, lon: raw.field_location.lon }
         : null,

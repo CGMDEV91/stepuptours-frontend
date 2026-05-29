@@ -45,6 +45,8 @@ export interface TourStep {
   /** Actual language of the content as returned by Drupal (may differ from UI language if untranslated) */
   contentLangcode: string;
   order: number;
+  /** Drupal publish state. Unpublished steps are hidden from visitors. */
+  published: boolean;
   location: GeoLocation | null;
   totalCompleted: number;
   featuredBusiness: Business | null;
