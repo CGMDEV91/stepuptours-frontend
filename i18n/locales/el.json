@@ -1004,5 +1004,14 @@
   "toast.translation_approved": "Η μετάφραση εγκρίθηκε",
   "toast.translation_unpublished": "Η μετάφραση αποσύρθηκε",
   "toast.translation_deleted": "Η μετάφραση διαγράφηκε",
-  "tickets.supportAuthor": "Υποστήριξη"
+  "tickets.supportAuthor": "Υποστήριξη",
+  "dashboard.quota.planTitle": "Τρέχον πλάνο",
+  "dashboard.quota.planSub": "Μηνιαίο όριο περιηγήσεων",
+  "dashboard.quota.createdTitle": "Δημιουργημένες περιηγήσεις",
+  "dashboard.quota.remainingTitle": "Υπόλοιπες",
+  "dashboard.quota.viewPlans": "Δείτε τα πλάνα",
+  "dashboard.quota.viewPlansSub": "Αναβαθμίστε το πλάνο σας για να δημιουργήσετε περισσότερες περιηγήσεις.",
+  "dashboard.plan.free": "Δωρεάν",
+  "dashboard.plan.basic": "Βασικό",
+  "dashboard.plan.premium": "Premium"
 }

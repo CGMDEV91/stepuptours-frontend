@@ -1066,5 +1066,14 @@
   "toast.translation_approved": "Traducción aprobada",
   "toast.translation_unpublished": "Traducción despublicada",
   "toast.translation_deleted": "Traducción eliminada",
-  "tickets.supportAuthor": "Soporte"
+  "tickets.supportAuthor": "Soporte",
+  "dashboard.quota.planTitle": "Plan Actual",
+  "dashboard.quota.planSub": "Límite mensual de tours",
+  "dashboard.quota.createdTitle": "Tours creados",
+  "dashboard.quota.remainingTitle": "Restantes",
+  "dashboard.quota.viewPlans": "Ver planes",
+  "dashboard.quota.viewPlansSub": "Mejora tu plan para crear más tours.",
+  "dashboard.plan.free": "Gratis",
+  "dashboard.plan.basic": "Básico",
+  "dashboard.plan.premium": "Premium"
 }

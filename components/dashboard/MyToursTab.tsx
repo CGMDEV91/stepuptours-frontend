@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   getToursByAuthor,
   deleteTour,
@@ -132,37 +132,87 @@ function FilterBar({ active, counts, onChange }: FilterBarProps) {
   );
 }
 
-// ── Quota bar ─────────────────────────────────────────────────────────────────
+// ── Quota card ────────────────────────────────────────────────────────────────
 
 interface QuotaBarProps {
   quota: ToursQuota;
+  onViewPlans: () => void;
 }
 
-function QuotaBar({ quota }: QuotaBarProps) {
+function QuotaBar({ quota, onViewPlans }: QuotaBarProps) {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isNarrow = width < 640;
 
   const isUnlimited = quota.max === -1;
-  const pct = isUnlimited ? 0 : Math.min(1, quota.used / quota.max);
-  const atLimit = !isUnlimited && quota.used >= quota.max;
+  const used = quota.used;
+  const remaining = isUnlimited ? -1 : Math.max(0, quota.max - used);
+  const atLimit = !isUnlimited && remaining === 0;
 
-  const barColor = atLimit ? '#EF4444' : pct >= 0.8 ? '#F59E0B' : '#10B981';
+  // Plan label: localized when the plan type is known, else the capitalized raw value.
+  const planKey = `dashboard.plan.${quota.planType}`;
+  const planResolved = t(planKey);
+  const planLabel = planResolved !== planKey
+    ? planResolved
+    : quota.planType.charAt(0).toUpperCase() + quota.planType.slice(1);
+
+  // "Restantes" badge colours: red at limit, amber when low, green otherwise.
+  const remBg = atLimit ? '#FEE2E2' : (!isUnlimited && remaining <= 1 ? '#FEF3C7' : '#D1FAE5');
+  const remFg = atLimit ? '#DC2626' : (!isUnlimited && remaining <= 1 ? '#92400E' : '#059669');
+
+  const Divider = () => <View style={isNarrow ? styles.quotaDividerH : styles.quotaDividerV} />;
 
   return (
-    <View style={styles.quotaBar}>
-      <View style={styles.quotaTextRow}>
-        <Text style={styles.quotaLabel}>
-          {isUnlimited
-            ? t('dashboard.toursQuotaUnlimited', { used: quota.used })
-            : t('dashboard.toursQuota', { used: quota.used, max: quota.max })}
-        </Text>
-        {atLimit && (
-          <Text style={styles.quotaLimitReached}>{t('dashboard.toursQuotaLimitReached')}</Text>
-        )}
-      </View>
-      {!isUnlimited && (
-        <View style={styles.quotaTrack}>
-          <View style={[styles.quotaFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: barColor }]} />
+    <View style={[styles.quotaCard, isNarrow && styles.quotaCardNarrow]}>
+      {/* Plan actual */}
+      <View style={[styles.quotaSeg, isNarrow && styles.quotaSegNarrow]}>
+        <View style={styles.quotaSegHead}>
+          <Text style={styles.quotaSegTitle}>{t('dashboard.quota.planTitle')}</Text>
+          <View style={styles.planBadge}>
+            <Text style={styles.planBadgeText}>{planLabel}</Text>
+          </View>
         </View>
+        <Text style={styles.quotaSegSub}>{t('dashboard.quota.planSub')}</Text>
+      </View>
+
+      <Divider />
+
+      {/* Tours creados */}
+      <View style={[styles.quotaSeg, isNarrow && styles.quotaSegNarrow]}>
+        <Text style={styles.quotaSegTitle}>{t('dashboard.quota.createdTitle')}</Text>
+        <Text style={styles.quotaBigNumber}>
+          {isUnlimited ? String(used) : `${used} / ${quota.max}`}
+        </Text>
+      </View>
+
+      <Divider />
+
+      {/* Restantes */}
+      <View style={[styles.quotaSeg, isNarrow && styles.quotaSegNarrow]}>
+        <Text style={styles.quotaSegTitle}>{t('dashboard.quota.remainingTitle')}</Text>
+        <View style={[styles.remainingBadge, { backgroundColor: remBg }]}>
+          <Text style={[styles.remainingText, { color: remFg }]}>
+            {isUnlimited ? '∞' : remaining}
+          </Text>
+        </View>
+      </View>
+
+      {/* Ver planes — only when the plan is limited */}
+      {!isUnlimited && (
+        <>
+          <Divider />
+          <TouchableOpacity
+            style={[styles.quotaCta, isNarrow && styles.quotaCtaNarrow]}
+            activeOpacity={0.85}
+            onPress={onViewPlans}
+          >
+            <View style={styles.quotaCtaHead}>
+              <MaterialCommunityIcons name="crown" size={18} color={AMBER} />
+              <Text style={styles.quotaCtaTitle}>{t('dashboard.quota.viewPlans')}</Text>
+            </View>
+            <Text style={styles.quotaCtaSub}>{t('dashboard.quota.viewPlansSub')}</Text>
+          </TouchableOpacity>
+        </>
       )}
     </View>
   );
@@ -334,7 +384,7 @@ export function MyToursTab({ userId }: MyToursTabProps) {
   return (
     <>
       {/* Monthly quota indicator */}
-      {quota && <QuotaBar quota={quota} />}
+      {quota && <QuotaBar quota={quota} onViewPlans={() => router.setParams({ tab: 'subscription' })} />}
 
       {/* Header: create button + search */}
       <View style={styles.listHeader}>
@@ -825,45 +875,46 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // ── Quota bar ────────────────────────────────────────────────────────────────
-  quotaBar: {
-    marginBottom: 12,
-    padding: 12,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 10,
+  // ── Quota card ───────────────────────────────────────────────────────────────
+  quotaCard: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    gap: 8,
-  },
-  quotaTextRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 4,
-  },
-  quotaLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  quotaLimitReached: {
-    fontSize: 11,
-    color: '#EF4444',
-    fontWeight: '700',
-    backgroundColor: '#FEE2E2',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-  },
-  quotaTrack: {
-    height: 6,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 3,
+    marginBottom: 16,
     overflow: 'hidden',
+    ...(Platform.OS === 'web'
+      ? { boxShadow: '0 1px 3px rgba(0,0,0,0.06)' } as any
+      : { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3, elevation: 1 }),
   },
-  quotaFill: {
-    height: 6,
-    borderRadius: 3,
+  quotaCardNarrow: { flexDirection: 'column' },
+
+  quotaSeg: { flex: 1, paddingVertical: 16, paddingHorizontal: 16, justifyContent: 'center', gap: 8 },
+  quotaSegNarrow: { width: '100%' },
+
+  quotaSegHead: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+  quotaSegTitle: { fontSize: 13, color: '#6B7280', fontWeight: '600' },
+  quotaSegSub: { fontSize: 12, color: '#9CA3AF' },
+
+  planBadge: { backgroundColor: '#EFF6FF', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
+  planBadgeText: { fontSize: 12, fontWeight: '700', color: '#2563EB' },
+
+  quotaBigNumber: { fontSize: 22, fontWeight: '800', color: '#111827' },
+
+  remainingBadge: {
+    minWidth: 34, height: 34, borderRadius: 17, paddingHorizontal: 10,
+    alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start',
   },
+  remainingText: { fontSize: 15, fontWeight: '800' },
+
+  quotaDividerV: { width: 1, backgroundColor: '#F1F3F5' },
+  quotaDividerH: { height: 1, backgroundColor: '#F1F3F5' },
+
+  quotaCta: { flex: 1.2, paddingVertical: 16, paddingHorizontal: 16, backgroundColor: '#FFF7ED', justifyContent: 'center', gap: 6 },
+  quotaCtaNarrow: { width: '100%' },
+  quotaCtaHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  quotaCtaTitle: { fontSize: 14, fontWeight: '800', color: '#111827' },
+  quotaCtaSub: { fontSize: 12, color: '#92400E', lineHeight: 16 },
 });

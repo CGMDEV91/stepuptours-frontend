@@ -1004,5 +1004,14 @@
   "toast.translation_approved": "Traduction approuvée",
   "toast.translation_unpublished": "Traduction dépubliée",
   "toast.translation_deleted": "Traduction supprimée",
-  "tickets.supportAuthor": "Assistance"
+  "tickets.supportAuthor": "Assistance",
+  "dashboard.quota.planTitle": "Forfait actuel",
+  "dashboard.quota.planSub": "Limite mensuelle de visites",
+  "dashboard.quota.createdTitle": "Visites créées",
+  "dashboard.quota.remainingTitle": "Restantes",
+  "dashboard.quota.viewPlans": "Voir les forfaits",
+  "dashboard.quota.viewPlansSub": "Améliorez votre forfait pour créer plus de visites.",
+  "dashboard.plan.free": "Gratuit",
+  "dashboard.plan.basic": "Basique",
+  "dashboard.plan.premium": "Premium"
 }
