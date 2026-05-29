@@ -166,7 +166,7 @@ function QuotaBar({ quota, onViewPlans }: QuotaBarProps) {
     <View style={[styles.quotaCard, isNarrow && styles.quotaCardNarrow]}>
       {/* Plan actual */}
       <View style={[styles.quotaSeg, isNarrow && styles.quotaSegNarrow]}>
-        <View style={styles.quotaSegHead}>
+        <View style={styles.quotaSegTop}>
           <Text style={styles.quotaSegTitle}>{t('dashboard.quota.planTitle')}</Text>
           <View style={styles.planBadge}>
             <Text style={styles.planBadgeText}>{planLabel}</Text>
@@ -179,7 +179,9 @@ function QuotaBar({ quota, onViewPlans }: QuotaBarProps) {
 
       {/* Tours creados */}
       <View style={[styles.quotaSeg, isNarrow && styles.quotaSegNarrow]}>
-        <Text style={styles.quotaSegTitle}>{t('dashboard.quota.createdTitle')}</Text>
+        <View style={styles.quotaSegTop}>
+          <Text style={styles.quotaSegTitle}>{t('dashboard.quota.createdTitle')}</Text>
+        </View>
         <Text style={styles.quotaBigNumber}>
           {isUnlimited ? String(used) : `${used} / ${quota.max}`}
         </Text>
@@ -189,7 +191,9 @@ function QuotaBar({ quota, onViewPlans }: QuotaBarProps) {
 
       {/* Restantes */}
       <View style={[styles.quotaSeg, isNarrow && styles.quotaSegNarrow]}>
-        <Text style={styles.quotaSegTitle}>{t('dashboard.quota.remainingTitle')}</Text>
+        <View style={styles.quotaSegTop}>
+          <Text style={styles.quotaSegTitle}>{t('dashboard.quota.remainingTitle')}</Text>
+        </View>
         <View style={[styles.remainingBadge, { backgroundColor: remBg }]}>
           <Text style={[styles.remainingText, { color: remFg }]}>
             {isUnlimited ? '∞' : remaining}
@@ -206,8 +210,8 @@ function QuotaBar({ quota, onViewPlans }: QuotaBarProps) {
             activeOpacity={0.85}
             onPress={onViewPlans}
           >
-            <View style={styles.quotaCtaHead}>
-              <MaterialCommunityIcons name="crown" size={18} color={AMBER} />
+            <View style={styles.quotaSegTop}>
+              <MaterialCommunityIcons name="crown-outline" size={17} color={AMBER} />
               <Text style={styles.quotaCtaTitle}>{t('dashboard.quota.viewPlans')}</Text>
             </View>
             <Text style={styles.quotaCtaSub}>{t('dashboard.quota.viewPlansSub')}</Text>
@@ -891,30 +895,30 @@ const styles = StyleSheet.create({
   },
   quotaCardNarrow: { flexDirection: 'column' },
 
-  quotaSeg: { flex: 1, paddingVertical: 16, paddingHorizontal: 16, justifyContent: 'center', gap: 8 },
+  quotaSeg: { flex: 1, paddingVertical: 18, paddingHorizontal: 18, justifyContent: 'flex-start', gap: 8 },
   quotaSegNarrow: { width: '100%' },
 
-  quotaSegHead: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  quotaSegTitle: { fontSize: 13, color: '#6B7280', fontWeight: '600' },
-  quotaSegSub: { fontSize: 12, color: '#9CA3AF' },
+  // Shared top row so titles (and the plan badge / crown) line up across columns.
+  quotaSegTop: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 22 },
+  quotaSegTitle: { fontSize: 14, color: '#374151', fontWeight: '500' },
+  quotaSegSub: { fontSize: 13, color: '#9CA3AF', fontWeight: '400' },
 
-  planBadge: { backgroundColor: '#EFF6FF', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
-  planBadgeText: { fontSize: 12, fontWeight: '700', color: '#2563EB' },
+  planBadge: { backgroundColor: '#EFF6FF', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
+  planBadgeText: { fontSize: 13, fontWeight: '500', color: '#3B82F6' },
 
-  quotaBigNumber: { fontSize: 22, fontWeight: '800', color: '#111827' },
+  quotaBigNumber: { fontSize: 20, fontWeight: '600', color: '#111827' },
 
   remainingBadge: {
-    minWidth: 34, height: 34, borderRadius: 17, paddingHorizontal: 10,
+    minWidth: 30, height: 30, borderRadius: 15, paddingHorizontal: 9,
     alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start',
   },
-  remainingText: { fontSize: 15, fontWeight: '800' },
+  remainingText: { fontSize: 14, fontWeight: '600' },
 
-  quotaDividerV: { width: 1, backgroundColor: '#F1F3F5' },
-  quotaDividerH: { height: 1, backgroundColor: '#F1F3F5' },
+  quotaDividerV: { width: 1, backgroundColor: '#EEF0F2' },
+  quotaDividerH: { height: 1, backgroundColor: '#EEF0F2' },
 
-  quotaCta: { flex: 1.2, paddingVertical: 16, paddingHorizontal: 16, backgroundColor: '#FFF7ED', justifyContent: 'center', gap: 6 },
+  quotaCta: { flex: 1.2, paddingVertical: 18, paddingHorizontal: 18, backgroundColor: '#FFF7ED', justifyContent: 'flex-start', gap: 8 },
   quotaCtaNarrow: { width: '100%' },
-  quotaCtaHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  quotaCtaTitle: { fontSize: 14, fontWeight: '800', color: '#111827' },
-  quotaCtaSub: { fontSize: 12, color: '#92400E', lineHeight: 16 },
+  quotaCtaTitle: { fontSize: 14, fontWeight: '600', color: '#111827' },
+  quotaCtaSub: { fontSize: 13, color: '#B07A2B', fontWeight: '400', lineHeight: 17 },
 });
