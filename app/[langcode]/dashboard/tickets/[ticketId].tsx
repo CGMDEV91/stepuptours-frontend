@@ -17,6 +17,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../../../stores/auth.store';
 import { webFullHeight } from '../../../../lib/web-styles';
 import { ChatBackground } from '../../../../components/chat/ChatBackground';
@@ -38,6 +39,9 @@ export default function TicketChatScreen() {
   const user = useAuthStore((s) => s.user);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const insets = useSafeAreaInsets();
+  // Extra breathing room below the input on mobile so it isn't flush with the footer.
+  const bottomPad = isDesktop ? 10 : 20 + insets.bottom;
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<TicketMessage[]>([]);
@@ -146,14 +150,14 @@ export default function TicketChatScreen() {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         {ticket.resolved ? (
-          <View style={styles.resolvedBar}>
+          <View style={[styles.resolvedBar, { paddingBottom: bottomPad }]}>
             <Ionicons name="checkmark-done-outline" size={16} color="#6B7280" />
             <Text style={styles.resolvedBarText}>
               {t('tickets.resolvedNotice', 'This ticket is closed. Open a new one for other queries.')}
             </Text>
           </View>
         ) : (
-          <View style={styles.inputBar}>
+          <View style={[styles.inputBar, { paddingBottom: bottomPad }]}>
             <TextInput
               style={styles.input}
               value={draft}
@@ -243,7 +247,7 @@ const styles = StyleSheet.create({
   errorText: { fontSize: 13, color: '#EF4444', textAlign: 'center', paddingHorizontal: 16, paddingBottom: 6 },
 
   inputBar: {
-    flexDirection: 'row', alignItems: 'flex-end', gap: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
     padding: 10, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E5E7EB',
   },
   input: { flex: 1, maxHeight: 120, borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 9, fontSize: 15, color: '#111827', backgroundColor: '#FAFAFA' },
