@@ -163,3 +163,53 @@
 - Probar con datos reales (necesita analytics en BD para el negocio)
 - El step drilldown desde BusinessAnalyticsTab usa `fetchTourAnalytics` que requiere `access analytics dashboard` (admin). Si el business owner no es admin, el endpoint devolverá 403. Evaluar si añadir permiso o mostrar solo la vista básica de top_tours sin drilldown para no-admins.
 
+---
+
+## Sesión 2026-05-29 — Cobros del guía + admin Pagar + filtro StepUp Tours + sello "Certified guide"
+
+**Resumen**: Reparto de donaciones end-to-end (lado frontend), rediseño de la pestaña Cobros del guía con 3 estados, nuevo botón "Pagar" en la vista admin para liquidar cobros pendientes manualmente, conversión de los chips de autor en un 4º dropdown junto a los otros filtros, y nueva lógica del sello "Certified guide" basada en el rol del autor.
+
+**Trabajo realizado**:
+
+### Pestaña Cobros del guía (`components/dashboard/PayoutsTab.tsx`)
+- Eliminada la pestaña "Datos de Pago" (formulario IBAN/BIC redundante con el onboarding de Stripe Express). Borrado `components/dashboard/PaymentDataTab.tsx` y todas sus referencias en `app/[langcode]/dashboard.tsx` (`TabId`, `TABS`, `VALID_TABS`, render block, prop `onGoToPayment`).
+- Tabla "Tus cobros" rediseñada: tarjetas blancas con borde + sombra suave sobre el fondo `#F9FAFB` del dashboard, badge de estado con punto de color, importe "Recibes" prominente, donación bruta secundaria, donante + fecha en pie con separador, motivo de fallo si aplica.
+- 3 estados en el badge: `succeeded` (transferencia confirmada por Stripe), `pending` (donación cobrada pero transferencia al guía aún no hecha o fallida), `failed` (la donación misma falló). Mapeados en `STATUS` con bg/fg/dot colors.
+- `getOnboardStatus` simplificado: ya no lanza `NoProfileError` (el perfil se autocrea backend); eliminada la rama `noProfile` del componente.
+
+### Vista admin con botón "Pagar" (`components/shared/DonationsView.tsx`)
+- Nueva columna "Pago al guía" en la tabla (desktop) y bloque equivalente en cards (mobile).
+- Componente `PayoutBadge` con los 3 estados; componente `PayButton` que muestra spinner mientras está en vuelo.
+- Handler `handlePay(id)` llama `settleAdminPayout(id)` (nuevo en `services/payment.service.ts`), refresca la fila localmente al éxito y dispara toast (`useToastStore`). El botón solo aparece cuando `payable: true` (donación pagada, guía con onboarding, importe > 0, transferencia aún no hecha).
+- Espaciado de las cards mobile reducido (gap 8 sin marginBottom).
+
+### Filtro StepUp Tours como 4º dropdown (`app/[langcode]/(tabs)/index.tsx`)
+- Eliminado el `authorTypeRow` (los 3 chips Todos / StepUp Tours / De guías).
+- Añadido un 4º trigger "Autor" en `DesktopChipRow` (después de Ciudad) y una sección equivalente en `MobileFilterBar`, ambos siguiendo el patrón ya existente de los otros 3 dropdowns (refs + `openFilter` + `renderOptions` + modal absoluto en desktop; acordeón en móvil).
+- Estado inicial: el filtro respeta la URL `?author=admin|guide` igual que antes.
+- `filters.authorType` incluida en `hasActive` para el botón "Limpiar".
+
+### Filtro por rol de autor (`services/tours.service.ts`)
+- Reemplazado el filtro hardcodeado a `uid.drupal_internal__uid=1` por filtros sobre el campo cacheado `field_author_is_admin` (boolean almacenado en el tour, ver backend): `admin → filter[field_author_is_admin]=1`, `guide → filter[field_author_is_admin]=0`. Más simple, sin condition groups, sin traversal a user.roles (que JSON:API restringe para anónimos).
+
+### Sello "Certified guide" (`components/tour/TourCard.tsx`)
+- Condición pasada de negativa (`!isOwner && tour.published && !tour.authorIsAdmin`) a positiva (`!isOwner && tour.published && tour.authorIsGuide`): ahora el sello aparece **solo** cuando el autor tiene rol `guide` o `professional`. Antes mostraba el sello en cualquier tour de un autor no-admin, lo que incluía business y otros roles incorrectamente.
+- Nuevo `authorIsGuide?: boolean` en el tipo `Tour` (`types/index.ts`), mapeado en `lib/drupal-client.ts:mapDrupalTour` desde `field_author_is_guide` (campo backend nuevo, ver MEMORY backend).
+- `field_author_is_guide` añadido a las dos listas `fields[node--tour]` de `services/tours.service.ts` para que llegue en las respuestas de listado/detalle.
+
+### i18n (6 locales)
+- Añadidas claves `payouts.statusPending` (3-estado en cobros), `admin.payouts.column`/`pay`/`paid`/`payError` para el botón admin Pagar, y reutilización de `home.filter.all/byAdmin/byGuide` para el nuevo dropdown. El payError menciona explícitamente revisar el saldo disponible en Stripe.
+
+**Archivos modificados (principales)**:
+- `app/[langcode]/dashboard.tsx`, `app/[langcode]/(tabs)/index.tsx`
+- `components/dashboard/PayoutsTab.tsx`, `components/shared/DonationsView.tsx`, `components/tour/TourCard.tsx`
+- `components/dashboard/PaymentDataTab.tsx` (eliminado)
+- `services/tours.service.ts`, `services/payouts.service.ts`, `services/payment.service.ts`
+- `lib/drupal-client.ts`
+- `types/index.ts`
+- `i18n/locales/{es,en,de,el,fr,it}.json`
+
+**Pendiente / Próximos pasos**:
+- Considerar migrar el flujo de donaciones a **destination charges** (`transfer_data[destination]` + `application_fee_amount`) para eliminar la fragilidad del modelo separate-charges-and-transfers (que falla cuando el saldo disponible es bajo). El botón Pagar manual del admin es un parche; el modelo atómico lo resuelve de raíz.
+- Bugs cazados en esta sesión: ver `BUGLOG.md` BUG-010 (filtro StepUp Tours hardcoded a UID 1) y BUG-011 (sello disappears en traducciones por campo translatable + lógica negativa).
+

@@ -108,3 +108,29 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 **Files:** `components/tour/StepContent.tsx`
 
 ---
+
+## BUG-010 — "StepUp Tours" filter returned 0 results in production
+
+**Status:** Fixed
+**Date:** 2026-05-29
+**Symptom:** On the home page filter, selecting "StepUp Tours" returned "No se encontraron tours" in production, even though there were tours owned by users with role `administrator`. "De guías" included those same admin-owned tours by accident.
+**Root cause:** `services/tours.service.ts` hardcoded the filter to `filter[uid.drupal_internal__uid]=1`, matching only Drupal's canonical superadmin (UID 1). In production the admin-owned tours belong to other users that also have role `administrator` but are not UID 1, so they never matched. The mirror filter for guides (`uid<>1`) wrongly placed those non-UID-1 admin tours in the guides bucket. First attempt — filter by user role through the relationship (`filter[uid.roles.target_id]=administrator`) — returned 400 because Drupal JSON:API restricts the `user.roles` field for anonymous visitors.
+**Fix:** Added a stored boolean `field_author_is_admin` on the `tour` bundle (backend update 10008) kept in sync by `hook_node_presave` and `hook_user_update`. Frontend filter is now `filter[field_author_is_admin]=1` for admin and `=0` for guide — no traversal to user.roles, no access issue, works anonymously.
+**Files:** `services/tours.service.ts`. See also backend `BUGLOG.md` (`field_author_is_admin` field) and the role-by-relationship 400 noted there.
+
+---
+
+## BUG-011 — "Certified guide" seal missing on translated tours and shown on non-guides
+
+**Status:** Fixed
+**Date:** 2026-05-29
+**Symptom:** Two-part bug. (a) On the home in English, a tour with translations was missing the "Certified guide" seal even though it was owned by a guide. (b) The seal was sometimes shown on tours owned by `business` users (or other non-guide roles), not just guides.
+**Root cause:** Two compounding causes.
+1. `TourCard.tsx` used a NEGATIVE condition `!isOwner && tour.published && !tour.authorIsAdmin`. `!authorIsAdmin` matches anyone who isn't admin — including `business` and role-less users — so the seal showed for the wrong audience.
+2. The new backend mirror fields `field_author_is_admin` / `field_author_is_guide` were created as **translatable** (Drupal defaults the flag to true when `content_translation` is enabled for the bundle). The role of the author is independent of language, but each translation got its own copy of the field. The backfill only wrote the value on the default-language (es) translation; the EN translation had the field empty, so when JSON:API served the EN translation `tour.authorIsGuide` was falsy → seal hidden.
+**Fix:**
+- Condition flipped to POSITIVE: `!isOwner && tour.published && tour.authorIsGuide`. Backend exposes the new boolean `field_author_is_guide` (true when owner has role `guide` or `professional`, mirroring `lib/roles.ts:isGuideRole`).
+- Backend fields made **untranslatable** (`FieldStorageConfig::setTranslatable(FALSE)`); Drupal collapses to a single shared value (the default-translation one, which had been correctly backfilled).
+**Files:** `components/tour/TourCard.tsx`, `lib/drupal-client.ts` (map `authorIsGuide`), `services/tours.service.ts` (request the field), `types/index.ts`. Backend counterparts in `BUGLOG.md` (root repo of the Drupal site).
+
+---
