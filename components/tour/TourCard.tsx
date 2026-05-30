@@ -195,7 +195,7 @@ export function TourCard({
               </>
             )}
           </View>
-          {!isOwner && tour.published && !tour.authorIsAdmin ? (
+          {!isOwner && tour.published && tour.authorIsGuide ? (
             <View style={styles.certifiedPill}>
               <VerifiedSeal size={13} starColor="#FFFFFF" checkColor={VERIFIED_GOLD} />
               <Text style={styles.certifiedPillText} numberOfLines={1}>

@@ -541,6 +541,9 @@ export function mapDrupalTour(raw: any): Tour {
     authorIsAdmin: typeof raw.author_is_admin === 'boolean'
         ? raw.author_is_admin
         : deriveAuthorIsAdmin(raw.uid),
+    // Cached on the tour by stepuptours_api_node_presave so it doesn't depend
+    // on user.roles being readable in JSON:API responses.
+    authorIsGuide: !!raw.field_author_is_guide,
     availableLangs: normalizeAvailableLangs(raw),
     published: raw.status ?? false,
     langcode: raw.langcode ?? DRUPAL_DEFAULT_LANG,

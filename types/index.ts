@@ -77,6 +77,7 @@ export interface Tour {
   authorId: string;
   authorPublicName?: string;
   authorIsAdmin?: boolean;
+  authorIsGuide?: boolean;
   availableLangs?: string[];
   isUntranslated?: boolean;
   published: boolean;
