@@ -45,11 +45,12 @@ interface DesktopChipRowProps {
   onCountryClear: () => void;
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
+  onAuthorSelect: (a: TourFilters['authorType']) => void;
   onClear: () => void;
 }
 
 interface DesktopDropdownConfig {
-  type: 'sort' | 'country' | 'city';
+  type: 'sort' | 'country' | 'city' | 'author';
   x: number;
   y: number;
   minWidth: number;
@@ -63,16 +64,18 @@ function DesktopChipRow({
   onCountryClear,
   onCitySelect,
   onSortSelect,
+  onAuthorSelect,
   onClear,
 }: DesktopChipRowProps) {
   const { t } = useTranslation();
-  const [openChip, setOpenChip] = useState<null | 'sort' | 'country' | 'city'>(null);
+  const [openChip, setOpenChip] = useState<null | 'sort' | 'country' | 'city' | 'author'>(null);
   const [ddConfig, setDdConfig] = useState<DesktopDropdownConfig | null>(null);
   const [ddSearch, setDdSearch] = useState('');
 
   const sortRef = useRef<any>(null);
   const countryRef = useRef<any>(null);
   const cityRef = useRef<any>(null);
+  const authorRef = useRef<any>(null);
 
   const sortOptions: { key: NonNullable<TourFilters['sort']>; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { key: 'rating',            label: t('filter.sortRating'),    icon: 'star-outline'      },
@@ -82,12 +85,22 @@ function DesktopChipRow({
     { key: 'stops_asc',         label: t('filter.sortStopsAsc'),  icon: 'footsteps-outline' },
   ];
 
+  type AuthorOptionKey = 'all' | NonNullable<TourFilters['authorType']>;
+  const authorOptions: { key: AuthorOptionKey; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { key: 'all',   label: t('home.filter.all'),     icon: 'apps-outline'     },
+    { key: 'admin', label: t('home.filter.byAdmin'), icon: 'business-outline' },
+    { key: 'guide', label: t('home.filter.byGuide'), icon: 'people-outline'   },
+  ];
+
   const activeSortLabel =
     sortOptions.find((o) => o.key === (filters.sort ?? 'rating'))?.label ?? t('filter.sort');
+  const activeAuthorKey: AuthorOptionKey = filters.authorType ?? 'all';
+  const activeAuthorLabel =
+    authorOptions.find((o) => o.key === activeAuthorKey)?.label ?? t('home.filter.all');
   const selectedCountries = filters.countries ?? [];
-  const hasActive = !!(selectedCountries.length || filters.city || filters.sort);
+  const hasActive = !!(selectedCountries.length || filters.city || filters.sort || filters.authorType);
 
-  const openFilter = (ref: React.RefObject<any>, type: 'sort' | 'country' | 'city') => {
+  const openFilter = (ref: React.RefObject<any>, type: 'sort' | 'country' | 'city' | 'author') => {
     ref.current?.measureInWindow((x: number, y: number, w: number, h: number) => {
       setDdSearch('');
       setDdConfig({ type, x, y: y + h + 6, minWidth: Math.max(w, 240) });
@@ -151,6 +164,14 @@ function DesktopChipRow({
         ),
       ];
     }
+    if (type === 'author') {
+      return authorOptions.map((o) =>
+        renderOption(o.key, o.label, activeAuthorKey === o.key, o.icon, () => {
+          onAuthorSelect(o.key === 'all' ? undefined : o.key);
+          close();
+        }),
+      );
+    }
     return null;
   };
 
@@ -190,6 +211,17 @@ function DesktopChipRow({
             <Ionicons name="location-outline" size={13} color={filters.city ? '#fff' : '#374151'} />
             <Text style={[styles.chipText, filters.city && styles.chipTextActive]}>{filters.city ?? t('filter.city')}</Text>
             <Ionicons name="chevron-down" size={11} color={filters.city ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
+          </TouchableOpacity>
+        </View>
+        <View ref={authorRef}>
+          <TouchableOpacity
+            style={[styles.chip, filters.authorType && styles.chipActive]}
+            onPress={() => openFilter(authorRef, 'author')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="person-outline" size={13} color={filters.authorType ? '#fff' : '#374151'} />
+            <Text style={[styles.chipText, filters.authorType && styles.chipTextActive]}>{activeAuthorLabel}</Text>
+            <Ionicons name="chevron-down" size={11} color={filters.authorType ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
           </TouchableOpacity>
         </View>
         {hasActive && (
@@ -246,6 +278,7 @@ interface MobileFilterBarProps {
   onCountryClear: () => void;
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
+  onAuthorSelect: (a: TourFilters['authorType']) => void;
   onFetchCities: (countries?: string[]) => void;
   onClear: () => void;
   cardPadding: number;
@@ -259,6 +292,7 @@ function MobileFilterBar({
   onCountryClear,
   onCitySelect,
   onSortSelect,
+  onAuthorSelect,
   onFetchCities,
   onClear,
   cardPadding,
@@ -267,7 +301,7 @@ function MobileFilterBar({
   const [open, setOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
   const [citySearch, setCitySearch] = useState('');
-  const [expandedSection, setExpandedSection] = useState<'sort' | 'country' | 'city' | null>(null);
+  const [expandedSection, setExpandedSection] = useState<'sort' | 'country' | 'city' | 'author' | null>(null);
 
   const sortOptions: { key: NonNullable<TourFilters['sort']>; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { key: 'rating',            label: t('filter.sortRating'),    icon: 'star-outline'      },
@@ -277,10 +311,18 @@ function MobileFilterBar({
     { key: 'stops_asc',         label: t('filter.sortStopsAsc'),  icon: 'footsteps-outline' },
   ];
 
+  type AuthorOptionKey = 'all' | NonNullable<TourFilters['authorType']>;
+  const authorOptions: { key: AuthorOptionKey; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { key: 'all',   label: t('home.filter.all'),     icon: 'apps-outline'     },
+    { key: 'admin', label: t('home.filter.byAdmin'), icon: 'business-outline' },
+    { key: 'guide', label: t('home.filter.byGuide'), icon: 'people-outline'   },
+  ];
+
   const selectedCountriesMobile = filters.countries ?? [];
-  const activeCount = [...selectedCountriesMobile, filters.city, filters.sort].filter(Boolean).length;
+  const activeCount = [...selectedCountriesMobile, filters.city, filters.sort, filters.authorType].filter(Boolean).length;
   const hasActive = activeCount > 0;
   const currentSortLabel = sortOptions.find((o) => o.key === (filters.sort ?? 'rating'))?.label ?? '';
+  const currentAuthorLabel = authorOptions.find((o) => o.key === (filters.authorType ?? 'all'))?.label ?? '';
 
   const openModal = () => {
     setCountrySearch('');
@@ -292,7 +334,7 @@ function MobileFilterBar({
 
   const close = () => setOpen(false);
 
-  const toggleSection = (section: 'sort' | 'country' | 'city') => {
+  const toggleSection = (section: 'sort' | 'country' | 'city' | 'author') => {
     setExpandedSection((prev) => (prev === section ? null : section));
   };
 
@@ -449,6 +491,35 @@ function MobileFilterBar({
                   </ScrollView>
                 </>
               )}
+            </View>
+
+            {/* Author section */}
+            <View style={styles.filterSection}>
+              <TouchableOpacity style={styles.filterSectionRow} onPress={() => toggleSection('author')} activeOpacity={0.7}>
+                <Text style={styles.mobileSectionLabel}>{t('home.filter.author', 'Autor')}</Text>
+                <View style={styles.filterSectionRight}>
+                  <Text style={styles.filterSectionValue} numberOfLines={1}>{currentAuthorLabel}</Text>
+                  <Ionicons name={expandedSection === 'author' ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
+                </View>
+              </TouchableOpacity>
+              {expandedSection === 'author' && authorOptions.map((o) => {
+                const isActive = (filters.authorType ?? 'all') === o.key;
+                return (
+                  <TouchableOpacity
+                    key={o.key}
+                    style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
+                    onPress={() => {
+                      onAuthorSelect(o.key === 'all' ? undefined : o.key);
+                      close();
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name={o.icon} size={18} color={isActive ? AMBER : '#6B7280'} />
+                    <Text style={[styles.mobileOptionText, isActive && styles.mobileOptionTextActive]}>{o.label}</Text>
+                    {isActive && <Ionicons name="checkmark" size={18} color={AMBER} />}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
           </ScrollView>
@@ -777,6 +848,7 @@ export default function HomePage() {
                 onCountryClear={handleCountryClear}
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
+                onAuthorSelect={handleAuthorTypeSelect}
                 onClear={handleClear}
               />
             ) : (
@@ -788,37 +860,12 @@ export default function HomePage() {
                 onCountryClear={handleCountryClear}
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
+                onAuthorSelect={handleAuthorTypeSelect}
                 onFetchCities={fetchCities}
                 onClear={handleClear}
                 cardPadding={PADDING}
               />
             )}
-
-            {/* ── AUTHOR TYPE CHIPS ── */}
-            <View style={[styles.authorTypeRow, { paddingHorizontal: PADDING }]}>
-              {(['all', 'admin', 'guide'] as const).map((key) => {
-                const value: TourFilters['authorType'] = key === 'all' ? undefined : key;
-                const active = (filters.authorType ?? undefined) === value;
-                const label =
-                  key === 'all'
-                    ? t('home.filter.all')
-                    : key === 'admin'
-                    ? t('home.filter.byAdmin')
-                    : t('home.filter.byGuide');
-                return (
-                  <TouchableOpacity
-                    key={key}
-                    style={[styles.authorTypeChip, active && styles.authorTypeChipActive]}
-                    onPress={() => handleAuthorTypeSelect(value)}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.authorTypeChipText, active && styles.authorTypeChipTextActive]}>
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
 
             {/* ── FACET SUMMARY ── */}
             <FacetSummaryRow

@@ -133,19 +133,16 @@ async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<To
   const drupalFilters: Record<string, any> = { status: 1 };
   if (city) drupalFilters['field_city.name'] = city;
 
-  // Filter by author type: "admin" = the superadmin (UID 1, the official
-  // StepUp Tours account), "guide" = anyone else. We use Drupal's
-  // drupal_internal__uid on the uid relationship so we don't depend on any
-  // configured UUID — UID 1 is the canonical superadmin.
+  // Filter by author type via the cached boolean field_author_is_admin on
+  // the tour itself (kept in sync by stepuptours_api_node_presave /
+  // stepuptours_api_user_update). We can't filter through uid.roles.target_id
+  // because JSON:API restricts the user.roles field for anonymous visitors and
+  // returns 400. Filtering a simple boolean on the node has no access issues.
   let authorFilterStr = '';
   if (authorType === 'admin') {
-    authorFilterStr = 'filter[uid.drupal_internal__uid]=1';
+    authorFilterStr = 'filter[field_author_is_admin]=1';
   } else if (authorType === 'guide') {
-    authorFilterStr = [
-      'filter[author][condition][path]=uid.drupal_internal__uid',
-      'filter[author][condition][operator]=%3C%3E',
-      'filter[author][condition][value]=1',
-    ].join('&');
+    authorFilterStr = 'filter[field_author_is_admin]=0';
   }
 
   let sortParam = 'sort=-field_average_rate,-field_rating_count,drupal_internal__nid';
