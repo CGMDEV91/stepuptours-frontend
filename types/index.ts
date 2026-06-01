@@ -212,8 +212,9 @@ export interface TourFilters {
   search?: string;
   page?: number;
   limit?: number;
-  sort?: 'rating' | 'alphabetical' | 'alphabetical_desc' | 'stops_desc' | 'stops_asc';
+  sort?: 'rating' | 'most_completed' | 'newest' | 'alphabetical' | 'alphabetical_desc' | 'stops_desc' | 'stops_asc';
   authorType?: 'admin' | 'guide';
+  langs?: string[];
 }
 
 // Tipos de autenticación

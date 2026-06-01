@@ -130,7 +130,24 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
 }
 
 async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
-  const { page = 1, limit = 20, countries, city, minRating, search, sort, authorType } = filters;
+  const { page = 1, limit = 20, countries, city, minRating, search, sort, authorType, langs } = filters;
+
+  // ── Language filter (client-side) ─────────────────────────────────────────
+  // `available_langs` is a computed field not stored in the DB, so it cannot
+  // be filtered via JSON:API. Strategy: fetch all tours without the lang filter
+  // (large limit), then filter client-side by availableLangs.
+  if (langs && langs.length > 0) {
+    const allResult = await fetchTours({ ...filters, langs: undefined, limit: 500, page: 1 });
+    const filtered = allResult.data.filter((t) =>
+      langs.some((l) => t.availableLangs.includes(l)),
+    );
+    const start = (page - 1) * limit;
+    return {
+      data: filtered.slice(start, start + limit),
+      total: filtered.length,
+      hasMore: start + limit < filtered.length,
+    };
+  }
 
   const drupalFilters: Record<string, any> = { status: 1 };
   if (city) drupalFilters['field_city.name'] = city;
@@ -148,10 +165,26 @@ async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<To
   }
 
   let sortParam = 'sort=-field_average_rate,-field_rating_count,drupal_internal__nid';
+  if (sort === 'most_completed')    sortParam = 'sort=-field_rating_count,-field_average_rate,drupal_internal__nid';
+  if (sort === 'newest')            sortParam = 'sort=-created,drupal_internal__nid';
   if (sort === 'alphabetical')      sortParam = 'sort=title,drupal_internal__nid';
   if (sort === 'alphabetical_desc') sortParam = 'sort=-title,drupal_internal__nid';
   if (sort === 'stops_desc')        sortParam = 'sort=-field_steps_count,drupal_internal__nid';
   if (sort === 'stops_asc')         sortParam = 'sort=field_steps_count,drupal_internal__nid';
+
+  // ── Search filter: OR across title, city and country ─────────────────────
+  // Previously only title was searched. Now we build a JSON:API OR group so
+  // that typing "Barcelona" or "Spain" also returns the right tours.
+  let searchFilter = '';
+  if (search) {
+    const q = encodeURIComponent(search);
+    searchFilter = [
+      'filter[sg][group][conjunction]=OR',
+      `filter[title_f][condition][path]=title&filter[title_f][condition][operator]=CONTAINS&filter[title_f][condition][value]=${q}&filter[title_f][condition][memberOf]=sg`,
+      `filter[city_f][condition][path]=field_city.name&filter[city_f][condition][operator]=CONTAINS&filter[city_f][condition][value]=${q}&filter[city_f][condition][memberOf]=sg`,
+      `filter[country_f][condition][path]=field_country.name&filter[country_f][condition][operator]=CONTAINS&filter[country_f][condition][value]=${q}&filter[country_f][condition][memberOf]=sg`,
+    ].join('&');
+  }
 
   // Skip the country relationship filter when a city is selected:
   // a city already implies its country unambiguously, and combining
@@ -163,7 +196,7 @@ async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<To
     buildFilters(drupalFilters),
     city ? '' : buildCountriesFilter(countries ?? []),
     minRating ? `filter[rate][condition][path]=field_average_rate&filter[rate][condition][operator]=>=&filter[rate][condition][value]=${minRating}` : '',
-    search ? `filter[title][condition][path]=title&filter[title][condition][operator]=CONTAINS&filter[title][condition][value]=${encodeURIComponent(search)}` : '',
+    searchFilter,
     authorFilterStr,
   ].filter(Boolean).join('&');
 

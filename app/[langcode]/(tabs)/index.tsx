@@ -33,6 +33,16 @@ import { PageFlatList } from '../../../components/layout/PageFlatList';
 import { webFullHeight } from '../../../lib/web-styles';
 const AMBER = '#F59E0B';
 
+// Idiomas disponibles como filtro (los mismos que la app soporta)
+const LANG_OPTIONS = [
+  { code: 'es', label: 'Español' },
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'el', label: 'Ελληνικά' },
+];
+
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80';
 
@@ -46,11 +56,12 @@ interface DesktopChipRowProps {
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
   onAuthorSelect: (a: TourFilters['authorType']) => void;
+  onLangToggle: (l: string) => void;
   onClear: () => void;
 }
 
 interface DesktopDropdownConfig {
-  type: 'sort' | 'country' | 'city' | 'author';
+  type: 'sort' | 'country' | 'city' | 'author' | 'lang';
   x: number;
   y: number;
   minWidth: number;
@@ -65,10 +76,11 @@ function DesktopChipRow({
   onCitySelect,
   onSortSelect,
   onAuthorSelect,
+  onLangToggle,
   onClear,
 }: DesktopChipRowProps) {
   const { t } = useTranslation();
-  const [openChip, setOpenChip] = useState<null | 'sort' | 'country' | 'city' | 'author'>(null);
+  const [openChip, setOpenChip] = useState<null | 'sort' | 'country' | 'city' | 'author' | 'lang'>(null);
   const [ddConfig, setDdConfig] = useState<DesktopDropdownConfig | null>(null);
   const [ddSearch, setDdSearch] = useState('');
 
@@ -76,13 +88,16 @@ function DesktopChipRow({
   const countryRef = useRef<any>(null);
   const cityRef = useRef<any>(null);
   const authorRef = useRef<any>(null);
+  const langRef = useRef<any>(null);
 
   const sortOptions: { key: NonNullable<TourFilters['sort']>; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { key: 'rating',            label: t('filter.sortRating'),    icon: 'star-outline'      },
-    { key: 'alphabetical',      label: t('filter.sortAlpha'),     icon: 'text-outline'      },
-    { key: 'alphabetical_desc', label: t('filter.sortAlphaDesc'), icon: 'text-outline'      },
-    { key: 'stops_desc',        label: t('filter.sortStopsDesc'), icon: 'footsteps-outline' },
-    { key: 'stops_asc',         label: t('filter.sortStopsAsc'),  icon: 'footsteps-outline' },
+    { key: 'rating',            label: t('filter.sortRating'),         icon: 'star-outline'      },
+    { key: 'most_completed',    label: t('filter.sortMostCompleted'),  icon: 'people-outline'    },
+    { key: 'newest',            label: t('filter.sortNewest'),         icon: 'time-outline'      },
+    { key: 'alphabetical',      label: t('filter.sortAlpha'),          icon: 'text-outline'      },
+    { key: 'alphabetical_desc', label: t('filter.sortAlphaDesc'),      icon: 'text-outline'      },
+    { key: 'stops_desc',        label: t('filter.sortStopsDesc'),      icon: 'footsteps-outline' },
+    { key: 'stops_asc',         label: t('filter.sortStopsAsc'),       icon: 'footsteps-outline' },
   ];
 
   type AuthorOptionKey = 'all' | NonNullable<TourFilters['authorType']>;
@@ -98,9 +113,10 @@ function DesktopChipRow({
   const activeAuthorLabel =
     authorOptions.find((o) => o.key === activeAuthorKey)?.label ?? t('home.filter.all');
   const selectedCountries = filters.countries ?? [];
-  const hasActive = !!(selectedCountries.length || filters.city || filters.sort || filters.authorType);
+  const selectedLangs = filters.langs ?? [];
+  const hasActive = !!(selectedCountries.length || filters.city || filters.sort || filters.authorType || selectedLangs.length);
 
-  const openFilter = (ref: React.RefObject<any>, type: 'sort' | 'country' | 'city' | 'author') => {
+  const openFilter = (ref: React.RefObject<any>, type: 'sort' | 'country' | 'city' | 'author' | 'lang') => {
     ref.current?.measureInWindow((x: number, y: number, w: number, h: number) => {
       setDdSearch('');
       setDdConfig({ type, x, y: y + h + 6, minWidth: Math.max(w, 240) });
@@ -172,6 +188,13 @@ function DesktopChipRow({
         }),
       );
     }
+    if (type === 'lang') {
+      return LANG_OPTIONS.map((o) =>
+        renderOption(o.code, o.label, selectedLangs.includes(o.code), 'language-outline', () => {
+          onLangToggle(o.code);
+        }),
+      );
+    }
     return null;
   };
 
@@ -222,6 +245,19 @@ function DesktopChipRow({
             <Ionicons name="person-outline" size={13} color={filters.authorType ? '#fff' : '#374151'} />
             <Text style={[styles.chipText, filters.authorType && styles.chipTextActive]}>{activeAuthorLabel}</Text>
             <Ionicons name="chevron-down" size={11} color={filters.authorType ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
+          </TouchableOpacity>
+        </View>
+        <View ref={langRef}>
+          <TouchableOpacity
+            style={[styles.chip, selectedLangs.length > 0 && styles.chipActive]}
+            onPress={() => openFilter(langRef, 'lang')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="language-outline" size={13} color={selectedLangs.length > 0 ? '#fff' : '#374151'} />
+            <Text style={[styles.chipText, selectedLangs.length > 0 && styles.chipTextActive]}>
+              {selectedLangs.length > 0 ? `${t('filter.language')} (${selectedLangs.length})` : t('filter.language')}
+            </Text>
+            <Ionicons name="chevron-down" size={11} color={selectedLangs.length > 0 ? 'rgba(255,255,255,0.7)' : '#9CA3AF'} />
           </TouchableOpacity>
         </View>
         {hasActive && (
@@ -279,6 +315,7 @@ interface MobileFilterBarProps {
   onCitySelect: (c: string | null) => void;
   onSortSelect: (s: TourFilters['sort']) => void;
   onAuthorSelect: (a: TourFilters['authorType']) => void;
+  onLangToggle: (l: string) => void;
   onFetchCities: (countries?: string[]) => void;
   onClear: () => void;
   cardPadding: number;
@@ -293,6 +330,7 @@ function MobileFilterBar({
   onCitySelect,
   onSortSelect,
   onAuthorSelect,
+  onLangToggle,
   onFetchCities,
   onClear,
   cardPadding,
@@ -301,14 +339,16 @@ function MobileFilterBar({
   const [open, setOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
   const [citySearch, setCitySearch] = useState('');
-  const [expandedSection, setExpandedSection] = useState<'sort' | 'country' | 'city' | 'author' | null>(null);
+  const [expandedSection, setExpandedSection] = useState<'sort' | 'country' | 'city' | 'author' | 'lang' | null>(null);
 
   const sortOptions: { key: NonNullable<TourFilters['sort']>; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { key: 'rating',            label: t('filter.sortRating'),    icon: 'star-outline'      },
-    { key: 'alphabetical',      label: t('filter.sortAlpha'),     icon: 'text-outline'      },
-    { key: 'alphabetical_desc', label: t('filter.sortAlphaDesc'), icon: 'text-outline'      },
-    { key: 'stops_desc',        label: t('filter.sortStopsDesc'), icon: 'footsteps-outline' },
-    { key: 'stops_asc',         label: t('filter.sortStopsAsc'),  icon: 'footsteps-outline' },
+    { key: 'rating',            label: t('filter.sortRating'),        icon: 'star-outline'      },
+    { key: 'most_completed',    label: t('filter.sortMostCompleted'), icon: 'people-outline'    },
+    { key: 'newest',            label: t('filter.sortNewest'),        icon: 'time-outline'      },
+    { key: 'alphabetical',      label: t('filter.sortAlpha'),         icon: 'text-outline'      },
+    { key: 'alphabetical_desc', label: t('filter.sortAlphaDesc'),     icon: 'text-outline'      },
+    { key: 'stops_desc',        label: t('filter.sortStopsDesc'),     icon: 'footsteps-outline' },
+    { key: 'stops_asc',         label: t('filter.sortStopsAsc'),      icon: 'footsteps-outline' },
   ];
 
   type AuthorOptionKey = 'all' | NonNullable<TourFilters['authorType']>;
@@ -319,7 +359,8 @@ function MobileFilterBar({
   ];
 
   const selectedCountriesMobile = filters.countries ?? [];
-  const activeCount = [...selectedCountriesMobile, filters.city, filters.sort, filters.authorType].filter(Boolean).length;
+  const selectedLangsMobile = filters.langs ?? [];
+  const activeCount = [...selectedCountriesMobile, ...(filters.langs ?? []), filters.city, filters.sort, filters.authorType].filter(Boolean).length;
   const hasActive = activeCount > 0;
   const currentSortLabel = sortOptions.find((o) => o.key === (filters.sort ?? 'rating'))?.label ?? '';
   const currentAuthorLabel = authorOptions.find((o) => o.key === (filters.authorType ?? 'all'))?.label ?? '';
@@ -515,6 +556,36 @@ function MobileFilterBar({
                     activeOpacity={0.7}
                   >
                     <Ionicons name={o.icon} size={18} color={isActive ? AMBER : '#6B7280'} />
+                    <Text style={[styles.mobileOptionText, isActive && styles.mobileOptionTextActive]}>{o.label}</Text>
+                    {isActive && <Ionicons name="checkmark" size={18} color={AMBER} />}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Language section */}
+            <View style={styles.filterSection}>
+              <TouchableOpacity style={styles.filterSectionRow} onPress={() => toggleSection('lang')} activeOpacity={0.7}>
+                <Text style={styles.mobileSectionLabel}>{t('filter.language')}</Text>
+                <View style={styles.filterSectionRight}>
+                  <Text style={styles.filterSectionValue} numberOfLines={1}>
+                    {selectedLangsMobile.length > 0
+                      ? `${selectedLangsMobile.length} ${t('filter.selected')}`
+                      : t('filter.selectLanguage')}
+                  </Text>
+                  <Ionicons name={expandedSection === 'lang' ? 'chevron-up' : 'chevron-down'} size={16} color="#9CA3AF" />
+                </View>
+              </TouchableOpacity>
+              {expandedSection === 'lang' && LANG_OPTIONS.map((o) => {
+                const isActive = selectedLangsMobile.includes(o.code);
+                return (
+                  <TouchableOpacity
+                    key={o.code}
+                    style={[styles.mobileOption, isActive && styles.mobileOptionActive]}
+                    onPress={() => onLangToggle(o.code)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="language-outline" size={18} color={isActive ? AMBER : '#6B7280'} />
                     <Text style={[styles.mobileOptionText, isActive && styles.mobileOptionTextActive]}>{o.label}</Text>
                     {isActive && <Ionicons name="checkmark" size={18} color={AMBER} />}
                   </TouchableOpacity>
@@ -731,6 +802,17 @@ export default function HomePage() {
     }
   };
 
+  const handleLangToggle = (lang: string) => {
+    const current = filters.langs ?? [];
+    const updated = current.includes(lang)
+      ? current.filter((l) => l !== lang)
+      : [...current, lang];
+    const newFilters = { langs: updated.length ? updated : undefined, page: 1 };
+    setFilters(newFilters);
+    fetchTours(newFilters);
+    void track('filter_apply', { langcode: langcode ?? 'en', valueStr: `lang:${lang}` });
+  };
+
   const handleClear = () => {
     clearFilters();
     clearTours();
@@ -849,6 +931,7 @@ export default function HomePage() {
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
                 onAuthorSelect={handleAuthorTypeSelect}
+                onLangToggle={handleLangToggle}
                 onClear={handleClear}
               />
             ) : (
@@ -861,6 +944,7 @@ export default function HomePage() {
                 onCitySelect={handleCitySelect}
                 onSortSelect={handleSortSelect}
                 onAuthorSelect={handleAuthorTypeSelect}
+                onLangToggle={handleLangToggle}
                 onFetchCities={fetchCities}
                 onClear={handleClear}
                 cardPadding={PADDING}
