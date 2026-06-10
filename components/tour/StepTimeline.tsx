@@ -285,7 +285,6 @@ export function StepTimeline({
                   <View style={styles.stepHeaderLeft}>
                     <Text
                       style={[styles.stepTitle, state === 'completed' && styles.stepTitleCompleted]}
-                      numberOfLines={isExpanded ? undefined : 1}
                     >
                       {step.title}
                     </Text>

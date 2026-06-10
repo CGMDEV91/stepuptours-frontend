@@ -134,3 +134,14 @@ Each entry is a confirmed, fixed bug. Use this as a reference before debugging s
 **Files:** `components/tour/TourCard.tsx`, `lib/drupal-client.ts` (map `authorIsGuide`), `services/tours.service.ts` (request the field), `types/index.ts`. Backend counterparts in `BUGLOG.md` (root repo of the Drupal site).
 
 ---
+
+## BUG-012 — Author signature shows username, not public name
+
+**Status:** Fixed
+**Date:** 2026-06-10
+**Symptom:** Tour cards (and the step-completion popup) showed the guide's raw username (e.g. `alexandre.dubois`) as the author signature instead of their public name.
+**Root cause:** JSON:API restricts the user `field_public_name` and `name` fields for anonymous visitors, so the `uid` include only returned `display_name` (= username) and the frontend fell back to it.
+**Fix:** Added a server-side computed field `author_public_name` on the tour node (reads the owner's `field_public_name` with username fallback, bypassing anonymous field-access), exposed it via JSON:API and the `/api/tours/search` controller, and made the frontend read it first.
+**Files:** `lib/drupal-client.ts`, `services/tours.service.ts`, `app/[langcode]/tour/[id]/steps.tsx`. Backend: `stepuptours_computed_fields/src/Field/AuthorPublicNameItemList.php`, `stepuptours_computed_fields.module`, `stepuptours_api/src/Controller/TourSearchController.php`.
+
+---

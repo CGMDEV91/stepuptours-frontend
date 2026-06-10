@@ -367,7 +367,7 @@ export default function TourStepsScreen() {
         onClose={handleCloseCompletion}
         langcode={langcode ?? 'en'}
         guideId={guideUser?.id}
-        guideName={guideUser?.username}
+        guideName={tour.authorPublicName ?? guideUser?.publicName ?? guideUser?.username}
         guideAvatar={guideUser?.avatar ?? null}
         guideRoles={guideUser?.roles}
       />

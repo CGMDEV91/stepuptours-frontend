@@ -536,8 +536,14 @@ export function mapDrupalTour(raw: any): Tour {
       raw.field_featured_business_3 ? mapDrupalBusiness(raw.field_featured_business_3) : null,
     ],
     authorId: raw.uid?.id ?? raw.uid ?? '',
+    // `author_public_name` is a computed field on the tour node (added by
+    // stepuptours_computed_fields). It resolves the owner's field_public_name
+    // server-side, bypassing the anonymous field-access restriction that hides
+    // field_public_name / name from JSON:API user includes. The uid fallbacks
+    // only apply to responses fetched before the field existed / authenticated
+    // reads where the user fields are readable.
     authorPublicName:
-        raw.uid?.field_public_name ?? raw.uid?.display_name ?? raw.uid?.name ?? undefined,
+        raw.author_public_name ?? raw.uid?.field_public_name ?? raw.uid?.display_name ?? raw.uid?.name ?? undefined,
     authorIsAdmin: typeof raw.author_is_admin === 'boolean'
         ? raw.author_is_admin
         : deriveAuthorIsAdmin(raw.uid),
