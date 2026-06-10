@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { useToursStore } from '../../../stores/tours.store';
 import { useAuthStore } from '../../../stores/auth.store';
 import { StarRating } from '../../../components/tour/StarRating';
+import { WeatherChip } from '../../../components/tour/WeatherChip';
+import { WeatherModal } from '../../../components/tour/WeatherModal';
 import { BusinessCard } from '../../../components/tour/BusinessCard';
 import { PreviewBanner } from '../../../components/tour/PreviewBanner';
 import { HtmlText } from '../../../components/ui/HtmlText';
@@ -31,6 +33,7 @@ import { LAYOUT } from '../../../styles/theme';
 import { imageHeaders } from '../../../lib/drupal-client';
 import { getAnonProgress } from '../../../lib/anon-progress';
 import { track } from '../../../services/analytics.service';
+import { getWeather, type WeatherData } from '../../../services/weather.service';
 import { buildTourSlug, extractNidFromSlug } from '../../../lib/tour-slug';
 import { useActiveLangs } from '../../../hooks/useActiveLangs';
 import { useBackendLoadGuard } from '../../../hooks/useBackendLoadGuard';
@@ -145,6 +148,8 @@ export default function TourDetailScreen() {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [pendingRating, setPendingRating] = useState(0);
   const [anonStepsCompleted, setAnonStepsCompleted] = useState<string[]>([]);
+  const [showWeatherModal, setShowWeatherModal] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
 
   // Fetch tour detail on mount
   useEffect(() => {
@@ -166,6 +171,15 @@ export default function TourDetailScreen() {
     if (user || !tour?.id) return;
     getAnonProgress(tour.id).then(setAnonStepsCompleted).catch(() => {});
   }, [user, tour?.id]);
+
+  // Fetch weather for the tour's location (no-op when location is missing).
+  useEffect(() => {
+    if (!tour?.location) {
+      setWeather(null);
+      return;
+    }
+    getWeather(tour.location.lat, tour.location.lon).then(setWeather).catch(() => {});
+  }, [tour?.location?.lat, tour?.location?.lon]);
 
   // Show rating prompt when tour is completed but not yet rated
   useEffect(() => {
@@ -425,6 +439,10 @@ export default function TourDetailScreen() {
             </View>
 
             <StarRating value={tour?.averageRate ?? 0} count={tour?.ratingCount} size={18} />
+
+            {tour.location && weather ? (
+              <WeatherChip weather={weather} onPress={() => setShowWeatherModal(true)} />
+            ) : null}
           </View>
 
           {/* Description */}
@@ -500,6 +518,14 @@ export default function TourDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Weather forecast modal */}
+      <WeatherModal
+        visible={showWeatherModal}
+        weather={weather}
+        locationLabel={[tour.city?.name, tour.country?.name].filter(Boolean).join(', ')}
+        onClose={() => setShowWeatherModal(false)}
+      />
     </View>
     </>
   );
@@ -696,6 +722,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 24,
     paddingBottom: 32,
+    marginTop: 24,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
