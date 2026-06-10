@@ -36,9 +36,19 @@ export interface WeatherCurrent {
   isDay: boolean;
 }
 
+export interface WeatherDay {
+  /** Local date string from the API, e.g. '2026-06-11'. */
+  date: string;
+  code: number;
+  tempMax: number;
+  tempMin: number;
+  precipitationProbabilityMax: number;
+}
+
 export interface WeatherData {
   current: WeatherCurrent;
   hourly: WeatherHour[];
+  daily: WeatherDay[];
   timezone: string;
 }
 
@@ -60,7 +70,8 @@ async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
       current:
         'temperature_2m,weather_code,is_day,apparent_temperature,relative_humidity_2m,wind_speed_10m',
       hourly: 'temperature_2m,weather_code,precipitation_probability',
-      forecast_days: 2,
+      daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+      forecast_days: 7,
       timezone: 'auto',
     },
   });
@@ -79,6 +90,21 @@ async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
     precipitationProbability: precs[i] ?? 0,
   }));
 
+  const d = data.daily ?? {};
+  const dDates: string[] = d.time ?? [];
+  const dCodes: number[] = d.weather_code ?? [];
+  const dMax: number[] = d.temperature_2m_max ?? [];
+  const dMin: number[] = d.temperature_2m_min ?? [];
+  const dPrec: number[] = d.precipitation_probability_max ?? [];
+
+  const daily: WeatherDay[] = dDates.map((date, i) => ({
+    date,
+    code: dCodes[i] ?? 0,
+    tempMax: Math.round(dMax[i] ?? 0),
+    tempMin: Math.round(dMin[i] ?? 0),
+    precipitationProbabilityMax: dPrec[i] ?? 0,
+  }));
+
   return {
     current: {
       time: cur.time ?? '',
@@ -90,6 +116,7 @@ async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
       isDay: (cur.is_day ?? 1) === 1,
     },
     hourly,
+    daily,
     timezone: data.timezone ?? 'auto',
   };
 }

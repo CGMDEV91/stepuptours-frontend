@@ -150,6 +150,8 @@ export default function TourDetailScreen() {
   const [anonStepsCompleted, setAnonStepsCompleted] = useState<string[]>([]);
   const [showWeatherModal, setShowWeatherModal] = useState(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState(false);
 
   // Fetch tour detail on mount
   useEffect(() => {
@@ -173,13 +175,34 @@ export default function TourDetailScreen() {
   }, [user, tour?.id]);
 
   // Fetch weather for the tour's location (no-op when location is missing).
-  useEffect(() => {
-    if (!tour?.location) {
+  // Treats >5s as a failure so the chip can offer a retry instead of hanging.
+  const loadWeather = useCallback(() => {
+    const loc = tour?.location;
+    if (!loc) {
       setWeather(null);
+      setWeatherError(false);
       return;
     }
-    getWeather(tour.location.lat, tour.location.lon).then(setWeather).catch(() => {});
+    setWeatherLoading(true);
+    setWeatherError(false);
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('weather-timeout')), 5000),
+    );
+    Promise.race([getWeather(loc.lat, loc.lon), timeout])
+      .then((w) => {
+        setWeather(w as WeatherData);
+        setWeatherLoading(false);
+      })
+      .catch(() => {
+        setWeather(null);
+        setWeatherLoading(false);
+        setWeatherError(true);
+      });
   }, [tour?.location?.lat, tour?.location?.lon]);
+
+  useEffect(() => {
+    loadWeather();
+  }, [loadWeather]);
 
   // Show rating prompt when tour is completed but not yet rated
   useEffect(() => {
@@ -440,8 +463,13 @@ export default function TourDetailScreen() {
 
             <StarRating value={tour?.averageRate ?? 0} count={tour?.ratingCount} size={18} />
 
-            {tour.location && weather ? (
-              <WeatherChip weather={weather} onPress={() => setShowWeatherModal(true)} />
+            {tour.location ? (
+              <WeatherChip
+                status={weatherError ? 'error' : weatherLoading ? 'loading' : weather ? 'ready' : 'loading'}
+                weather={weather}
+                onPress={() => setShowWeatherModal(true)}
+                onRetry={loadWeather}
+              />
             ) : null}
           </View>
 
