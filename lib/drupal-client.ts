@@ -214,7 +214,7 @@ function normalizeAssetUrl(url: string | null | undefined): string | null {
   return fullUrl;
 }
 
-function resolveImageUrl(raw: any): string | null {
+export function resolveImageUrl(raw: any): string | null {
   return normalizeAssetUrl(raw?.uri?.url ?? raw?.url ?? null);
 }
 

@@ -18,6 +18,7 @@ import {
   mapDrupalActivity,
   extractTourFromActivity,
   getApiLanguage,
+  resolveImageUrl,
 } from '../lib/drupal-client';
 import { cached } from '../lib/mem-cache';
 import type {
@@ -27,6 +28,8 @@ import type {
   TourFilters,
   PaginatedResult,
 } from '../types';
+
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
 
 // ── Constantes de campos y relaciones ─────────────────────────────────────────
 
@@ -123,6 +126,60 @@ function buildCountriesFilter(countries: string[]): string {
   return parts.join('&');
 }
 
+// ── Búsqueda por título, ciudad o país via endpoint custom ────────────────────
+// La query JSON:API con OR group sobre campos de relación de entidad
+// (field_city.name, field_country.name) genera JOINs costosos que causan 504.
+// El endpoint /api/tours/search usa EntityQuery con OR sobre TIDs, que es eficiente.
+
+function mapSearchTour(item: any): Tour {
+  return {
+    id: item.id,
+    drupalInternalId: item.nid ?? 0,
+    title: item.title ?? '',
+    description: '',
+    image: item.imageUrl ? resolveImageUrl({ url: item.imageUrl }) : null,
+    imageStyles: null,
+    duration: item.duration ?? 0,
+    averageRate: parseFloat(item.averageRate ?? '0'),
+    ratingCount: item.ratingCount ?? 0,
+    stopsCount: item.stopsCount ?? 0,
+    donationCount: item.donationCount ?? 0,
+    donationTotal: 0,
+    city: item.city ?? null,
+    country: item.country ?? null,
+    location: null,
+    featuredBusinesses: [null, null, null],
+    authorId: '',
+    authorPublicName: undefined,
+    authorIsAdmin: !!item.authorIsAdmin,
+    authorIsGuide: !!item.authorIsGuide,
+    availableLangs: Array.isArray(item.availableLangs) && item.availableLangs.length > 0
+      ? item.availableLangs
+      : [item.langcode ?? 'en'],
+    published: !!item.status,
+    langcode: item.langcode ?? 'en',
+  };
+}
+
+async function searchTours(filters: TourFilters): Promise<PaginatedResult<Tour>> {
+  const { search, page = 1, limit = 20 } = filters;
+  const params = new URLSearchParams();
+  if (search) params.set('q', search);
+  params.set('page', String(page));
+  params.set('limit', String(limit));
+  params.set('lang', getApiLanguage());
+
+  const { data } = await axios.get<{ data: any[]; total: number; hasMore: boolean }>(
+    `${BASE_URL}/api/tours/search?${params.toString()}`,
+  );
+
+  return {
+    data: (data.data ?? []).map(mapSearchTour),
+    total: data.total ?? 0,
+    hasMore: data.hasMore ?? false,
+  };
+}
+
 export async function getTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
   // Caché por idioma + filtros: revisitar una vista ya cargada no relanza la API.
   const cacheKey = `tours:${getApiLanguage()}:${JSON.stringify(filters)}`;
@@ -131,6 +188,12 @@ export async function getTours(filters: TourFilters = {}): Promise<PaginatedResu
 
 async function fetchTours(filters: TourFilters = {}): Promise<PaginatedResult<Tour>> {
   const { page = 1, limit = 20, countries, city, minRating, search, sort, authorType, langs } = filters;
+
+  // Búsqueda libre: delegar al endpoint custom /api/tours/search para evitar el
+  // timeout causado por los JOINs del OR group en campos de relación JSON:API.
+  if (search && search.trim().length > 0) {
+    return searchTours({ search: search.trim(), page, limit });
+  }
 
   // ── Language filter (client-side) ─────────────────────────────────────────
   // `available_langs` is a computed field not stored in the DB, so it cannot
@@ -405,7 +468,6 @@ export async function upsertTourActivity(
 // contiene el rating, y el hook de recálculo actualiza field_average_rate.
 
 export async function submitTourRating(tourId: string, rating: number): Promise<void> {
-  const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://stepuptours.ddev.site';
   const session = useAuthStore.getState().session;
   const authHeader = session?.token ? { Authorization: `Basic ${session.token}` } : {};
   await axios.post(
