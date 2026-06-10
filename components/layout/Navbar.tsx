@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../stores/auth.store';
 import { isAdmin, isBusiness, isGuide } from '../../lib/roles';
 import { LanguageSelector } from './LanguageSelector';
+import { useIsHydrated } from '../../hooks/useIsHydrated';
 
 interface NavbarProps {
   onOpenAuth: (mode: 'login' | 'register') => void;
@@ -33,7 +34,10 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const router = useRouter();
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
+  // El prerender estático renderiza el layout móvil (sin `window`). Mantén ese
+  // árbol en el primer paint del cliente para no romper la hidratación.
+  const hydrated = useIsHydrated();
+  const isDesktop = hydrated && width >= 768;
 
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);

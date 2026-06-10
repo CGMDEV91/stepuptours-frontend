@@ -34,6 +34,7 @@ import { track } from '../../../services/analytics.service';
 import { buildTourSlug, extractNidFromSlug } from '../../../lib/tour-slug';
 import { useActiveLangs } from '../../../hooks/useActiveLangs';
 import { useBackendLoadGuard } from '../../../hooks/useBackendLoadGuard';
+import { useIsHydrated } from '../../../hooks/useIsHydrated';
 
 const AMBER = '#F59E0B';
 const BANNER_HEIGHT = 255;
@@ -102,7 +103,11 @@ export default function TourDetailScreen() {
   const { t } = useTranslation();
   const activeLangs = useActiveLangs();
 
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: rawScreenWidth } = useWindowDimensions();
+  // El prerender estático renderiza el layout móvil (sin `window`). Mantén ese
+  // árbol en el primer paint del cliente (width=0) para no romper la hidratación.
+  const hydrated = useIsHydrated();
+  const screenWidth = hydrated ? rawScreenWidth : 0;
   const isMobile = screenWidth < 768;
   const isDesktop = screenWidth >= 768;
 

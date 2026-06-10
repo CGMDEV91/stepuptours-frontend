@@ -9,6 +9,7 @@ import { getSocialLinks, type SocialLinksConfig } from '../../services/admin.ser
 import { useFeedbackStore } from '../../stores/feedback.store';
 import { isNative } from '../../lib/platform';
 import { imageHeaders } from '../../lib/drupal-client';
+import { useIsHydrated } from '../../hooks/useIsHydrated';
 
 const NAVY = '#1C2B3A';
 const NAVY_LIGHT = '#243447';
@@ -52,7 +53,10 @@ function FooterWeb() {
   const { width } = useWindowDimensions();
   const user = useAuthStore((s) => s.user);
   const openFeedback = useFeedbackStore((s) => s.openFeedback);
-  const isDesktop = width >= 768;
+  // El prerender estático renderiza el layout móvil (sin `window`). Mantén ese
+  // árbol en el primer paint del cliente para no romper la hidratación.
+  const hydrated = useIsHydrated();
+  const isDesktop = hydrated && width >= 768;
 
   const lang = langcode ?? 'en';
 

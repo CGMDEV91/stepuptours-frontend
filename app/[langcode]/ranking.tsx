@@ -23,6 +23,7 @@ import { webFullHeight } from '../../lib/web-styles';
 import type { RankingEntry } from '../../types';
 import { PageHead } from '../../components/seo/PageHead';
 import { useActiveLangs } from '../../hooks/useActiveLangs';
+import { useIsHydrated } from '../../hooks/useIsHydrated';
 import { useBackendLoadGuard } from '../../hooks/useBackendLoadGuard';
 
 const AMBER = '#F59E0B';
@@ -152,9 +153,13 @@ function RankingRow({ entry, isLast }: { entry: RankingEntry; isLast: boolean })
 export default function RankingScreen() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
+  const { width: rawWidth } = useWindowDimensions();
   const activeLangs = useActiveLangs();
 
+  // El prerender estático renderiza el layout móvil (sin `window`). Mantén ese
+  // árbol en el primer paint del cliente (width=0) para no romper la hidratación.
+  const hydrated = useIsHydrated();
+  const width = hydrated ? rawWidth : 0;
   const isDesktop = width >= 768;
 
   const [entries, setEntries] = useState<RankingEntry[]>([]);

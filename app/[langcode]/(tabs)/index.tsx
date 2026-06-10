@@ -24,6 +24,7 @@ import { useAuthStore } from '../../../stores/auth.store';
 import { useLanguageStore } from '../../../stores/language.store';
 import { useActiveLangs } from '../../../hooks/useActiveLangs';
 import { useBackendLoadGuard } from '../../../hooks/useBackendLoadGuard';
+import { useIsHydrated } from '../../../hooks/useIsHydrated';
 import { TourCard } from '../../../components/tour/TourCard';
 import { ListingHead } from '../../../components/seo/ListingHead';
 import { Ionicons } from '@expo/vector-icons';
@@ -634,7 +635,12 @@ function FacetSummaryRow({ filters, onRemoveCountry, onRemoveCity, padding }: Fa
 export default function HomePage() {
   const { langcode } = useLocalSearchParams<{ langcode: string }>();
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
+  const { width: rawWidth } = useWindowDimensions();
+  // En el prerender estático no hay `window`: se renderiza el layout "móvil".
+  // Mantenemos ese mismo árbol en el primer paint del cliente (width=0) y solo
+  // tras montar usamos el ancho real, para no romper la hidratación.
+  const hydrated = useIsHydrated();
+  const width = hydrated ? rawWidth : 0;
   const [search, setSearch] = useState('');
 
   const {
